@@ -1,0 +1,77 @@
+ERROR|COMPILE_TIME_ERROR|CONST_WITH_NON_CONST|D:\\zenvi\\frontend_pos\\lib\\main.dart|142|18|5|The constructor being called isn't a const constructor.
+ERROR|COMPILE_TIME_ERROR|UNDEFINED_METHOD|D:\\zenvi\\frontend_pos\\lib\\models\\branch_model.dart|24|52|2|The method 'tr' isn't defined for the type 'String'.
+ERROR|COMPILE_TIME_ERROR|UNDEFINED_IDENTIFIER|D:\\zenvi\\frontend_pos\\lib\\models\\branch_model.dart|24|64|7|Undefined name 'context'.
+ERROR|COMPILE_TIME_ERROR|UNDEFINED_METHOD|D:\\zenvi\\frontend_pos\\lib\\models\\employee_permission_model.dart|95|82|2|The method 'tr' isn't defined for the type 'String'.
+ERROR|COMPILE_TIME_ERROR|UNDEFINED_IDENTIFIER|D:\\zenvi\\frontend_pos\\lib\\models\\employee_permission_model.dart|95|94|7|Undefined name 'context'.
+ERROR|COMPILE_TIME_ERROR|UNDEFINED_METHOD|D:\\zenvi\\frontend_pos\\lib\\models\\expense_model.dart|27|53|2|The method 'tr' isn't defined for the type 'String'.
+ERROR|COMPILE_TIME_ERROR|UNDEFINED_IDENTIFIER|D:\\zenvi\\frontend_pos\\lib\\models\\expense_model.dart|27|65|7|Undefined name 'context'.
+ERROR|COMPILE_TIME_ERROR|UNDEFINED_METHOD|D:\\zenvi\\frontend_pos\\lib\\models\\notification_model.dart|34|59|2|The method 'tr' isn't defined for the type 'String'.
+ERROR|COMPILE_TIME_ERROR|UNDEFINED_IDENTIFIER|D:\\zenvi\\frontend_pos\\lib\\models\\notification_model.dart|34|71|7|Undefined name 'context'.
+ERROR|COMPILE_TIME_ERROR|CONST_EVAL_METHOD_INVOCATION|D:\\zenvi\\frontend_pos\\lib\\providers\\auth_provider.dart|98|53|30|Methods can't be invoked in constant expressions.
+ERROR|COMPILE_TIME_ERROR|UNDEFINED_IDENTIFIER|D:\\zenvi\\frontend_pos\\lib\\providers\\auth_provider.dart|98|75|7|Undefined name 'context'.
+ERROR|COMPILE_TIME_ERROR|CONST_EVAL_METHOD_INVOCATION|D:\\zenvi\\frontend_pos\\lib\\providers\\chat_provider.dart|21|24|42|Methods can't be invoked in constant expressions.
+ERROR|COMPILE_TIME_ERROR|UNDEFINED_IDENTIFIER|D:\\zenvi\\frontend_pos\\lib\\providers\\chat_provider.dart|21|58|7|Undefined name 'context'.
+ERROR|COMPILE_TIME_ERROR|UNDEFINED_IDENTIFIER|D:\\zenvi\\frontend_pos\\lib\\providers\\chat_provider.dart|30|78|7|Undefined name 'context'.
+ERROR|COMPILE_TIME_ERROR|UNDEFINED_IDENTIFIER|D:\\zenvi\\frontend_pos\\lib\\providers\\employee_permission_provider.dart|42|68|7|Undefined name 'context'.
+ERROR|COMPILE_TIME_ERROR|UNDEFINED_IDENTIFIER|D:\\zenvi\\frontend_pos\\lib\\providers\\member_provider.dart|142|86|7|Undefined name 'context'.
+ERROR|COMPILE_TIME_ERROR|CONST_WITH_NON_CONST|D:\\zenvi\\frontend_pos\\lib\\screens\\auth\\login_screen.dart|52|43|5|The constructor being called isn't a const constructor.
+ERROR|COMPILE_TIME_ERROR|CONST_WITH_NON_CONST|D:\\zenvi\\frontend_pos\\lib\\screens\\auth\\pending_approval_screen.dart|45|45|5|The constructor being called isn't a const constructor.
+ERROR|COMPILE_TIME_ERROR|CONST_WITH_NON_CONST|D:\\zenvi\\frontend_pos\\lib\\screens\\auth\\pending_approval_screen.dart|108|45|5|The constructor being called isn't a const constructor.
+ERROR|COMPILE_TIME_ERROR|CONST_EVAL_METHOD_INVOCATION|D:\\zenvi\\frontend_pos\\lib\\screens\\dashboard\\employee_verification_screen.dart|94|24|30|Methods can't be invoked in constant expressions.
+ERROR|COMPILE_TIME_ERROR|CONST_EVAL_METHOD_INVOCATION|D:\\zenvi\\frontend_pos\\lib\\screens\\dashboard\\employee_verification_screen.dart|101|24|38|Methods can't be invoked in constant expressions.
+ERROR|COMPILE_TIME_ERROR|CONST_EVAL_METHOD_INVOCATION|D:\\zenvi\\frontend_pos\\lib\\screens\\dashboard\\employee_verification_screen.dart|108|24|39|Methods can't be invoked in constant expressions.
+ERROR|COMPILE_TIME_ERROR|CONST_EVAL_METHOD_INVOCATION|D:\\zenvi\\frontend_pos\\lib\\screens\\dashboard\\employee_verification_screen.dart|115|24|31|Methods can't be invoked in constant expressions.
+ERROR|COMPILE_TIME_ERROR|CONST_EVAL_METHOD_INVOCATION|D:\\zenvi\\frontend_pos\\lib\\screens\\dashboard\\employee_verification_screen.dart|122|24|31|Methods can't be invoked in constant expressions.
+ERROR|COMPILE_TIME_ERROR|IMPLICIT_THIS_REFERENCE_IN_INITIALIZER|D:\\zenvi\\frontend_pos\\lib\\screens\\pos\\widgets\\payment_modal.dart|65|95|7|The instance member 'context' can't be accessed in an initializer.
+ERROR|COMPILE_TIME_ERROR|CONST_WITH_NON_CONST|D:\\zenvi\\frontend_pos\\lib\\screens\\settings\\settings_screen.dart|109|100|5|The constructor being called isn't a const constructor.
+ERROR|COMPILE_TIME_ERROR|UNDEFINED_IDENTIFIER|D:\\zenvi\\frontend_pos\\lib\\services\\printer_service.dart|88|71|7|Undefined name 'context'.
+ERROR|COMPILE_TIME_ERROR|UNDEFINED_IDENTIFIER|D:\\zenvi\\frontend_pos\\lib\\services\\printer_service.dart|110|73|7|Undefined name 'context'.
+ERROR|COMPILE_TIME_ERROR|UNDEFINED_IDENTIFIER|D:\\zenvi\\frontend_pos\\lib\\services\\printer_service.dart|197|38|7|Undefined name 'context'.
+WARNING|STATIC_WARNING|UNUSED_IMPORT|D:\\zenvi\\frontend_pos\\inject_tr.dart|2|8|14|Unused import: 'dart:convert'.
+INFO|LINT|AVOID_PRINT|D:\\zenvi\\frontend_pos\\find_hardcoded.dart|13|9|5|Don't invoke 'print' in production code.
+INFO|LINT|AVOID_PRINT|D:\\zenvi\\frontend_pos\\find_hardcoded.dart|17|13|5|Don't invoke 'print' in production code.
+INFO|LINT|AVOID_PRINT|D:\\zenvi\\frontend_pos\\find_hardcoded.dart|24|3|5|Don't invoke 'print' in production code.
+INFO|LINT|AVOID_PRINT|D:\\zenvi\\frontend_pos\\fix_const.dart|25|3|5|Don't invoke 'print' in production code.
+INFO|LINT|AVOID_PRINT|D:\\zenvi\\frontend_pos\\fix_imports.dart|24|3|5|Don't invoke 'print' in production code.
+INFO|LINT|UNNECESSARY_BRACE_IN_STRING_INTERPS|D:\\zenvi\\frontend_pos\\inject_tr.dart|491|27|6|Unnecessary braces in a string interpolation.
+INFO|LINT|UNNECESSARY_BRACE_IN_STRING_INTERPS|D:\\zenvi\\frontend_pos\\inject_tr.dart|492|27|6|Unnecessary braces in a string interpolation.
+INFO|LINT|UNNECESSARY_BRACE_IN_STRING_INTERPS|D:\\zenvi\\frontend_pos\\inject_tr.dart|493|32|6|Unnecessary braces in a string interpolation.
+INFO|LINT|UNNECESSARY_BRACE_IN_STRING_INTERPS|D:\\zenvi\\frontend_pos\\inject_tr.dart|494|32|6|Unnecessary braces in a string interpolation.
+INFO|LINT|UNNECESSARY_BRACE_IN_STRING_INTERPS|D:\\zenvi\\frontend_pos\\inject_tr.dart|499|27|6|Unnecessary braces in a string interpolation.
+INFO|LINT|UNNECESSARY_BRACE_IN_STRING_INTERPS|D:\\zenvi\\frontend_pos\\inject_tr.dart|500|27|6|Unnecessary braces in a string interpolation.
+INFO|LINT|UNNECESSARY_BRACE_IN_STRING_INTERPS|D:\\zenvi\\frontend_pos\\inject_tr.dart|501|32|6|Unnecessary braces in a string interpolation.
+INFO|LINT|UNNECESSARY_BRACE_IN_STRING_INTERPS|D:\\zenvi\\frontend_pos\\inject_tr.dart|502|32|6|Unnecessary braces in a string interpolation.
+INFO|LINT|UNNECESSARY_BRACE_IN_STRING_INTERPS|D:\\zenvi\\frontend_pos\\inject_tr.dart|507|27|6|Unnecessary braces in a string interpolation.
+INFO|LINT|UNNECESSARY_BRACE_IN_STRING_INTERPS|D:\\zenvi\\frontend_pos\\inject_tr.dart|508|27|6|Unnecessary braces in a string interpolation.
+INFO|LINT|UNNECESSARY_BRACE_IN_STRING_INTERPS|D:\\zenvi\\frontend_pos\\inject_tr.dart|509|32|6|Unnecessary braces in a string interpolation.
+INFO|LINT|UNNECESSARY_BRACE_IN_STRING_INTERPS|D:\\zenvi\\frontend_pos\\inject_tr.dart|510|32|6|Unnecessary braces in a string interpolation.
+INFO|LINT|AVOID_PRINT|D:\\zenvi\\frontend_pos\\inject_tr.dart|522|3|5|Don't invoke 'print' in production code.
+INFO|LINT|PREFER_CONST_CONSTRUCTORS_IN_IMMUTABLES|D:\\zenvi\\frontend_pos\\lib\\screens\\auth\\role_selection_screen.dart|12|3|19|Constructors in '@immutable' classes should be declared as 'const'.
+INFO|HINT|UNNECESSARY_IMPORT|D:\\zenvi\\frontend_pos\\lib\\screens\\chat\\chat_room_screen.dart|5|8|24|The import of 'package:intl/intl.dart' is unnecessary because all of the used elements are also provided by the import of 'package:easy_localization/easy_localization.dart'.
+INFO|HINT|UNNECESSARY_IMPORT|D:\\zenvi\\frontend_pos\\lib\\screens\\dashboard\\employee_performance_screen.dart|5|8|24|The import of 'package:intl/intl.dart' is unnecessary because all of the used elements are also provided by the import of 'package:easy_localization/easy_localization.dart'.
+INFO|HINT|UNNECESSARY_IMPORT|D:\\zenvi\\frontend_pos\\lib\\screens\\dashboard\\owner_transaction_log_screen.dart|5|8|24|The import of 'package:intl/intl.dart' is unnecessary because all of the used elements are also provided by the import of 'package:easy_localization/easy_localization.dart'.
+INFO|HINT|UNNECESSARY_IMPORT|D:\\zenvi\\frontend_pos\\lib\\screens\\kds\\kds_screen.dart|6|8|24|The import of 'package:intl/intl.dart' is unnecessary because all of the used elements are also provided by the import of 'package:easy_localization/easy_localization.dart'.
+INFO|HINT|UNNECESSARY_IMPORT|D:\\zenvi\\frontend_pos\\lib\\screens\\membership\\member_management_screen.dart|6|8|24|The import of 'package:intl/intl.dart' is unnecessary because all of the used elements are also provided by the import of 'package:easy_localization/easy_localization.dart'.
+INFO|LINT|USE_BUILD_CONTEXT_SYNCHRONOUSLY|D:\\zenvi\\frontend_pos\\lib\\screens\\membership\\member_management_screen.dart|291|113|16|Don't use 'BuildContext's across async gaps, guarded by an unrelated 'mounted' check.
+INFO|HINT|UNNECESSARY_IMPORT|D:\\zenvi\\frontend_pos\\lib\\screens\\notifications\\notification_center_screen.dart|6|8|24|The import of 'package:intl/intl.dart' is unnecessary because all of the used elements are also provided by the import of 'package:easy_localization/easy_localization.dart'.
+INFO|HINT|UNNECESSARY_IMPORT|D:\\zenvi\\frontend_pos\\lib\\screens\\permission\\employee_permission_screen.dart|6|8|24|The import of 'package:intl/intl.dart' is unnecessary because all of the used elements are also provided by the import of 'package:easy_localization/easy_localization.dart'.
+INFO|HINT|UNNECESSARY_IMPORT|D:\\zenvi\\frontend_pos\\lib\\screens\\pos\\member_selection_modal.dart|5|8|24|The import of 'package:intl/intl.dart' is unnecessary because all of the used elements are also provided by the import of 'package:easy_localization/easy_localization.dart'.
+INFO|LINT|USE_BUILD_CONTEXT_SYNCHRONOUSLY|D:\\zenvi\\frontend_pos\\lib\\screens\\pos\\member_selection_modal.dart|177|113|16|Don't use 'BuildContext's across async gaps, guarded by an unrelated 'mounted' check.
+INFO|LINT|USE_BUILD_CONTEXT_SYNCHRONOUSLY|D:\\zenvi\\frontend_pos\\lib\\screens\\pos\\printer_dialog.dart|91|34|16|Don't use 'BuildContext's across async gaps.
+INFO|LINT|USE_BUILD_CONTEXT_SYNCHRONOUSLY|D:\\zenvi\\frontend_pos\\lib\\screens\\pos\\printer_dialog.dart|105|36|16|Don't use 'BuildContext's across async gaps.
+INFO|HINT|UNNECESSARY_IMPORT|D:\\zenvi\\frontend_pos\\lib\\screens\\pos\\widgets\\payment_modal.dart|3|8|24|The import of 'package:intl/intl.dart' is unnecessary because all of the used elements are also provided by the import of 'package:easy_localization/easy_localization.dart'.
+INFO|HINT|UNNECESSARY_IMPORT|D:\\zenvi\\frontend_pos\\lib\\screens\\pos\\widgets\\receipt_preview_modal.dart|5|8|24|The import of 'package:intl/intl.dart' is unnecessary because all of the used elements are also provided by the import of 'package:easy_localization/easy_localization.dart'.
+INFO|HINT|UNNECESSARY_IMPORT|D:\\zenvi\\frontend_pos\\lib\\screens\\pos\\widgets\\receipt_widget.dart|3|8|24|The import of 'package:intl/intl.dart' is unnecessary because all of the used elements are also provided by the import of 'package:easy_localization/easy_localization.dart'.
+INFO|HINT|UNNECESSARY_IMPORT|D:\\zenvi\\frontend_pos\\lib\\screens\\reservation\\reservation_list_screen.dart|6|8|24|The import of 'package:intl/intl.dart' is unnecessary because all of the used elements are also provided by the import of 'package:easy_localization/easy_localization.dart'.
+INFO|LINT|PREFER_CONST_CONSTRUCTORS_IN_IMMUTABLES|D:\\zenvi\\frontend_pos\\lib\\screens\\settings\\employee_settings_screen.dart|11|3|22|Constructors in '@immutable' classes should be declared as 'const'.
+INFO|LINT|USE_BUILD_CONTEXT_SYNCHRONOUSLY|D:\\zenvi\\frontend_pos\\lib\\screens\\shift\\shift_screen.dart|76|74|16|Don't use 'BuildContext's across async gaps.
+INFO|LINT|USE_BUILD_CONTEXT_SYNCHRONOUSLY|D:\\zenvi\\frontend_pos\\lib\\screens\\shift\\shift_screen.dart|81|98|16|Don't use 'BuildContext's across async gaps.
+INFO|LINT|USE_BUILD_CONTEXT_SYNCHRONOUSLY|D:\\zenvi\\frontend_pos\\lib\\screens\\shift\\shift_screen.dart|84|60|16|Don't use 'BuildContext's across async gaps.
+INFO|LINT|AVOID_PRINT|D:\\zenvi\\frontend_pos\\test_json.dart|8|5|5|Don't invoke 'print' in production code.
+INFO|LINT|AVOID_PRINT|D:\\zenvi\\frontend_pos\\test_json.dart|10|5|5|Don't invoke 'print' in production code.
+INFO|LINT|AVOID_PRINT|D:\\zenvi\\frontend_pos\\test_json.dart|16|5|5|Don't invoke 'print' in production code.
+INFO|LINT|AVOID_PRINT|D:\\zenvi\\frontend_pos\\test_json.dart|18|5|5|Don't invoke 'print' in production code.
+INFO|LINT|AVOID_PRINT|D:\\zenvi\\frontend_pos\\translate_dashboard.dart|28|3|5|Don't invoke 'print' in production code.
+INFO|LINT|AVOID_PRINT|D:\\zenvi\\frontend_pos\\translate_more.dart|23|5|5|Don't invoke 'print' in production code.
+INFO|LINT|AVOID_PRINT|D:\\zenvi\\frontend_pos\\translate_more.dart|43|3|5|Don't invoke 'print' in production code.
+INFO|LINT|AVOID_PRINT|D:\\zenvi\\frontend_pos\\update_json.dart|28|5|5|Don't invoke 'print' in production code.

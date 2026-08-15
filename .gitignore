@@ -1,0 +1,82 @@
+# ==========================================
+# Root & General Exclusions
+# ==========================================
+*.log
+*.tmp
+*.temp
+*.swp
+*.bak
+*.stackdump
+curl_out.txt
+domains_ls.txt
+.DS_Store
+Thumbs.db
+
+# IDE & Editor files
+.idea/
+.vscode/
+*.iml
+*.ipr
+*.iws
+.history/
+
+# ==========================================
+# Laravel Backend Exclusions
+# ==========================================
+backend/.phpunit.cache
+backend/.phpunit.result.cache
+backend/node_modules/
+backend/public/build
+backend/public/hot
+backend/public/storage
+backend/storage/*.key
+backend/storage/logs/*.log
+backend/storage/framework/cache/data/*
+!backend/storage/framework/cache/data/.gitignore
+backend/storage/framework/sessions/*
+!backend/storage/framework/sessions/.gitignore
+backend/storage/framework/views/*
+!backend/storage/framework/views/.gitignore
+backend/storage/framework/testing/*
+!backend/storage/framework/testing/.gitignore
+backend/vendor/
+backend/.env
+backend/.env.backup
+backend/.env.production
+backend/.env.*.local
+backend/Homestead.json
+backend/Homestead.yaml
+backend/auth.json
+backend/npm-debug.log
+backend/yarn-error.log
+
+# ==========================================
+# Flutter / Dart Frontend Exclusions
+# ==========================================
+frontend_pos/.dart_tool/
+frontend_pos/.flutter-plugins
+frontend_pos/.flutter-plugins-dependencies
+frontend_pos/.pub-cache/
+frontend_pos/.pub/
+frontend_pos/build/
+**/build/
+frontend_pos/coverage/
+frontend_pos/**/doc/api/
+frontend_pos/**/ios/Flutter/.last_build_id
+frontend_pos/app.*.symbols
+frontend_pos/app.*.map.json
+*.apk
+*.aab
+frontend_pos/android/app/debug/
+frontend_pos/android/app/profile/
+frontend_pos/android/app/release/
+.gradle/
+**/android/.gradle/
+frontend_pos/android/.gradle/
+frontend_pos/android/local.properties
+frontend_pos/ios/.symlinks/
+frontend_pos/ios/Pods/
+frontend_pos/ios/Podfile.lock
+frontend_pos/macos/Pods/
+frontend_pos/windows/flutter/ephemeral/
+frontend_pos/linux/flutter/ephemeral/
