@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "919665567596",
+    "project_id": "zenvi-erp",
+    "storage_bucket": "zenvi-erp.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:919665567596:android:3e2377e010f542a1953549",
+        "android_client_info": {
+          "package_name": "com.cellanoma.zenvi"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyArAObNFnI8hH1Hrdm6teVPIkXzSrf6bdY"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
