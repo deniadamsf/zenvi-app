@@ -121,7 +121,8 @@ class FirebaseNotificationService
      */
     protected static function sendFcmToTokens(array $tokens, string $title, string $body, array $data = []): void
     {
-        if (empty($tokens)) {
+        $uniqueTokens = array_values(array_filter(array_unique($tokens)));
+        if (empty($uniqueTokens)) {
             return;
         }
 
@@ -140,9 +141,9 @@ class FirebaseNotificationService
             $stringData[(string)$key] = is_array($val) ? json_encode($val) : (string)$val;
         }
 
-        foreach (array_unique($tokens) as $token) {
-            if (empty(trim($token))) continue;
-
+        // Fast parallel dispatch using Http::pool
+        if (count($uniqueTokens) === 1) {
+            $token = $uniqueTokens[0];
             $payload = [
                 'message' => [
                     'token' => $token,
@@ -166,20 +167,63 @@ class FirebaseNotificationService
 
             try {
                 $res = Http::withToken($accessToken)
+                    ->timeout(5)
                     ->withHeaders(['Content-Type' => 'application/json; UTF-8'])
                     ->post($url, $payload);
 
                 if ($res->failed()) {
                     $error = $res->json();
                     Log::warning("FCM Send failed for token: {$token}. Error: " . json_encode($error));
-                    
-                    // If token is invalid or unregistered, remove from DB
                     if (isset($error['error']['status']) && in_array($error['error']['status'], ['NOT_FOUND', 'UNREGISTERED', 'INVALID_ARGUMENT'])) {
                         UserDevice::where('fcm_token', $token)->delete();
                     }
                 }
             } catch (\Exception $e) {
                 Log::error('FCM Send exception: ' . $e->getMessage());
+            }
+        } else {
+            try {
+                $responses = Http::pool(function ($pool) use ($uniqueTokens, $accessToken, $url, $title, $body, $stringData) {
+                    return array_map(function ($token) use ($pool, $accessToken, $url, $title, $body, $stringData) {
+                        $payload = [
+                            'message' => [
+                                'token' => $token,
+                                'notification' => [
+                                    'title' => $title,
+                                    'body' => $body,
+                                ],
+                                'data' => $stringData,
+                                'android' => [
+                                    'priority' => 'HIGH',
+                                    'notification' => [
+                                        'sound' => 'default',
+                                        'click_action' => 'FLUTTER_NOTIFICATION_CLICK',
+                                        'channel_id' => 'zenvi_channel_high_importance',
+                                        'icon' => 'ic_launcher',
+                                        'color' => '#00796B',
+                                    ],
+                                ],
+                            ],
+                        ];
+
+                        return $pool->withToken($accessToken)
+                            ->timeout(5)
+                            ->withHeaders(['Content-Type' => 'application/json; UTF-8'])
+                            ->post($url, $payload);
+                    }, $uniqueTokens);
+                });
+
+                foreach ($responses as $index => $res) {
+                    if ($res instanceof \Illuminate\Http\Client\Response && $res->failed()) {
+                        $error = $res->json();
+                        $token = $uniqueTokens[$index] ?? null;
+                        if ($token && isset($error['error']['status']) && in_array($error['error']['status'], ['NOT_FOUND', 'UNREGISTERED', 'INVALID_ARGUMENT'])) {
+                            UserDevice::where('fcm_token', $token)->delete();
+                        }
+                    }
+                }
+            } catch (\Exception $e) {
+                Log::error('FCM Pool Send exception: ' . $e->getMessage());
             }
         }
     }
