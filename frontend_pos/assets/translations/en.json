@@ -535,7 +535,7 @@
     "karyawan_harus_mengisi_stok_462": "Employees must replenish physical stock before the shift closes.",
     "peringatan_indikasi_fraud_stok_463": "Fraud Indication Warning / Strange Stock!",
     "restock_464": "Restock",
-    "opname_465": "Hospitalization",
+    "opname_465": "Stock Opname",
     "wastage_466": "Wastage",
     "total_harga_beli_awal_467": "Total Initial Purchase Price (Rp)",
     "total_harga_rp_468": "Total Price (Rp)",
@@ -1113,5 +1113,8 @@
     "role_staff": "Staff",
     "duration_hours_mins": "{}h {}m",
     "duration_hours_only": "{}h",
-    "duration_mins_only": "{}m"
+    "duration_mins_only": "{}m",
+    "dialog_restock_title": "Restock {}",
+    "dialog_opname_title": "Stock Opname {}",
+    "dialog_wastage_title": "Record Wastage {}"
 }
