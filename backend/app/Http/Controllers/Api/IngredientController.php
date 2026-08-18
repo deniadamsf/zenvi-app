@@ -76,7 +76,11 @@ class IngredientController extends Controller
      */
     public function store(StoreIngredientRequest $request)
     {
+        $user = $request->user();
+        $companyId = $user->company_id;
+
         DB::beginTransaction();
+        try {
             $costPerUnit = ($request->filled('cost_per_unit'))
                 ? (float) $request->cost_per_unit
                 : (($request->filled('price') && $request->stock_qty > 0) ? ((float) $request->price / (float) $request->stock_qty) : 0.0);
