@@ -91,7 +91,7 @@ class ZenviApp extends StatelessWidget {
 
     return MaterialApp(
       navigatorKey: NotificationService.navigatorKey,
-      title: 'Zenvi POS',
+      title: 'Zenvi',
       debugShowCheckedModeBanner: false,
       localizationsDelegates: context.localizationDelegates,
       supportedLocales: context.supportedLocales,
