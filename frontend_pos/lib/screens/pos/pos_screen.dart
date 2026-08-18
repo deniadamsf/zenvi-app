@@ -22,7 +22,8 @@ import 'reservation_selection_modal.dart';
 
 class POSScreen extends StatefulWidget {
   final VoidCallback? onNavigateToShift;
-  const POSScreen({super.key, this.onNavigateToShift});
+  final VoidCallback? onNavigateBack;
+  const POSScreen({super.key, this.onNavigateToShift, this.onNavigateBack});
 
   @override
   State<POSScreen> createState() => _POSScreenState();
@@ -661,26 +662,64 @@ class _POSScreenState extends State<POSScreen> {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
-              // Judul POS yang luas (tidak akan terpotong elipsis)
+              // Judul POS yang luas (dengan tombol Back jika ada onNavigateBack atau canPop)
               Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  mainAxisSize: MainAxisSize.min,
+                child: Row(
                   children: [
-                    Text(
-                      'pos_title'.tr(context: context),
-                      style: theme.textTheme.titleLarge?.copyWith(
-                        fontWeight: FontWeight.w900,
-                        letterSpacing: -0.5,
+                    if (widget.onNavigateBack != null || Navigator.of(context).canPop()) ...[
+                      Material(
+                        color: Colors.transparent,
+                        child: InkWell(
+                          onTap: () {
+                            if (widget.onNavigateBack != null) {
+                              widget.onNavigateBack!();
+                            } else if (Navigator.of(context).canPop()) {
+                              Navigator.of(context).pop();
+                            }
+                          },
+                          borderRadius: BorderRadius.circular(12),
+                          child: Container(
+                            padding: const EdgeInsets.all(8),
+                            margin: const EdgeInsets.only(right: 12),
+                            decoration: BoxDecoration(
+                              color: theme.colorScheme.surface,
+                              borderRadius: BorderRadius.circular(12),
+                              border: Border.all(color: theme.dividerColor.withValues(alpha: 0.1)),
+                              boxShadow: [
+                                BoxShadow(
+                                  color: theme.shadowColor.withValues(alpha: 0.03),
+                                  blurRadius: 6,
+                                  offset: const Offset(0, 2),
+                                ),
+                              ],
+                            ),
+                            child: Icon(Icons.arrow_back_rounded, size: 20, color: theme.colorScheme.onSurface),
+                          ),
+                        ),
                       ),
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                    Text(
-                      'pos_header_subtitle'.tr(context: context),
-                      style: TextStyle(color: theme.colorScheme.onSurfaceVariant, fontSize: 12, fontWeight: FontWeight.w500),
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
+                    ],
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Text(
+                            'pos_title'.tr(context: context),
+                            style: theme.textTheme.titleLarge?.copyWith(
+                              fontWeight: FontWeight.w900,
+                              letterSpacing: -0.5,
+                            ),
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                          Text(
+                            'pos_header_subtitle'.tr(context: context),
+                            style: TextStyle(color: theme.colorScheme.onSurfaceVariant, fontSize: 12, fontWeight: FontWeight.w500),
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                        ],
+                      ),
                     ),
                   ],
                 ),
