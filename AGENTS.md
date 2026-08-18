@@ -42,3 +42,7 @@ Setiap kali ada perubahan pada backend (Laravel) baik berupa:
   - `frontend_pos/assets/translations/id.json` (Bahasa Indonesia)
   - `frontend_pos/assets/translations/en.json` (Bahasa Inggris)
 - Jika saat proses pengeditan/pengecekan menemukan string yang masih *hardcoded* atau belum multibahasa, maka **wajib langsung diubah ke Easy Localization**.
+
+## 4. Mandatory Automated Git Version Control
+- Setiap kali selesai melakukan perbaikan bug, penambahan fitur, atau modifikasi file di Zenvi, **WAJIB** membuat Git commit otomatis dengan format pesan deskriptif (Conventional Commits: `feat(...)`, `fix(...)`, `refactor(...)`, dll).
+- Jika remote repository (`origin`) sudah terhubung, lakukan `git push origin <branch>` secara otomatis agar backup kode selalu up-to-date.
