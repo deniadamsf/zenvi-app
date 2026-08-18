@@ -3,5 +3,5 @@
     <item>
         <color android:color="#00796B" />
     </item>
-    <item android:drawable="@drawable/ic_splash_logo" android:gravity="center" />
+    <item android:drawable="@mipmap/ic_launcher" android:gravity="center" />
 </layer-list>

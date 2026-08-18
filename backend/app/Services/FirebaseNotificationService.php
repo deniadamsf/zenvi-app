@@ -157,6 +157,8 @@ class FirebaseNotificationService
                             'sound' => 'default',
                             'click_action' => 'FLUTTER_NOTIFICATION_CLICK',
                             'channel_id' => 'zenvi_channel_high_importance',
+                            'icon' => 'ic_launcher',
+                            'color' => '#00796B',
                         ],
                     ],
                 ],
