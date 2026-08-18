@@ -1113,5 +1113,8 @@
     "role_staff": "Staf",
     "duration_hours_mins": "{}j {}m",
     "duration_hours_only": "{}j",
-    "duration_mins_only": "{}m"
+    "duration_mins_only": "{}m",
+    "dialog_restock_title": "Restock {}",
+    "dialog_opname_title": "Stock Opname {}",
+    "dialog_wastage_title": "Catat Susut/Rusak {}"
 }

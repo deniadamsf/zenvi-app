@@ -155,6 +155,7 @@ class _StockManagementScreenState extends State<StockManagementScreen> {
     final qtyController = TextEditingController();
     final priceController = TextEditingController();
     final notesController = TextEditingController();
+    final theme = Theme.of(context);
     
     final branches = Provider.of<BranchProvider>(context, listen: false).branches;
     int? actionBranchId = _selectedBranchId ?? (branches.isNotEmpty ? branches.first.id : null);
@@ -162,13 +163,13 @@ class _StockManagementScreenState extends State<StockManagementScreen> {
     String title = '';
     String qtyLabel = '';
     if (type == 'restock') {
-      title = 'Restock $ingredientName';
+      title = 'dialog_restock_title'.tr(context: context, args: [ingredientName]);
       qtyLabel = 'restock_qty_label'.tr(context: context);
     } else if (type == 'wastage') {
-      title = 'Wastage $ingredientName';
+      title = 'dialog_wastage_title'.tr(context: context, args: [ingredientName]);
       qtyLabel = 'wastage_qty_label'.tr(context: context);
     } else if (type == 'opname') {
-      title = 'Stock Opname $ingredientName';
+      title = 'dialog_opname_title'.tr(context: context, args: [ingredientName]);
       qtyLabel = 'opname_qty_label'.tr(context: context);
     }
 
@@ -178,7 +179,8 @@ class _StockManagementScreenState extends State<StockManagementScreen> {
         return StatefulBuilder(
           builder: (ctx, setModalState) {
             return AlertDialog(
-              title: Text(title),
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+              title: Text(title, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
               content: SingleChildScrollView(
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
@@ -223,6 +225,11 @@ class _StockManagementScreenState extends State<StockManagementScreen> {
                   child: Text('batal_5'.tr(context: context)),
                 ),
                 ElevatedButton(
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: theme.colorScheme.primary,
+                    foregroundColor: Colors.white,
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                  ),
                   onPressed: () async {
                     final qty = double.tryParse(qtyController.text);
                     if (qty == null || qty < 0) return;
@@ -281,6 +288,7 @@ class _StockManagementScreenState extends State<StockManagementScreen> {
     );
   }
 
+
   @override
   Widget build(BuildContext context) {
     final provider = Provider.of<IngredientProvider>(context);
@@ -292,9 +300,15 @@ class _StockManagementScreenState extends State<StockManagementScreen> {
       extendBodyBehindAppBar: true,
       floatingActionButton: FloatingActionButton.extended(
         onPressed: _showAddDialog,
-        icon: const Icon(Icons.add),
-        label: Text('bahan_baru_459'.tr(context: context)),
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+        backgroundColor: theme.colorScheme.primary,
+        foregroundColor: Colors.white,
+        elevation: 3,
+        icon: const Icon(Icons.add_rounded, size: 20),
+        label: Text(
+          'bahan_baru_459'.tr(context: context),
+          style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13, letterSpacing: 0.2),
+        ),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
       ),
       body: provider.isLoading
           ? const Center(child: CircularProgressIndicator())
@@ -542,58 +556,93 @@ class _StockManagementScreenState extends State<StockManagementScreen> {
                                 padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
                                 child: Row(
                                   children: [
-                                    Expanded(
-                                      child: OutlinedButton.icon(
-                                        onPressed: () => _showActionDialog('restock', item.id, item.name),
-                                        icon: const Icon(Icons.add_shopping_cart, size: 18),
-                                        label: Text('restock_464'.tr(context: context), style: const TextStyle(fontSize: 12)),
-                                        style: OutlinedButton.styleFrom(
-                                          foregroundColor: Colors.green.shade700,
-                                          side: BorderSide(color: Colors.green.withValues(alpha: 0.3)),
-                                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-                                        ),
-                                      ),
+                                    _buildStockActionButton(
+                                      context: context,
+                                      label: 'restock_464'.tr(context: context),
+                                      icon: Icons.add_shopping_cart_rounded,
+                                      color: const Color(0xFF10B981),
+                                      onTap: () => _showActionDialog('restock', item.id, item.name),
                                     ),
                                     const SizedBox(width: 8),
-                                    Expanded(
-                                      child: OutlinedButton.icon(
-                                        onPressed: () => _showActionDialog('opname', item.id, item.name),
-                                        icon: const Icon(Icons.fact_check_outlined, size: 18),
-                                        label: Text('opname_465'.tr(context: context), style: const TextStyle(fontSize: 12)),
-                                        style: OutlinedButton.styleFrom(
-                                          foregroundColor: theme.colorScheme.primary,
-                                          side: BorderSide(color: theme.colorScheme.primary.withValues(alpha: 0.3)),
-                                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-                                        ),
-                                      ),
+                                    _buildStockActionButton(
+                                      context: context,
+                                      label: 'opname_465'.tr(context: context),
+                                      icon: Icons.fact_check_rounded,
+                                      color: theme.colorScheme.primary,
+                                      onTap: () => _showActionDialog('opname', item.id, item.name),
                                     ),
                                     const SizedBox(width: 8),
-                                    Expanded(
-                                      child: OutlinedButton.icon(
-                                        onPressed: () => _showActionDialog('wastage', item.id, item.name),
-                                        icon: const Icon(Icons.delete_outline, size: 18),
-                                        label: Text('wastage_466'.tr(context: context), style: const TextStyle(fontSize: 12)),
-                                        style: OutlinedButton.styleFrom(
-                                          foregroundColor: Colors.red.shade700,
-                                          side: BorderSide(color: Colors.red.withValues(alpha: 0.3)),
-                                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-                                        ),
-                                      ),
+                                    _buildStockActionButton(
+                                      context: context,
+                                      label: 'wastage_466'.tr(context: context),
+                                      icon: Icons.delete_outline_rounded,
+                                      color: const Color(0xFFF43F5E),
+                                      onTap: () => _showActionDialog('wastage', item.id, item.name),
                                     ),
                                   ],
                                 ),
-                                )
-                              ],
-                            ),
+                              ),
+                            ],
                           ),
-                        );
-                      },
+                        ),
+                      );
+                    },
                       childCount: provider.ingredients.length,
                     ),
+                  ),
+                  const SliverToBoxAdapter(
+                    child: SizedBox(height: 88),
                   ),
                 ],
               ),
     );
   }
+
+  Widget _buildStockActionButton({
+    required BuildContext context,
+    required String label,
+    required IconData icon,
+    required Color color,
+    required VoidCallback onTap,
+  }) {
+    return Expanded(
+      child: Material(
+        color: color.withValues(alpha: 0.08),
+        borderRadius: BorderRadius.circular(12),
+        child: InkWell(
+          onTap: onTap,
+          borderRadius: BorderRadius.circular(12),
+          child: Container(
+            padding: const EdgeInsets.symmetric(vertical: 9, horizontal: 4),
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(12),
+              border: Border.all(color: color.withValues(alpha: 0.25), width: 1),
+            ),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Icon(icon, size: 18, color: color),
+                const SizedBox(height: 4),
+                FittedBox(
+                  fit: BoxFit.scaleDown,
+                  child: Text(
+                    label,
+                    style: TextStyle(
+                      fontSize: 11.5,
+                      fontWeight: FontWeight.bold,
+                      color: color,
+                    ),
+                    maxLines: 1,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
 }
+
 
