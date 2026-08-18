@@ -967,53 +967,61 @@ class _StoreSettingsScreenState extends State<StoreSettingsScreen> {
                     const SizedBox(height: 12),
                     Divider(height: 1, color: theme.dividerColor.withValues(alpha: 0.1)),
                     const SizedBox(height: 12),
-                    Row(
-                      children: [
-                        Expanded(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
+                    Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+                      decoration: BoxDecoration(
+                        color: theme.colorScheme.surface.withValues(alpha: 0.7),
+                        borderRadius: BorderRadius.circular(14),
+                        border: Border.all(color: theme.dividerColor.withValues(alpha: 0.08)),
+                      ),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Row(
                             children: [
-                              Row(
-                                children: [
-                                  Icon(
-                                    isPointsEnabled ? Icons.stars_rounded : Icons.star_border_rounded,
-                                    size: 16,
-                                    color: isPointsEnabled ? Colors.amber : theme.colorScheme.onSurfaceVariant,
-                                  ),
-                                  const SizedBox(width: 6),
-                                  Expanded(
-                                    child: Text(
-                                      isPointsEnabled
-                                          ? 'poin_status_active'.tr(context: context, args: [NumberFormat('#,###', 'id_ID').format(earningAmt)])
-                                          : 'poin_status_inactive'.tr(context: context),
-                                      style: TextStyle(
-                                        fontSize: 12,
-                                        fontWeight: FontWeight.w600,
-                                        color: isPointsEnabled ? theme.colorScheme.onSurface : theme.colorScheme.onSurfaceVariant,
-                                      ),
-                                    ),
-                                  ),
-                                ],
+                              Icon(
+                                isPointsEnabled ? Icons.stars_rounded : Icons.star_border_rounded,
+                                size: 18,
+                                color: isPointsEnabled ? Colors.amber : theme.colorScheme.onSurfaceVariant,
                               ),
-                              const SizedBox(height: 2),
-                              Text(
-                                'diskon_default_label'.tr(context: context, args: [defaultDiscount.toStringAsFixed(0)]),
-                                style: TextStyle(fontSize: 11, color: theme.colorScheme.onSurfaceVariant),
+                              const SizedBox(width: 8),
+                              Expanded(
+                                child: Text(
+                                  isPointsEnabled
+                                      ? 'poin_status_active'.tr(context: context, args: [NumberFormat('#,###', 'id_ID').format(earningAmt)])
+                                      : 'poin_status_inactive'.tr(context: context),
+                                  style: TextStyle(
+                                    fontSize: 13,
+                                    fontWeight: FontWeight.w600,
+                                    color: isPointsEnabled ? theme.colorScheme.onSurface : theme.colorScheme.onSurfaceVariant,
+                                  ),
+                                ),
                               ),
                             ],
                           ),
-                        ),
-                        FilledButton.tonalIcon(
-                          onPressed: () => _showEditMembershipDialog(context, theme, authProvider),
-                          icon: const Icon(Icons.tune_rounded, size: 16),
-                          label: Text('atur_poin_diskon_btn'.tr(context: context), style: const TextStyle(fontSize: 12, fontWeight: FontWeight.bold)),
-                          style: FilledButton.styleFrom(
-                            padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
-                            visualDensity: VisualDensity.compact,
-                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                          const SizedBox(height: 4),
+                          Padding(
+                            padding: const EdgeInsets.only(left: 26),
+                            child: Text(
+                              'diskon_default_label'.tr(context: context, args: [defaultDiscount.toStringAsFixed(0)]),
+                              style: TextStyle(fontSize: 11.5, color: theme.colorScheme.onSurfaceVariant),
+                            ),
                           ),
+                        ],
+                      ),
+                    ),
+                    const SizedBox(height: 10),
+                    SizedBox(
+                      width: double.infinity,
+                      child: FilledButton.tonalIcon(
+                        onPressed: () => _showEditMembershipDialog(context, theme, authProvider),
+                        icon: const Icon(Icons.tune_rounded, size: 16),
+                        label: Text('atur_poin_diskon_btn'.tr(context: context), style: const TextStyle(fontSize: 12, fontWeight: FontWeight.bold)),
+                        style: FilledButton.styleFrom(
+                          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                         ),
-                      ],
+                      ),
                     ),
                   ],
                 ],
