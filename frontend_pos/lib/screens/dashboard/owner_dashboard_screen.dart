@@ -1889,15 +1889,19 @@ class _DashboardOverviewState extends State<_DashboardOverview> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          Wrap(
+            alignment: WrapAlignment.spaceBetween,
+            crossAxisAlignment: WrapCrossAlignment.center,
+            spacing: 8,
+            runSpacing: 6,
             children: [
               Text(
                 'revenue_profit_trend'.tr(context: context),
-                style: const TextStyle(fontWeight: FontWeight.w800, fontSize: 14.5),
+                style: const TextStyle(fontWeight: FontWeight.w800, fontSize: 14),
               ),
               Wrap(
                 spacing: 8,
+                runSpacing: 4,
                 children: [
                   _buildChartLegend(color: theme.colorScheme.primary, label: 'revenue_label'.tr(context: context)),
                   _buildChartLegend(color: const Color(0xFF10B981), label: 'profit_label'.tr(context: context)),
@@ -1936,12 +1940,15 @@ class _DashboardOverviewState extends State<_DashboardOverview> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          Wrap(
+            alignment: WrapAlignment.spaceBetween,
+            crossAxisAlignment: WrapCrossAlignment.center,
+            spacing: 8,
+            runSpacing: 6,
             children: [
               Text(
                 'peak_hours_analysis'.tr(context: context),
-                style: const TextStyle(fontWeight: FontWeight.w800, fontSize: 14.5),
+                style: const TextStyle(fontWeight: FontWeight.w800, fontSize: 14),
               ),
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
