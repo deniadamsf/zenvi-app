@@ -15,7 +15,6 @@ import '../../providers/notification_provider.dart';
 
 import 'shift_log_screen.dart';
 import '../settings/settings_screen.dart';
-import '../../widgets/zenvi_logo_widgets.dart';
 import '../settings/branch_list_screen.dart';
 import 'product_list_screen.dart';
 import 'expense_screen.dart';
@@ -1068,19 +1067,38 @@ class _DashboardOverviewState extends State<_DashboardOverview> {
                         },
                         borderRadius: BorderRadius.circular(12),
                         child: Container(
-                          padding: const EdgeInsets.all(7),
+                          padding: const EdgeInsets.all(7.5),
                           decoration: BoxDecoration(
                             color: theme.colorScheme.surface,
                             borderRadius: BorderRadius.circular(12),
-                            border: Border.all(color: theme.dividerColor.withValues(alpha: 0.08)),
+                            border: Border.all(color: theme.dividerColor.withValues(alpha: 0.1)),
                             boxShadow: [
                               BoxShadow(color: theme.shadowColor.withValues(alpha: 0.03), blurRadius: 6, offset: const Offset(0, 2)),
                             ],
                           ),
-                          child: ZenviNotificationIcon(
-                            notificationCount: unread,
-                            size: 20,
-                            onTap: null,
+                          child: Stack(
+                            clipBehavior: Clip.none,
+                            children: [
+                              Icon(Icons.notifications_outlined, color: theme.colorScheme.onSurface, size: 20),
+                              if (unread > 0)
+                                Positioned(
+                                  top: -4,
+                                  right: -4,
+                                  child: Container(
+                                    padding: const EdgeInsets.all(3),
+                                    decoration: BoxDecoration(
+                                      color: theme.colorScheme.error,
+                                      shape: BoxShape.circle,
+                                    ),
+                                    constraints: const BoxConstraints(minWidth: 14, minHeight: 14),
+                                    child: Text(
+                                      unread > 9 ? '9+' : unread.toString(),
+                                      style: const TextStyle(color: Colors.white, fontSize: 8, fontWeight: FontWeight.bold, height: 1),
+                                      textAlign: TextAlign.center,
+                                    ),
+                                  ),
+                                ),
+                            ],
                           ),
                         ),
                       ),
