@@ -175,6 +175,8 @@ class NotificationService {
       enableVibration: true,
       playSound: true,
       icon: '@mipmap/ic_launcher',
+      largeIcon: DrawableResourceAndroidBitmap('@mipmap/ic_launcher'),
+      color: Color(0xFF00796B),
     );
 
     const NotificationDetails platformDetails =
