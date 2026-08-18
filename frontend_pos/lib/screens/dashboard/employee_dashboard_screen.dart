@@ -445,8 +445,7 @@ class _EmployeeOverviewScreen extends StatelessWidget {
                           const SizedBox(width: 12),
                           // Tombol Notifikasi Bell dengan Unread Counter & Interaksi Tactile
                           Material(
-                            color: theme.colorScheme.surface,
-                            borderRadius: BorderRadius.circular(16),
+                            color: Colors.transparent,
                             child: InkWell(
                               onTap: () {
                                 Navigator.push(
@@ -454,21 +453,25 @@ class _EmployeeOverviewScreen extends StatelessWidget {
                                   MaterialPageRoute(builder: (_) => const NotificationCenterScreen()),
                                 );
                               },
-                              borderRadius: BorderRadius.circular(16),
+                              borderRadius: BorderRadius.circular(12),
                               child: Container(
-                                padding: const EdgeInsets.all(12),
+                                padding: const EdgeInsets.all(7.5),
                                 decoration: BoxDecoration(
-                                  border: Border.all(color: theme.dividerColor.withValues(alpha: 0.08)),
-                                  borderRadius: BorderRadius.circular(16),
+                                  color: theme.colorScheme.surface,
+                                  borderRadius: BorderRadius.circular(12),
+                                  border: Border.all(color: theme.dividerColor.withValues(alpha: 0.1)),
+                                  boxShadow: [
+                                    BoxShadow(color: theme.shadowColor.withValues(alpha: 0.03), blurRadius: 6, offset: const Offset(0, 2)),
+                                  ],
                                 ),
                                 child: Stack(
                                   clipBehavior: Clip.none,
                                   children: [
-                                    Icon(Icons.notifications_outlined, color: theme.colorScheme.onSurface, size: 22),
+                                    Icon(Icons.notifications_outlined, color: theme.colorScheme.onSurface, size: 20),
                                     if (notifProvider.unreadCount > 0)
                                       Positioned(
-                                        top: -6,
-                                        right: -6,
+                                        top: -4,
+                                        right: -4,
                                         child: Container(
                                           padding: const EdgeInsets.all(3),
                                           decoration: BoxDecoration(
@@ -478,7 +481,7 @@ class _EmployeeOverviewScreen extends StatelessWidget {
                                           constraints: const BoxConstraints(minWidth: 14, minHeight: 14),
                                           child: Text(
                                             notifProvider.unreadCount > 9 ? '9+' : notifProvider.unreadCount.toString(),
-                                            style: const TextStyle(color: Colors.white, fontSize: 8, fontWeight: FontWeight.bold),
+                                            style: const TextStyle(color: Colors.white, fontSize: 8, fontWeight: FontWeight.bold, height: 1),
                                             textAlign: TextAlign.center,
                                           ),
                                         ),
