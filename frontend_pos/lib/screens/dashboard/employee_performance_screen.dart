@@ -101,7 +101,7 @@ class _EmployeePerformanceScreenState extends State<EmployeePerformanceScreen> {
                           const SizedBox(height: 16),
 
                           // 2. Overview Banner (Fixed Overflow)
-                          _buildOverviewCard(theme, report.summary, report.periodLabel),
+                          _buildOverviewCard(theme, report.summary, _getLocalizedPeriodLabel(context, report.period, report.periodLabel)),
                           const SizedBox(height: 20),
 
                           // 3. Top Performers Podium (Leaderboard)
@@ -347,7 +347,7 @@ class _EmployeePerformanceScreenState extends State<EmployeePerformanceScreen> {
               Expanded(
                 child: _buildOverviewMiniItem(
                   Icons.receipt_rounded,
-                  'AOV ${_formatCurrency(summary.averageOrderValue)}',
+                  'aov_avg_order_val'.tr(context: context, args: [_formatCurrency(summary.averageOrderValue)]),
                 ),
               ),
             ],
@@ -421,6 +421,23 @@ class _EmployeePerformanceScreenState extends State<EmployeePerformanceScreen> {
     );
   }
 
+  String _getLocalizedPeriodLabel(BuildContext context, String period, String serverLabel) {
+    switch (period) {
+      case 'today':
+        return 'filter_today'.tr(context: context);
+      case '7days':
+        return 'period_last_7_days'.tr(context: context);
+      case '30days':
+        return 'period_last_30_days'.tr(context: context);
+      case 'this_month':
+        return 'filter_this_month'.tr(context: context);
+      case 'all':
+        return 'period_all_time'.tr(context: context);
+      default:
+        return serverLabel;
+    }
+  }
+
   String _localizeBadgeTitle(BuildContext context, String rawBadge) {
     if (rawBadge.contains('Omzet')) return 'top_revenue_badge'.tr(context: context);
     if (rawBadge.contains('Produktif')) return 'most_productive_badge'.tr(context: context);
@@ -428,6 +445,87 @@ class _EmployeePerformanceScreenState extends State<EmployeePerformanceScreen> {
     if (rawBadge.contains('Waktu')) return 'most_punctual_badge'.tr(context: context);
     if (rawBadge.contains('Rajin')) return 'most_diligent_badge'.tr(context: context);
     return rawBadge;
+  }
+
+  String _localizeBadgeValue(BuildContext context, TopPerformerBadge badge) {
+    if (badge.badge.contains('Omzet')) {
+      return badge.value;
+    } else if (badge.badge.contains('Produktif')) {
+      final numbers = RegExp(r'\d+').firstMatch(badge.value)?.group(0) ?? '';
+      return 'badge_orders_value'.tr(context: context, args: [numbers]);
+    } else if (badge.badge.contains('Akurat')) {
+      final numbers = RegExp(r'\d+').firstMatch(badge.value)?.group(0) ?? '100';
+      return 'badge_accuracy_value'.tr(context: context, args: [numbers]);
+    } else if (badge.badge.contains('Rajin')) {
+      final numbers = RegExp(r'[\d\.]+').firstMatch(badge.value)?.group(0) ?? '';
+      return 'badge_hours_value'.tr(context: context, args: [numbers]);
+    } else if (badge.badge.contains('Waktu')) {
+      final numbers = RegExp(r'\d+').firstMatch(badge.value)?.group(0) ?? '100';
+      return 'badge_punctual_value'.tr(context: context, args: [numbers]);
+    }
+    return badge.value;
+  }
+
+  String _localizeBadgeSubValue(BuildContext context, TopPerformerBadge badge) {
+    if (badge.badge.contains('Omzet')) {
+      final percentMatch = RegExp(r'[\d\.]+%').firstMatch(badge.subValue)?.group(0) ?? '';
+      return 'badge_revenue_subvalue'.tr(context: context, args: [percentMatch]);
+    } else if (badge.badge.contains('Produktif')) {
+      final avgMatch = RegExp(r'Rp\s*[\d\.,]+').firstMatch(badge.subValue)?.group(0) ?? '';
+      return 'badge_orders_subvalue'.tr(context: context, args: [avgMatch]);
+    } else if (badge.badge.contains('Akurat')) {
+      final shiftsMatch = RegExp(r'\((\d+)\s*shift\)').firstMatch(badge.subValue)?.group(1) ?? '0';
+      if (badge.subValue.contains('Pas') || badge.subValue.contains('0')) {
+        return 'badge_accuracy_subvalue_exact'.tr(context: context, args: [shiftsMatch]);
+      } else {
+        final diffAmount = RegExp(r'[+-]Rp\s*[\d\.,]+').firstMatch(badge.subValue)?.group(0) ?? '';
+        return 'badge_accuracy_subvalue_diff'.tr(context: context, args: [diffAmount, shiftsMatch]);
+      }
+    } else if (badge.badge.contains('Rajin')) {
+      final shiftsMatch = RegExp(r'\d+').firstMatch(badge.subValue)?.group(0) ?? '0';
+      return 'badge_hours_subvalue'.tr(context: context, args: [shiftsMatch]);
+    } else if (badge.badge.contains('Waktu')) {
+      if (badge.subValue.contains('0x Telat') || badge.subValue.contains('0x Late')) {
+        final shiftsMatch = RegExp(r'\((\d+)\s*Shift').firstMatch(badge.subValue)?.group(1) ?? '0';
+        return 'badge_punctual_subvalue_zero'.tr(context: context, args: [shiftsMatch]);
+      } else {
+        final lateCount = RegExp(r'(\d+)x').firstMatch(badge.subValue)?.group(1) ?? '0';
+        final lateMins = RegExp(r'Total\s*(\d+)\s*mnt').firstMatch(badge.subValue)?.group(1) ?? '0';
+        return 'badge_punctual_subvalue_late'.tr(context: context, args: [lateCount, lateMins]);
+      }
+    }
+    return badge.subValue;
+  }
+
+  String _localizeRole(BuildContext context, String? roleOrTitle) {
+    if (roleOrTitle == null || roleOrTitle.isEmpty) return 'role_staff'.tr(context: context);
+    if (roleOrTitle == 'Owner') return 'role_owner'.tr(context: context);
+    if (roleOrTitle == 'Admin') return 'role_admin'.tr(context: context);
+    if (roleOrTitle == 'Employee') return 'role_employee'.tr(context: context);
+    if (roleOrTitle == 'Staff') return 'role_staff'.tr(context: context);
+    if (roleOrTitle == 'Kasir' || roleOrTitle == 'Cashier') return 'role_cashier'.tr(context: context);
+    if (roleOrTitle.contains('Kapster') || roleOrTitle.contains('Terapis')) return 'kapster_terapis_17'.tr(context: context);
+    return roleOrTitle;
+  }
+
+  String _formatShiftDuration(BuildContext context, String rawDuration) {
+    final match = RegExp(r'(\d+)j\s*(\d+)m').firstMatch(rawDuration);
+    if (match != null) {
+      final hours = match.group(1);
+      final mins = match.group(2);
+      if (hours == '0') {
+        return 'duration_mins_only'.tr(context: context, args: [mins!]);
+      }
+      return 'duration_hours_mins'.tr(context: context, args: [hours!, mins!]);
+    }
+    return rawDuration;
+  }
+
+  String _localizeShiftName(BuildContext context, String shiftName) {
+    if (shiftName == 'Shift Reguler' || shiftName == 'Regular Shift') {
+      return 'shift_reguler_default'.tr(context: context);
+    }
+    return shiftName;
   }
 
   Widget _buildPodiumBadgeCard(ThemeData theme, TopPerformerBadge badge, int index) {
@@ -522,7 +620,7 @@ class _EmployeePerformanceScreenState extends State<EmployeePerformanceScreen> {
                 fit: BoxFit.scaleDown,
                 alignment: Alignment.centerLeft,
                 child: Text(
-                  badge.value,
+                  _localizeBadgeValue(context, badge),
                   style: TextStyle(
                     color: primaryColor,
                     fontSize: 15,
@@ -533,7 +631,7 @@ class _EmployeePerformanceScreenState extends State<EmployeePerformanceScreen> {
             ],
           ),
           Text(
-            badge.subValue,
+            _localizeBadgeSubValue(context, badge),
             style: TextStyle(
               fontSize: 9.5,
               color: theme.colorScheme.onSurfaceVariant,
@@ -641,7 +739,7 @@ class _EmployeePerformanceScreenState extends State<EmployeePerformanceScreen> {
                                   borderRadius: BorderRadius.circular(5),
                                 ),
                                 child: Text(
-                                  emp.jobTitle ?? emp.role,
+                                  _localizeRole(context, emp.jobTitle ?? emp.role),
                                   style: TextStyle(
                                     color: theme.colorScheme.primary,
                                     fontSize: 9.5,
@@ -842,7 +940,7 @@ class _EmployeePerformanceScreenState extends State<EmployeePerformanceScreen> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(emp.name, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 17)),
-                        Text('${emp.role} • ${emp.email}', style: TextStyle(fontSize: 11.5, color: theme.colorScheme.onSurfaceVariant)),
+                        Text('${_localizeRole(context, emp.role)} • ${emp.email}', style: TextStyle(fontSize: 11.5, color: theme.colorScheme.onSurfaceVariant)),
                       ],
                     ),
                   ),
@@ -942,18 +1040,25 @@ class _EmployeePerformanceScreenState extends State<EmployeePerformanceScreen> {
                         ],
                       ),
                       const SizedBox(height: 6),
-                      ...emp.approvedLeaves.map((leave) => Padding(
-                        padding: const EdgeInsets.only(top: 4.0),
-                        child: Row(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text('• ${leave.date}: ', style: const TextStyle(fontSize: 11, fontWeight: FontWeight.bold)),
-                            Expanded(
-                              child: Text(leave.reason, style: TextStyle(fontSize: 11, color: theme.colorScheme.onSurfaceVariant)),
-                            ),
-                          ],
-                        ),
-                      )),
+                      ...emp.approvedLeaves.map((leave) {
+                        String formattedDate = leave.date;
+                        try {
+                          final parsedDate = DateTime.parse(leave.date);
+                          formattedDate = DateFormat('dd MMM yyyy', context.locale.languageCode).format(parsedDate);
+                        } catch (_) {}
+                        return Padding(
+                          padding: const EdgeInsets.only(top: 4.0),
+                          child: Row(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text('• $formattedDate: ', style: const TextStyle(fontSize: 11, fontWeight: FontWeight.bold)),
+                              Expanded(
+                                child: Text(leave.reason, style: TextStyle(fontSize: 11, color: theme.colorScheme.onSurfaceVariant)),
+                              ),
+                            ],
+                          ),
+                        );
+                      }),
                     ],
                   ),
                 ),
@@ -984,7 +1089,7 @@ class _EmployeePerformanceScreenState extends State<EmployeePerformanceScreen> {
                     itemBuilder: (ctx, idx) {
                       final s = emp.recentShifts[idx];
                       final startFormatted = s.startTime != null 
-                          ? DateFormat('dd MMM yyyy, HH:mm').format(DateTime.parse(s.startTime!)) 
+                          ? DateFormat('dd MMM yyyy, HH:mm', context.locale.languageCode).format(DateTime.parse(s.startTime!)) 
                           : '-';
                       
                       String varianceText = 'exact_balance_zero'.tr(context: context);
@@ -1047,7 +1152,7 @@ class _EmployeePerformanceScreenState extends State<EmployeePerformanceScreen> {
                                     ],
                                   ),
                                   const SizedBox(height: 2),
-                                  Text('${s.shiftName} • ${s.durationFormatted} • ${'revenue_label_prefix'.tr(context: context, args: [_formatCurrency(s.totalRevenue)])}', 
+                                  Text('${_localizeShiftName(context, s.shiftName)} • ${_formatShiftDuration(context, s.durationFormatted)} • ${'revenue_label_prefix'.tr(context: context, args: [_formatCurrency(s.totalRevenue)])}', 
                                     style: TextStyle(fontSize: 10.5, color: theme.colorScheme.onSurfaceVariant)),
                                 ],
                               ),
