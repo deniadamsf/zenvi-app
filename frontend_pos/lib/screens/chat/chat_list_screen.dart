@@ -34,13 +34,14 @@ class _ChatListScreenState extends State<ChatListScreen> {
     final theme = Theme.of(context);
     
     return Scaffold(
-      backgroundColor: Colors.transparent, // Inherit dashboard background
+      backgroundColor: theme.scaffoldBackgroundColor,
       body: CustomScrollView(
         physics: const AlwaysScrollableScrollPhysics(parent: BouncingScrollPhysics()),
         slivers: [
           ZenviHeader.sliver(
             title: 'pesan_internal_14'.tr(context: context),
             subtitle: 'grup_karyawan_obrolan_pribadi_31'.tr(context: context),
+            showBackButton: Navigator.of(context).canPop(),
             actions: [
               Container(
                 width: 38,

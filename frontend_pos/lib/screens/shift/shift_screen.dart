@@ -757,7 +757,7 @@ class _ShiftScreenState extends State<ShiftScreen> {
     }
 
     return Scaffold(
-      backgroundColor: Colors.transparent, // Let dashboard background show through
+      backgroundColor: theme.scaffoldBackgroundColor,
       extendBodyBehindAppBar: true,
       body: RefreshIndicator(
         onRefresh: _refreshShiftData,
@@ -765,7 +765,8 @@ class _ShiftScreenState extends State<ShiftScreen> {
           physics: const AlwaysScrollableScrollPhysics(parent: BouncingScrollPhysics()),
           slivers: [
             ZenviHeader.sliver(
-              title: 'Manajemen Shift',
+              title: 'manajemen_shift_title'.tr(context: context) == 'manajemen_shift_title' ? 'Manajemen Shift' : 'manajemen_shift_title'.tr(context: context),
+              showBackButton: Navigator.of(context).canPop(),
               subtitleWidget: Text(
                 isShiftOpen ? 'Sedang Bertugas' : 'Mulai Shift Anda',
                 style: TextStyle(

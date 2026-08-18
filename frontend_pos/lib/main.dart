@@ -11,6 +11,7 @@ import 'screens/dashboard/employee_dashboard_screen.dart';
 import 'screens/notifications/notification_center_screen.dart';
 import 'screens/chat/chat_list_screen.dart';
 import 'screens/shift/shift_screen.dart';
+import 'screens/dashboard/shift_log_screen.dart';
 import 'screens/stock/stock_management_screen.dart';
 import 'screens/permission/owner_permission_management_screen.dart';
 import 'screens/reservation/reservation_list_screen.dart';
@@ -115,6 +116,7 @@ class ZenviApp extends StatelessWidget {
         '/notifications': (context) => const NotificationCenterScreen(),
         '/chat': (context) => const ChatListScreen(),
         '/shifts': (context) => const ShiftScreen(),
+        '/shift-logs': (context) => const ShiftLogScreen(),
         '/stock': (context) => const StockManagementScreen(),
         '/permissions': (context) => const OwnerPermissionManagementScreen(),
         '/reservations': (context) => const ReservationListScreen(),

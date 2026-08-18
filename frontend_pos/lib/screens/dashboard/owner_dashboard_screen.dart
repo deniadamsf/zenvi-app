@@ -2663,77 +2663,86 @@ class _DashboardOverviewState extends State<_DashboardOverview> {
               final startTime = s['start_time']?.toString() ?? '';
               final endTime = s['end_time']?.toString() ?? '';
 
-              return Container(
-                margin: const EdgeInsets.only(bottom: 10),
-                padding: const EdgeInsets.all(12),
-                decoration: BoxDecoration(
-                  color: theme.colorScheme.surfaceContainerHighest.withValues(alpha: 0.25),
+              return Material(
+                color: Colors.transparent,
+                child: InkWell(
+                  onTap: () {
+                    Navigator.push(context, MaterialPageRoute(builder: (_) => const ShiftLogScreen()));
+                  },
                   borderRadius: BorderRadius.circular(16),
-                  border: Border.all(color: theme.dividerColor.withValues(alpha: 0.08)),
-                ),
-                child: Row(
-                  children: [
-                    Container(
-                      padding: const EdgeInsets.all(9),
-                      decoration: BoxDecoration(
-                        color: isClosed ? Colors.grey.withValues(alpha: 0.15) : const Color(0xFF10B981).withValues(alpha: 0.15),
-                        shape: BoxShape.circle,
-                      ),
-                      child: Icon(
-                        isClosed ? Icons.lock_clock_rounded : Icons.point_of_sale_rounded,
-                        size: 18,
-                        color: isClosed ? Colors.grey.shade700 : const Color(0xFF10B981),
-                      ),
+                  child: Container(
+                    margin: const EdgeInsets.only(bottom: 10),
+                    padding: const EdgeInsets.all(12),
+                    decoration: BoxDecoration(
+                      color: theme.colorScheme.surfaceContainerHighest.withValues(alpha: 0.25),
+                      borderRadius: BorderRadius.circular(16),
+                      border: Border.all(color: theme.dividerColor.withValues(alpha: 0.08)),
                     ),
-                    const SizedBox(width: 12),
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Row(
+                    child: Row(
+                      children: [
+                        Container(
+                          padding: const EdgeInsets.all(9),
+                          decoration: BoxDecoration(
+                            color: isClosed ? Colors.grey.withValues(alpha: 0.15) : const Color(0xFF10B981).withValues(alpha: 0.15),
+                            shape: BoxShape.circle,
+                          ),
+                          child: Icon(
+                            isClosed ? Icons.lock_clock_rounded : Icons.point_of_sale_rounded,
+                            size: 18,
+                            color: isClosed ? Colors.grey.shade700 : const Color(0xFF10B981),
+                          ),
+                        ),
+                        const SizedBox(width: 12),
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              Flexible(
-                                child: Text(
-                                  name,
-                                  style: const TextStyle(fontWeight: FontWeight.w800, fontSize: 13.5),
-                                  maxLines: 1,
-                                  overflow: TextOverflow.ellipsis,
-                                ),
-                              ),
-                              const SizedBox(width: 6),
-                              Container(
-                                padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-                                decoration: BoxDecoration(
-                                  color: isClosed ? Colors.grey.withValues(alpha: 0.15) : const Color(0xFF10B981).withValues(alpha: 0.15),
-                                  borderRadius: BorderRadius.circular(6),
-                                ),
-                                child: Text(
-                                  isClosed ? 'shift_closed'.tr(context: context) : 'shift_status_active'.tr(context: context),
-                                  style: TextStyle(
-                                    fontSize: 9.5,
-                                    fontWeight: FontWeight.w700,
-                                    color: isClosed ? Colors.grey.shade700 : const Color(0xFF10B981),
+                              Row(
+                                children: [
+                                  Flexible(
+                                    child: Text(
+                                      name,
+                                      style: const TextStyle(fontWeight: FontWeight.w800, fontSize: 13.5),
+                                      maxLines: 1,
+                                      overflow: TextOverflow.ellipsis,
+                                    ),
                                   ),
-                                ),
+                                  const SizedBox(width: 6),
+                                  Container(
+                                    padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                                    decoration: BoxDecoration(
+                                      color: isClosed ? Colors.grey.withValues(alpha: 0.15) : const Color(0xFF10B981).withValues(alpha: 0.15),
+                                      borderRadius: BorderRadius.circular(6),
+                                    ),
+                                    child: Text(
+                                      isClosed ? 'shift_closed'.tr(context: context) : 'shift_status_active'.tr(context: context),
+                                      style: TextStyle(
+                                        fontSize: 9.5,
+                                        fontWeight: FontWeight.w700,
+                                        color: isClosed ? Colors.grey.shade700 : const Color(0xFF10B981),
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                              const SizedBox(height: 3),
+                              Text(
+                                '$branchName ${startTime.isNotEmpty ? '• Mulai: $startTime' : ''} ${endTime.isNotEmpty ? '• Selesai: $endTime' : ''}',
+                                style: TextStyle(fontSize: 11, color: theme.colorScheme.onSurfaceVariant),
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
                               ),
                             ],
                           ),
-                          const SizedBox(height: 3),
-                          Text(
-                            '$branchName ${startTime.isNotEmpty ? '• Mulai: $startTime' : ''} ${endTime.isNotEmpty ? '• Selesai: $endTime' : ''}',
-                            style: TextStyle(fontSize: 11, color: theme.colorScheme.onSurfaceVariant),
-                            maxLines: 1,
-                            overflow: TextOverflow.ellipsis,
-                          ),
-                        ],
-                      ),
+                        ),
+                        const SizedBox(width: 8),
+                        Text(
+                          'Rp ${NumberFormat.decimalPattern('id').format(revenue)}',
+                          style: TextStyle(fontWeight: FontWeight.w900, fontSize: 13.5, color: theme.colorScheme.primary),
+                        ),
+                      ],
                     ),
-                    const SizedBox(width: 8),
-                    Text(
-                      'Rp ${NumberFormat.decimalPattern('id').format(revenue)}',
-                      style: TextStyle(fontWeight: FontWeight.w900, fontSize: 13.5, color: theme.colorScheme.primary),
-                    ),
-                  ],
+                  ),
                 ),
               );
             }),

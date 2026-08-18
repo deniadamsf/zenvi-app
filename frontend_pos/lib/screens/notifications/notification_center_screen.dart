@@ -7,6 +7,13 @@ import '../../models/notification_model.dart';
 import '../../providers/auth_provider.dart';
 import '../../providers/notification_provider.dart';
 import '../../widgets/zenvi_header.dart';
+import '../dashboard/shift_log_screen.dart';
+import '../shift/shift_screen.dart';
+import '../chat/chat_list_screen.dart';
+import '../stock/stock_management_screen.dart';
+import '../permission/owner_permission_management_screen.dart';
+import '../permission/employee_permission_screen.dart';
+import '../reservation/reservation_list_screen.dart';
 
 class NotificationCenterScreen extends StatefulWidget {
   const NotificationCenterScreen({super.key});
@@ -376,20 +383,30 @@ class _NotificationCenterScreenState extends State<NotificationCenterScreen> {
   }
 
   void _handleAction(InAppNotificationModel notification) {
+    final auth = Provider.of<AuthProvider>(context, listen: false);
+    final isOwner = auth.isOwner;
     final type = notification.type;
     final payload = notification.dataPayload;
     final route = payload?['route']?.toString();
 
     if (route == '/chat' || type.startsWith('chat')) {
-      Navigator.of(context).pushNamed('/chat');
-    } else if (route == '/shifts' || type.startsWith('shift')) {
-      Navigator.of(context).pushNamed('/shifts');
+      Navigator.of(context).push(MaterialPageRoute(builder: (_) => const ChatListScreen()));
+    } else if (route == '/shifts' || route == '/shift-logs' || type.startsWith('shift')) {
+      if (isOwner) {
+        Navigator.of(context).push(MaterialPageRoute(builder: (_) => const ShiftLogScreen()));
+      } else {
+        Navigator.of(context).push(MaterialPageRoute(builder: (_) => const ShiftScreen()));
+      }
     } else if (route == '/stock' || type == 'stock' || type == 'low_stock') {
-      Navigator.of(context).pushNamed('/stock');
+      Navigator.of(context).push(MaterialPageRoute(builder: (_) => const StockManagementScreen()));
     } else if (route == '/permissions' || type.startsWith('permission') || type == 'leave') {
-      Navigator.of(context).pushNamed('/permissions');
+      if (isOwner) {
+        Navigator.of(context).push(MaterialPageRoute(builder: (_) => const OwnerPermissionManagementScreen()));
+      } else {
+        Navigator.of(context).push(MaterialPageRoute(builder: (_) => const EmployeePermissionScreen()));
+      }
     } else if (route == '/reservations' || type.startsWith('reservation')) {
-      Navigator.of(context).pushNamed('/reservations');
+      Navigator.of(context).push(MaterialPageRoute(builder: (_) => const ReservationListScreen()));
     }
   }
 
