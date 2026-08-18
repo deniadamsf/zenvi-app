@@ -138,8 +138,9 @@ class AuthGate extends StatelessWidget {
         // Saat pembacaan cache lokal dari disk sedang berjalan
         if (auth.isInitializing) {
           return const Scaffold(
+            backgroundColor: Color(0xFF00796B),
             body: Center(
-              child: ZenviLoadingAnimation(),
+              child: ZenviLoadingAnimation(size: 96, variant: ZenviLogoVariant.solid),
             ),
           );
         }
