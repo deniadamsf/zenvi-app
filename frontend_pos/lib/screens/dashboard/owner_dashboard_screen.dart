@@ -1692,7 +1692,7 @@ class _DashboardOverviewState extends State<_DashboardOverview> {
                               overflow: TextOverflow.ellipsis,
                             ),
                             Text(
-                              'Bahan/Modal',
+                              'materials_cogs_subtitle'.tr(context: context),
                               style: TextStyle(color: Colors.white.withValues(alpha: 0.65), fontSize: 9),
                               maxLines: 1,
                               overflow: TextOverflow.ellipsis,
@@ -1722,7 +1722,7 @@ class _DashboardOverviewState extends State<_DashboardOverview> {
                               overflow: TextOverflow.ellipsis,
                             ),
                             Text(
-                              'Margin $grossMargin%',
+                              'gross_margin_percent_subtitle'.tr(context: context, args: [grossMargin]),
                               style: TextStyle(color: Colors.white.withValues(alpha: 0.65), fontSize: 9),
                               maxLines: 1,
                               overflow: TextOverflow.ellipsis,
@@ -2600,18 +2600,35 @@ class _DashboardOverviewState extends State<_DashboardOverview> {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Text(
-                            name,
-                            style: const TextStyle(fontWeight: FontWeight.w800, fontSize: 14),
-                            maxLines: 1,
-                            overflow: TextOverflow.ellipsis,
-                          ),
-                          const SizedBox(height: 2),
                           Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
-                              Text('orders_count_label'.tr(context: context, args: [orders.toString()]), style: TextStyle(fontSize: 12, color: theme.colorScheme.onSurfaceVariant)),
-                              if (activeShifts > 0) ...[
-                                const SizedBox(width: 8),
+                              Expanded(
+                                child: Text(
+                                  name,
+                                  style: const TextStyle(fontWeight: FontWeight.w800, fontSize: 14),
+                                  maxLines: 1,
+                                  overflow: TextOverflow.ellipsis,
+                                ),
+                              ),
+                              const SizedBox(width: 8),
+                              Text(
+                                'Rp ${NumberFormat.decimalPattern('id').format(sales)}',
+                                style: TextStyle(fontWeight: FontWeight.w900, fontSize: 14.5, color: theme.colorScheme.primary),
+                              ),
+                            ],
+                          ),
+                          const SizedBox(height: 4),
+                          Wrap(
+                            spacing: 8,
+                            runSpacing: 4,
+                            crossAxisAlignment: WrapCrossAlignment.center,
+                            children: [
+                              Text(
+                                'orders_count_label'.tr(context: context, args: [orders.toString()]),
+                                style: TextStyle(fontSize: 12, color: theme.colorScheme.onSurfaceVariant, fontWeight: FontWeight.w500),
+                              ),
+                              if (activeShifts > 0)
                                 Container(
                                   padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
                                   decoration: BoxDecoration(
@@ -2621,22 +2638,19 @@ class _DashboardOverviewState extends State<_DashboardOverview> {
                                   child: Row(
                                     mainAxisSize: MainAxisSize.min,
                                     children: [
-                                      Container(width: 6, height: 6, decoration: const BoxDecoration(color: Color(0xFF10B981), shape: BoxShape.circle)),
+                                      Container(width: 5, height: 5, decoration: const BoxDecoration(color: Color(0xFF10B981), shape: BoxShape.circle)),
                                       const SizedBox(width: 4),
-                                      Text('active_cashiers_count_label'.tr(context: context, args: [activeShifts.toString()]), style: const TextStyle(fontSize: 10, fontWeight: FontWeight.w700, color: Color(0xFF10B981))),
+                                      Text(
+                                        'active_cashiers_count_label'.tr(context: context, args: [activeShifts.toString()]),
+                                        style: const TextStyle(fontSize: 10, fontWeight: FontWeight.w700, color: Color(0xFF10B981)),
+                                      ),
                                     ],
                                   ),
                                 ),
-                              ],
                             ],
                           ),
                         ],
                       ),
-                    ),
-                    const SizedBox(width: 8),
-                    Text(
-                      'Rp ${NumberFormat.decimalPattern('id').format(sales)}',
-                      style: TextStyle(fontWeight: FontWeight.w900, fontSize: 14.5, color: theme.colorScheme.primary),
                     ),
                   ],
                 ),
@@ -2735,6 +2749,13 @@ class _DashboardOverviewState extends State<_DashboardOverview> {
               final startTime = s['start_time']?.toString() ?? '';
               final endTime = s['end_time']?.toString() ?? '';
 
+              String timeInfo = '';
+              if (startTime.isNotEmpty && endTime.isNotEmpty) {
+                timeInfo = '$startTime - $endTime';
+              } else if (startTime.isNotEmpty) {
+                timeInfo = 'shift_since_time'.tr(context: context, args: [startTime]);
+              }
+
               return Material(
                 color: Colors.transparent,
                 child: InkWell(
@@ -2770,8 +2791,9 @@ class _DashboardOverviewState extends State<_DashboardOverview> {
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Row(
+                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                 children: [
-                                  Flexible(
+                                  Expanded(
                                     child: Text(
                                       name,
                                       style: const TextStyle(fontWeight: FontWeight.w800, fontSize: 13.5),
@@ -2779,7 +2801,23 @@ class _DashboardOverviewState extends State<_DashboardOverview> {
                                       overflow: TextOverflow.ellipsis,
                                     ),
                                   ),
-                                  const SizedBox(width: 6),
+                                  const SizedBox(width: 8),
+                                  Text(
+                                    'Rp ${NumberFormat.decimalPattern('id').format(revenue)}',
+                                    style: TextStyle(fontWeight: FontWeight.w900, fontSize: 13.5, color: theme.colorScheme.primary),
+                                  ),
+                                ],
+                              ),
+                              const SizedBox(height: 3),
+                              Wrap(
+                                spacing: 8,
+                                runSpacing: 3,
+                                crossAxisAlignment: WrapCrossAlignment.center,
+                                children: [
+                                  Text(
+                                    timeInfo.isNotEmpty ? '$branchName • $timeInfo' : branchName,
+                                    style: TextStyle(fontSize: 11, color: theme.colorScheme.onSurfaceVariant, fontWeight: FontWeight.w500),
+                                  ),
                                   Container(
                                     padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
                                     decoration: BoxDecoration(
@@ -2787,7 +2825,7 @@ class _DashboardOverviewState extends State<_DashboardOverview> {
                                       borderRadius: BorderRadius.circular(6),
                                     ),
                                     child: Text(
-                                      isClosed ? 'shift_closed'.tr(context: context) : 'shift_status_active'.tr(context: context),
+                                      isClosed ? 'shift_closed_short'.tr(context: context) : 'shift_active_short'.tr(context: context),
                                       style: TextStyle(
                                         fontSize: 9.5,
                                         fontWeight: FontWeight.w700,
@@ -2797,20 +2835,8 @@ class _DashboardOverviewState extends State<_DashboardOverview> {
                                   ),
                                 ],
                               ),
-                              const SizedBox(height: 3),
-                              Text(
-                                '$branchName ${startTime.isNotEmpty ? '• Mulai: $startTime' : ''} ${endTime.isNotEmpty ? '• Selesai: $endTime' : ''}',
-                                style: TextStyle(fontSize: 11, color: theme.colorScheme.onSurfaceVariant),
-                                maxLines: 1,
-                                overflow: TextOverflow.ellipsis,
-                              ),
                             ],
                           ),
-                        ),
-                        const SizedBox(width: 8),
-                        Text(
-                          'Rp ${NumberFormat.decimalPattern('id').format(revenue)}',
-                          style: TextStyle(fontWeight: FontWeight.w900, fontSize: 13.5, color: theme.colorScheme.primary),
                         ),
                       ],
                     ),

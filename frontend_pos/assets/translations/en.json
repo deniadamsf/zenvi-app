@@ -1116,5 +1116,10 @@
     "duration_mins_only": "{}m",
     "dialog_restock_title": "Restock {}",
     "dialog_opname_title": "Stock Opname {}",
-    "dialog_wastage_title": "Record Wastage {}"
+    "dialog_wastage_title": "Record Wastage {}",
+    "materials_cogs_subtitle": "Ingredients / Capital",
+    "gross_margin_percent_subtitle": "Margin {}%",
+    "shift_active_short": "Active",
+    "shift_closed_short": "Closed",
+    "shift_since_time": "Since {}"
 }
