@@ -511,12 +511,12 @@ class _EmployeePerformanceScreenState extends State<EmployeePerformanceScreen> {
   String _formatShiftDuration(BuildContext context, String rawDuration) {
     final match = RegExp(r'(\d+)j\s*(\d+)m').firstMatch(rawDuration);
     if (match != null) {
-      final hours = match.group(1);
-      final mins = match.group(2);
+      final hours = match.group(1) ?? '0';
+      final mins = match.group(2) ?? '0';
       if (hours == '0') {
-        return 'duration_mins_only'.tr(context: context, args: [mins!]);
+        return 'duration_mins_only'.tr(context: context, args: [mins]);
       }
-      return 'duration_hours_mins'.tr(context: context, args: [hours!, mins!]);
+      return 'duration_hours_mins'.tr(context: context, args: [hours, mins]);
     }
     return rawDuration;
   }
