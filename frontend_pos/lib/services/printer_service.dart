@@ -84,6 +84,8 @@ class PrinterService {
     final generator = Generator(PaperSize.mm58, profile);
     List<int> bytes = [];
 
+    bytes += generator.reset();
+
     final safeCompany = company ?? {'name': 'toko_saya_9'.tr()};
 
     // 1. Logo Toko (Auto B&W conversion for thermal printer)
