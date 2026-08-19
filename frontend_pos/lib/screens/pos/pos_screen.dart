@@ -1,4 +1,3 @@
-import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'printer_settings_screen.dart';
@@ -19,6 +18,7 @@ import '../../providers/reservation_provider.dart';
 import '../../models/reservation_model.dart';
 import 'member_selection_modal.dart';
 import 'reservation_selection_modal.dart';
+import '../../widgets/zenvi_header.dart';
 
 class POSScreen extends StatefulWidget {
   final VoidCallback? onNavigateToShift;
@@ -641,178 +641,103 @@ class _POSScreenState extends State<POSScreen> {
   }
 
   Widget _buildGlassHeader(BuildContext context, ThemeData theme, Size size, bool isDesktop) {
-    final topPadding = MediaQuery.of(context).padding.top;
-
-    return ClipRRect(
-      child: BackdropFilter(
-        filter: ImageFilter.blur(sigmaX: 15, sigmaY: 15),
-        child: Container(
-          width: double.infinity,
-          padding: EdgeInsets.only(
-            left: isDesktop ? 28 : 20,
-            right: isDesktop ? 28 : 20,
-            top: topPadding + 14,
-            bottom: 12,
-          ),
-          decoration: BoxDecoration(
-            color: theme.scaffoldBackgroundColor.withValues(alpha: 0.85),
-            border: Border(bottom: BorderSide(color: theme.dividerColor.withValues(alpha: 0.05))),
-          ),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: [
-              // Judul POS yang luas (dengan tombol Back jika ada onNavigateBack atau canPop)
-              Expanded(
-                child: Row(
-                  children: [
-                    if (widget.onNavigateBack != null || Navigator.of(context).canPop()) ...[
-                      Material(
-                        color: Colors.transparent,
-                        child: InkWell(
-                          onTap: () {
-                            if (widget.onNavigateBack != null) {
-                              widget.onNavigateBack!();
-                            } else if (Navigator.of(context).canPop()) {
-                              Navigator.of(context).pop();
-                            }
-                          },
-                          borderRadius: BorderRadius.circular(12),
-                          child: Container(
-                            padding: const EdgeInsets.all(8),
-                            margin: const EdgeInsets.only(right: 12),
-                            decoration: BoxDecoration(
-                              color: theme.colorScheme.surface,
-                              borderRadius: BorderRadius.circular(12),
-                              border: Border.all(color: theme.dividerColor.withValues(alpha: 0.1)),
-                              boxShadow: [
-                                BoxShadow(
-                                  color: theme.shadowColor.withValues(alpha: 0.03),
-                                  blurRadius: 6,
-                                  offset: const Offset(0, 2),
-                                ),
-                              ],
-                            ),
-                            child: Icon(Icons.arrow_back_rounded, size: 20, color: theme.colorScheme.onSurface),
-                          ),
-                        ),
+    return ZenviHeader(
+      title: 'pos_title'.tr(context: context),
+      subtitle: 'pos_header_subtitle'.tr(context: context),
+      showBackButton: widget.onNavigateBack != null || Navigator.of(context).canPop(),
+      onBackPressed: () {
+        if (widget.onNavigateBack != null) {
+          widget.onNavigateBack!();
+        } else if (Navigator.of(context).canPop()) {
+          Navigator.of(context).pop();
+        }
+      },
+      padding: EdgeInsets.only(
+        left: isDesktop ? 24 : 16,
+        right: isDesktop ? 24 : 16,
+        top: MediaQuery.of(context).padding.top + 4.0,
+        bottom: 6.0,
+      ),
+      actions: [
+        // Reservation Button
+        Consumer<ReservationProvider>(
+          builder: (context, resProv, child) {
+            final activeResCount = resProv.allReservations.where((r) => r.status == 'pending' || r.status == 'confirmed').length;
+            return Stack(
+              clipBehavior: Clip.none,
+              children: [
+                _buildHeaderActionButton(
+                  theme: theme,
+                  icon: Icons.event_available_rounded,
+                  tooltip: 'pos_reservation_tooltip'.tr(context: context),
+                  onTap: () => _showReservationModal(context),
+                ),
+                if (activeResCount > 0)
+                  Positioned(
+                    top: -3,
+                    right: -3,
+                    child: Container(
+                      padding: const EdgeInsets.all(4),
+                      decoration: BoxDecoration(
+                        color: Colors.teal.shade600,
+                        shape: BoxShape.circle,
                       ),
-                    ],
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          Text(
-                            'pos_title'.tr(context: context),
-                            style: theme.textTheme.titleLarge?.copyWith(
-                              fontWeight: FontWeight.w900,
-                              letterSpacing: -0.5,
-                            ),
-                            maxLines: 1,
-                            overflow: TextOverflow.ellipsis,
-                          ),
-                          Text(
-                            'pos_header_subtitle'.tr(context: context),
-                            style: TextStyle(color: theme.colorScheme.onSurfaceVariant, fontSize: 12, fontWeight: FontWeight.w500),
-                            maxLines: 1,
-                            overflow: TextOverflow.ellipsis,
-                          ),
-                        ],
+                      constraints: const BoxConstraints(minWidth: 16, minHeight: 16),
+                      child: Text(
+                        activeResCount > 9 ? '9+' : activeResCount.toString(),
+                        style: const TextStyle(color: Colors.white, fontSize: 9, fontWeight: FontWeight.bold),
+                        textAlign: TextAlign.center,
                       ),
                     ),
-                  ],
-                ),
-              ),
-
-              // Action Toolbar yang Rapi & Kompak
-              Row(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  // Reservation Button
-                  Consumer<ReservationProvider>(
-                    builder: (context, resProv, child) {
-                      final activeResCount = resProv.allReservations.where((r) => r.status == 'pending' || r.status == 'confirmed').length;
-                      return Stack(
-                        clipBehavior: Clip.none,
-                        children: [
-                          _buildHeaderActionButton(
-                            theme: theme,
-                            icon: Icons.event_available_rounded,
-                            tooltip: 'pos_reservation_tooltip'.tr(context: context),
-                            onTap: () => _showReservationModal(context),
-                          ),
-                          if (activeResCount > 0)
-                            Positioned(
-                              top: -3,
-                              right: -3,
-                              child: Container(
-                                padding: const EdgeInsets.all(4),
-                                decoration: BoxDecoration(
-                                  color: Colors.teal.shade600,
-                                  shape: BoxShape.circle,
-                                ),
-                                constraints: const BoxConstraints(minWidth: 16, minHeight: 16),
-                                child: Text(
-                                  activeResCount > 9 ? '9+' : activeResCount.toString(),
-                                  style: const TextStyle(color: Colors.white, fontSize: 9, fontWeight: FontWeight.bold),
-                                  textAlign: TextAlign.center,
-                                ),
-                              ),
-                            ),
-                        ],
-                      );
-                    },
                   ),
-                  const SizedBox(width: 8),
-
-                  // Sync Button
-                  _buildHeaderActionButton(
-                    theme: theme,
-                    icon: Icons.sync_rounded,
-                    tooltip: 'sync_data_tooltip'.tr(context: context),
-                    onTap: () {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(content: Text('menyinkronkan_data_286'.tr(context: context))),
-                      );
-                      _loadProducts();
-                      SyncService().pushOfflineOrders();
-                    },
-                  ),
-                  const SizedBox(width: 8),
-
-                  // Order History Button
-                  _buildHeaderActionButton(
-                    theme: theme,
-                    icon: Icons.history_rounded,
-                    tooltip: 'transaction_history_tooltip'.tr(context: context),
-                    onTap: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(builder: (context) => const order_history.OrderHistoryScreen()),
-                      );
-                    },
-                  ),
-                  const SizedBox(width: 8),
-
-                  // Printer Settings Button
-                  _buildHeaderActionButton(
-                    theme: theme,
-                    icon: Icons.print_outlined,
-                    tooltip: 'printer_settings_tooltip'.tr(context: context),
-                    onTap: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(builder: (context) => const PrinterSettingsScreen()),
-                      );
-                    },
-                  ),
-                ],
-              ),
-            ],
-          ),
+              ],
+            );
+          },
         ),
-      ),
+        const SizedBox(width: 6),
+
+        // Sync Button
+        _buildHeaderActionButton(
+          theme: theme,
+          icon: Icons.sync_rounded,
+          tooltip: 'sync_data_tooltip'.tr(context: context),
+          onTap: () {
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(content: Text('menyinkronkan_data_286'.tr(context: context))),
+            );
+            _loadProducts();
+            SyncService().pushOfflineOrders();
+          },
+        ),
+        const SizedBox(width: 6),
+
+        // Order History Button
+        _buildHeaderActionButton(
+          theme: theme,
+          icon: Icons.history_rounded,
+          tooltip: 'transaction_history_tooltip'.tr(context: context),
+          onTap: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) => const order_history.OrderHistoryScreen()),
+            );
+          },
+        ),
+        const SizedBox(width: 6),
+
+        // Printer Settings Button
+        _buildHeaderActionButton(
+          theme: theme,
+          icon: Icons.print_outlined,
+          tooltip: 'printer_settings_tooltip'.tr(context: context),
+          onTap: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) => const PrinterSettingsScreen()),
+            );
+          },
+        ),
+      ],
     );
   }
 
@@ -824,24 +749,29 @@ class _POSScreenState extends State<POSScreen> {
   }) {
     return Material(
       color: Colors.transparent,
-      child: InkWell(
-        borderRadius: BorderRadius.circular(14),
-        onTap: onTap,
-        child: Container(
-          padding: const EdgeInsets.all(9),
-          decoration: BoxDecoration(
-            color: theme.colorScheme.surface,
-            borderRadius: BorderRadius.circular(14),
-            border: Border.all(color: theme.dividerColor.withValues(alpha: 0.1)),
-            boxShadow: [
-              BoxShadow(
-                color: theme.shadowColor.withValues(alpha: 0.03),
-                blurRadius: 8,
-                offset: const Offset(0, 2),
-              ),
-            ],
+      child: Tooltip(
+        message: tooltip,
+        child: InkWell(
+          borderRadius: BorderRadius.circular(10),
+          onTap: onTap,
+          child: Container(
+            width: 36,
+            height: 36,
+            decoration: BoxDecoration(
+              color: theme.colorScheme.surface,
+              borderRadius: BorderRadius.circular(10),
+              border: Border.all(color: theme.colorScheme.outline.withValues(alpha: 0.12)),
+              boxShadow: [
+                BoxShadow(
+                  color: theme.shadowColor.withValues(alpha: 0.03),
+                  blurRadius: 6,
+                  offset: const Offset(0, 2),
+                ),
+              ],
+            ),
+            alignment: Alignment.center,
+            child: Icon(icon, color: theme.colorScheme.onSurface, size: 18),
           ),
-          child: Icon(icon, color: theme.colorScheme.onSurface, size: 19),
         ),
       ),
     );
