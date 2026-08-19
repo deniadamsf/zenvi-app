@@ -1116,5 +1116,10 @@
     "duration_mins_only": "{}m",
     "dialog_restock_title": "Restock {}",
     "dialog_opname_title": "Stock Opname {}",
-    "dialog_wastage_title": "Catat Susut/Rusak {}"
+    "dialog_wastage_title": "Catat Susut/Rusak {}",
+    "materials_cogs_subtitle": "Bahan / Modal",
+    "gross_margin_percent_subtitle": "Margin {}%",
+    "shift_active_short": "Aktif",
+    "shift_closed_short": "Tutup",
+    "shift_since_time": "Mulai {}"
 }
