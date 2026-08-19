@@ -219,8 +219,7 @@ class PrinterService {
     bytes += generator.feed(1);
     bytes += generator.text('Powered by Zenvi POS', styles: const PosStyles(align: PosAlign.center));
     
-    bytes += generator.feed(2);
-    bytes += generator.cut();
+    bytes += generator.feed(3);
     
     return bytes;
   }
