@@ -133,9 +133,12 @@ class NotificationProvider extends ChangeNotifier {
 
   /// Delete a notification
   Future<void> deleteNotification(int id, {String? token}) async {
-    final removed = _notifications.firstWhere((n) => n.id == id, orElse: () => _notifications.first);
-    if (!removed.isRead && _unreadCount > 0) {
-      _unreadCount--;
+    final matches = _notifications.where((n) => n.id == id);
+    if (matches.isNotEmpty) {
+      final removed = matches.first;
+      if (!removed.isRead && _unreadCount > 0) {
+        _unreadCount--;
+      }
     }
     _notifications.removeWhere((n) => n.id == id);
     notifyListeners();

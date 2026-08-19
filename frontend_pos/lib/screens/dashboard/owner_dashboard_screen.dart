@@ -1211,9 +1211,16 @@ class _DashboardOverviewState extends State<_DashboardOverview> {
               child: _buildDropdownFilterButton(
                 theme: theme,
                 icon: Icons.storefront_rounded,
-                label: _selectedBranch == 'all' 
-                    ? 'all_branches'.tr(context: context) 
-                    : branches.firstWhere((b) => b.id.toString() == _selectedBranch, orElse: () => branches.first).name,
+                label: () {
+                  if (_selectedBranch == 'all' || branches.isEmpty) {
+                    return 'all_branches'.tr(context: context);
+                  }
+                  final match = branches.where((b) => b.id.toString() == _selectedBranch);
+                  if (match.isNotEmpty) {
+                    return match.first.name;
+                  }
+                  return 'all_branches'.tr(context: context);
+                }(),
                 onTap: () => _showBranchSelector(theme, branches),
               ),
             ),
@@ -1299,9 +1306,13 @@ class _DashboardOverviewState extends State<_DashboardOverview> {
   void _showBranchSelector(ThemeData theme, List<dynamic> branches) {
     showModalBottomSheet(
       context: context,
+      isScrollControlled: true,
       backgroundColor: Colors.transparent,
       builder: (ctx) {
         return Container(
+          constraints: BoxConstraints(
+            maxHeight: MediaQuery.of(context).size.height * 0.75,
+          ),
           decoration: BoxDecoration(
             color: theme.colorScheme.surface,
             borderRadius: const BorderRadius.vertical(top: Radius.circular(28)),
@@ -1319,42 +1330,52 @@ class _DashboardOverviewState extends State<_DashboardOverview> {
                 ),
               ),
               const SizedBox(height: 24),
-              Text('pilih_cabang_138'.tr(context: context), style: TextStyle(fontWeight: FontWeight.w900, fontSize: 18)),
+              Text('pilih_cabang_138'.tr(context: context), style: const TextStyle(fontWeight: FontWeight.w900, fontSize: 18)),
               const SizedBox(height: 16),
-              ListTile(
-                title: Text('all_branches'.tr(context: context), style: const TextStyle(fontWeight: FontWeight.w700)),
-                leading: Container(
-                  padding: const EdgeInsets.all(8),
-                  decoration: BoxDecoration(
-                    color: _selectedBranch == 'all' ? theme.colorScheme.primary.withValues(alpha: 0.15) : theme.colorScheme.surfaceContainerHighest,
-                    borderRadius: BorderRadius.circular(10),
+              Flexible(
+                child: SingleChildScrollView(
+                  physics: const BouncingScrollPhysics(),
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      ListTile(
+                        title: Text('all_branches'.tr(context: context), style: const TextStyle(fontWeight: FontWeight.w700)),
+                        leading: Container(
+                          padding: const EdgeInsets.all(8),
+                          decoration: BoxDecoration(
+                            color: _selectedBranch == 'all' ? theme.colorScheme.primary.withValues(alpha: 0.15) : theme.colorScheme.surfaceContainerHighest,
+                            borderRadius: BorderRadius.circular(10),
+                          ),
+                          child: Icon(Icons.store_rounded, color: _selectedBranch == 'all' ? theme.colorScheme.primary : theme.colorScheme.onSurfaceVariant),
+                        ),
+                        trailing: _selectedBranch == 'all' ? Icon(Icons.check_circle_rounded, color: theme.colorScheme.primary) : null,
+                        onTap: () {
+                          setState(() => _selectedBranch = 'all');
+                          _fetchReport();
+                          Navigator.pop(ctx);
+                        },
+                      ),
+                      ...branches.map((b) => ListTile(
+                        title: Text(b.name ?? '', style: const TextStyle(fontWeight: FontWeight.w700)),
+                        leading: Container(
+                          padding: const EdgeInsets.all(8),
+                          decoration: BoxDecoration(
+                            color: _selectedBranch == b.id.toString() ? theme.colorScheme.primary.withValues(alpha: 0.15) : theme.colorScheme.surfaceContainerHighest,
+                            borderRadius: BorderRadius.circular(10),
+                          ),
+                          child: Icon(Icons.storefront_rounded, color: _selectedBranch == b.id.toString() ? theme.colorScheme.primary : theme.colorScheme.onSurfaceVariant),
+                        ),
+                        trailing: _selectedBranch == b.id.toString() ? Icon(Icons.check_circle_rounded, color: theme.colorScheme.primary) : null,
+                        onTap: () {
+                          setState(() => _selectedBranch = b.id.toString());
+                          _fetchReport();
+                          Navigator.pop(ctx);
+                        },
+                      )),
+                    ],
                   ),
-                  child: Icon(Icons.store_rounded, color: _selectedBranch == 'all' ? theme.colorScheme.primary : theme.colorScheme.onSurfaceVariant),
                 ),
-                trailing: _selectedBranch == 'all' ? Icon(Icons.check_circle_rounded, color: theme.colorScheme.primary) : null,
-                onTap: () {
-                  setState(() => _selectedBranch = 'all');
-                  _fetchReport();
-                  Navigator.pop(ctx);
-                },
               ),
-              ...branches.map((b) => ListTile(
-                title: Text(b.name, style: const TextStyle(fontWeight: FontWeight.w700)),
-                leading: Container(
-                  padding: const EdgeInsets.all(8),
-                  decoration: BoxDecoration(
-                    color: _selectedBranch == b.id.toString() ? theme.colorScheme.primary.withValues(alpha: 0.15) : theme.colorScheme.surfaceContainerHighest,
-                    borderRadius: BorderRadius.circular(10),
-                  ),
-                  child: Icon(Icons.storefront_rounded, color: _selectedBranch == b.id.toString() ? theme.colorScheme.primary : theme.colorScheme.onSurfaceVariant),
-                ),
-                trailing: _selectedBranch == b.id.toString() ? Icon(Icons.check_circle_rounded, color: theme.colorScheme.primary) : null,
-                onTap: () {
-                  setState(() => _selectedBranch = b.id.toString());
-                  _fetchReport();
-                  Navigator.pop(ctx);
-                },
-              )),
             ],
           ),
         );
@@ -2210,24 +2231,69 @@ class _DashboardOverviewState extends State<_DashboardOverview> {
   }
 
   Widget _buildDynamicLineChart(ThemeData theme, List<Map<String, dynamic>> chartData) {
-    double maxVal = 0;
+    if (chartData.isEmpty) {
+      return Center(
+        child: Text(
+          'no_transaction_data_range'.tr(context: context),
+          style: TextStyle(color: theme.colorScheme.onSurfaceVariant, fontSize: 12.5),
+        ),
+      );
+    }
+
+    double minVal = 0.0;
+    double maxVal = 0.0;
+    bool hasNonZero = false;
+
     for (var d in chartData) {
       final s = (d['sales'] as num?)?.toDouble() ?? 0.0;
       final e = (d['expense'] as num?)?.toDouble() ?? 0.0;
-      final p = (d['profit'] as num?)?.toDouble() ?? 0.0;
+      final p = (d['profit'] as num?)?.toDouble() ?? (d['net_profit'] as num?)?.toDouble() ?? 0.0;
+      
       if (s > maxVal) maxVal = s;
       if (e > maxVal) maxVal = e;
       if (p > maxVal) maxVal = p;
+      if (s < minVal) minVal = s;
+      if (e < minVal) minVal = e;
+      if (p < minVal) minVal = p;
+
+      if (s != 0 || e != 0 || p != 0) {
+        hasNonZero = true;
+      }
     }
-    double maxY = maxVal > 0 ? maxVal * 1.25 : 100000;
+
+    double minY = minVal < 0 ? minVal * 1.25 : 0.0;
+    double maxY = maxVal > 0 ? maxVal * 1.25 : 100000.0;
+    if (maxY <= minY) {
+      maxY = minY + 100000.0;
+    }
+
+    final rangeY = maxY - minY;
+    final intervalY = (rangeY > 0 ? rangeY / 4 : 25000.0).clamp(1.0, double.infinity);
     final maxX = (chartData.length <= 1 ? 1.0 : (chartData.length - 1).toDouble());
+
+    double clampY(double val) => val.clamp(minY, maxY);
+
+    final omzetSpots = List.generate(chartData.length, (i) {
+      final s = (chartData[i]['sales'] as num?)?.toDouble() ?? 0.0;
+      return FlSpot(i.toDouble(), clampY(s));
+    });
+
+    final profitSpots = List.generate(chartData.length, (i) {
+      final p = (chartData[i]['profit'] as num?)?.toDouble() ?? (chartData[i]['net_profit'] as num?)?.toDouble() ?? 0.0;
+      return FlSpot(i.toDouble(), clampY(p));
+    });
+
+    final expenseSpots = List.generate(chartData.length, (i) {
+      final e = (chartData[i]['expense'] as num?)?.toDouble() ?? 0.0;
+      return FlSpot(i.toDouble(), clampY(e));
+    });
 
     return LineChart(
       LineChartData(
         gridData: FlGridData(
           show: true,
           drawVerticalLine: false,
-          horizontalInterval: maxY / 4,
+          horizontalInterval: intervalY,
           getDrawingHorizontalLine: (value) {
             return FlLine(
               color: theme.colorScheme.surfaceContainerHighest.withValues(alpha: 0.6),
@@ -2268,7 +2334,7 @@ class _DashboardOverviewState extends State<_DashboardOverview> {
           leftTitles: AxisTitles(
             sideTitles: SideTitles(
               showTitles: true,
-              interval: maxY / 4,
+              interval: intervalY,
               reservedSize: 46,
               getTitlesWidget: (value, meta) {
                 if (value == 0 || value >= maxY * 0.98) return const SizedBox();
@@ -2284,20 +2350,18 @@ class _DashboardOverviewState extends State<_DashboardOverview> {
         borderData: FlBorderData(show: false),
         minX: 0,
         maxX: maxX,
-        minY: 0,
+        minY: minY,
         maxY: maxY,
         lineBarsData: [
           // Omzet Line (Teal Primary)
           LineChartBarData(
-            spots: List.generate(chartData.length, (i) {
-              return FlSpot(i.toDouble(), ((chartData[i]['sales'] as num?)?.toDouble() ?? 0.0));
-            }),
+            spots: omzetSpots,
             isCurved: chartData.length > 1,
             curveSmoothness: 0.35,
             color: theme.colorScheme.primary,
             barWidth: 3,
             isStrokeCapRound: true,
-            dotData: FlDotData(show: chartData.length <= 1),
+            dotData: FlDotData(show: chartData.length <= 1 || !hasNonZero),
             belowBarData: BarAreaData(
               show: true,
               gradient: LinearGradient(
@@ -2312,27 +2376,23 @@ class _DashboardOverviewState extends State<_DashboardOverview> {
           ),
           // Laba Bersih Line (Emerald Green)
           LineChartBarData(
-            spots: List.generate(chartData.length, (i) {
-              return FlSpot(i.toDouble(), ((chartData[i]['profit'] as num?)?.toDouble() ?? 0.0));
-            }),
+            spots: profitSpots,
             isCurved: chartData.length > 1,
             curveSmoothness: 0.35,
             color: const Color(0xFF10B981),
             barWidth: 2.5,
             isStrokeCapRound: true,
-            dotData: FlDotData(show: chartData.length <= 1),
+            dotData: FlDotData(show: chartData.length <= 1 || !hasNonZero),
           ),
           // Expense Line (Rose Red)
           LineChartBarData(
-            spots: List.generate(chartData.length, (i) {
-              return FlSpot(i.toDouble(), ((chartData[i]['expense'] as num?)?.toDouble() ?? 0.0));
-            }),
+            spots: expenseSpots,
             isCurved: chartData.length > 1,
             curveSmoothness: 0.35,
             color: const Color(0xFFF43F5E),
             barWidth: 2,
             dashArray: [4, 4],
-            dotData: FlDotData(show: chartData.length <= 1),
+            dotData: FlDotData(show: chartData.length <= 1 || !hasNonZero),
           ),
         ],
         lineTouchData: LineTouchData(
@@ -2355,19 +2415,29 @@ class _DashboardOverviewState extends State<_DashboardOverview> {
   }
 
   Widget _buildPeakHoursBarChart(ThemeData theme, List<Map<String, dynamic>> hourly) {
+    if (hourly.isEmpty) {
+      return Center(
+        child: Text(
+          'no_transaction_data'.tr(context: context),
+          style: TextStyle(color: theme.colorScheme.onSurfaceVariant, fontSize: 12.5),
+        ),
+      );
+    }
+
     double maxSales = 0;
     for (var h in hourly) {
       final s = (h['sales'] as num?)?.toDouble() ?? 0.0;
       if (s > maxSales) maxSales = s;
     }
     double maxY = maxSales > 0 ? maxSales * 1.25 : 100000;
+    final intervalY = (maxY / 4).clamp(1.0, double.infinity);
 
     return BarChart(
       BarChartData(
         gridData: FlGridData(
           show: true,
           drawVerticalLine: false,
-          horizontalInterval: maxY / 4,
+          horizontalInterval: intervalY,
           getDrawingHorizontalLine: (value) {
             return FlLine(
               color: theme.colorScheme.surfaceContainerHighest.withValues(alpha: 0.6),
@@ -2402,7 +2472,7 @@ class _DashboardOverviewState extends State<_DashboardOverview> {
           leftTitles: AxisTitles(
             sideTitles: SideTitles(
               showTitles: true,
-              interval: maxY / 4,
+              interval: intervalY,
               reservedSize: 42,
               getTitlesWidget: (value, meta) {
                 if (value == 0 || value >= maxY * 0.98) return const SizedBox();
@@ -2417,6 +2487,7 @@ class _DashboardOverviewState extends State<_DashboardOverview> {
         ),
         borderData: FlBorderData(show: false),
         maxY: maxY,
+        minY: 0,
         barGroups: hourly.map((h) {
           final hour = (h['hour'] as num?)?.toInt() ?? 0;
           final sales = (h['sales'] as num?)?.toDouble() ?? 0.0;
@@ -2426,7 +2497,7 @@ class _DashboardOverviewState extends State<_DashboardOverview> {
             x: hour,
             barRods: [
               BarChartRodData(
-                toY: sales,
+                toY: sales.clamp(0.0, maxY),
                 gradient: LinearGradient(
                   colors: isTopHour
                       ? [theme.colorScheme.primary, theme.colorScheme.secondary]
@@ -2444,9 +2515,10 @@ class _DashboardOverviewState extends State<_DashboardOverview> {
           touchTooltipData: BarTouchTooltipData(
             getTooltipColor: (group) => theme.colorScheme.surfaceContainerHighest,
             getTooltipItem: (group, groupIndex, rod, rodIndex) {
+              if (groupIndex < 0 || groupIndex >= hourly.length) return null;
               final h = hourly[groupIndex];
               return BarTooltipItem(
-                'Jam ${h['label']}\nRp ${NumberFormat.decimalPattern('id').format(rod.toY)}\n(${h['orders']} Order)',
+                'Jam ${h['label'] ?? ''}\nRp ${NumberFormat.decimalPattern('id').format(rod.toY)}\n(${h['orders'] ?? 0} Order)',
                 TextStyle(color: theme.colorScheme.primary, fontWeight: FontWeight.w800, fontSize: 11),
               );
             },
