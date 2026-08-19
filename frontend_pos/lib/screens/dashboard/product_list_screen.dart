@@ -2,6 +2,7 @@ import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../providers/product_provider.dart';
+import '../../providers/auth_provider.dart';
 import '../../models/product_model.dart';
 import 'add_product_screen.dart';
 import '../../widgets/zenvi_header.dart';
@@ -26,6 +27,7 @@ class _ProductListScreenState extends State<ProductListScreen> {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final productProvider = Provider.of<ProductProvider>(context);
+    final isProductImageEnabled = Provider.of<AuthProvider>(context).isProductImageEnabled;
 
     return Scaffold(
       backgroundColor: theme.scaffoldBackgroundColor,
@@ -117,7 +119,7 @@ class _ProductListScreenState extends State<ProductListScreen> {
                                       borderRadius: BorderRadius.circular(16),
                                       border: Border.all(color: theme.dividerColor.withValues(alpha: 0.05)),
                                     ),
-                                    child: (product.imageUrl != null && product.imageUrl!.isNotEmpty)
+                                    child: (isProductImageEnabled && product.imageUrl != null && product.imageUrl!.isNotEmpty)
                                         ? ClipRRect(
                                             borderRadius: BorderRadius.circular(16),
                                             child: Image.network(

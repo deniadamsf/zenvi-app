@@ -6,6 +6,7 @@ import 'package:image_cropper/image_cropper.dart';
 import 'package:provider/provider.dart';
 import '../../providers/product_provider.dart';
 import '../../providers/ingredient_provider.dart';
+import '../../providers/auth_provider.dart';
 import '../../models/product_model.dart';
 import '../../widgets/zenvi_header.dart';
 
@@ -254,6 +255,8 @@ class _AddProductScreenState extends State<AddProductScreen> {
     final isLoading = Provider.of<ProductProvider>(context).isLoading;
     final existingCategories = Provider.of<ProductProvider>(context, listen: false).categories;
     final ingredientProvider = Provider.of<IngredientProvider>(context);
+    final authProvider = Provider.of<AuthProvider>(context);
+    final isProductImageEnabled = authProvider.isProductImageEnabled;
     final isEditing = widget.product != null;
 
     final inputDecoration = InputDecoration(
@@ -293,46 +296,48 @@ class _AddProductScreenState extends State<AddProductScreen> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
-                    // FOTO PRODUK
-                    Text('foto_produk_43'.tr(context: context), style: theme.textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold)),
-                    const SizedBox(height: 12),
-                    GestureDetector(
-                      onTap: _pickImage,
-                      child: Container(
-                        height: 180,
-                        decoration: BoxDecoration(
-                          color: theme.colorScheme.surfaceContainerHighest.withValues(alpha: 0.3),
-                          borderRadius: BorderRadius.circular(24),
-                          border: Border.all(color: theme.dividerColor.withValues(alpha: 0.2)),
-                        ),
-                        child: _imageFile != null
-                            ? ClipRRect(
-                                borderRadius: BorderRadius.circular(24),
-                                child: Image.file(_imageFile!, fit: BoxFit.cover, width: double.infinity),
-                              )
-                            : (isEditing && widget.product!.imageUrl != null)
-                                ? ClipRRect(
-                                    borderRadius: BorderRadius.circular(24),
-                                    child: Image.network(widget.product!.imageUrl!, fit: BoxFit.cover, width: double.infinity),
-                                  )
-                                : Column(
-                                    mainAxisAlignment: MainAxisAlignment.center,
-                                    children: [
-                                      Container(
-                                        padding: const EdgeInsets.all(16),
-                                        decoration: BoxDecoration(
-                                          color: theme.colorScheme.primary.withValues(alpha: 0.1),
-                                          shape: BoxShape.circle,
+                    if (isProductImageEnabled) ...[
+                      // FOTO PRODUK
+                      Text('foto_produk_43'.tr(context: context), style: theme.textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold)),
+                      const SizedBox(height: 12),
+                      GestureDetector(
+                        onTap: _pickImage,
+                        child: Container(
+                          height: 180,
+                          decoration: BoxDecoration(
+                            color: theme.colorScheme.surfaceContainerHighest.withValues(alpha: 0.3),
+                            borderRadius: BorderRadius.circular(24),
+                            border: Border.all(color: theme.dividerColor.withValues(alpha: 0.2)),
+                          ),
+                          child: _imageFile != null
+                              ? ClipRRect(
+                                  borderRadius: BorderRadius.circular(24),
+                                  child: Image.file(_imageFile!, fit: BoxFit.cover, width: double.infinity),
+                                )
+                              : (isEditing && widget.product!.imageUrl != null)
+                                  ? ClipRRect(
+                                      borderRadius: BorderRadius.circular(24),
+                                      child: Image.network(widget.product!.imageUrl!, fit: BoxFit.cover, width: double.infinity),
+                                    )
+                                  : Column(
+                                      mainAxisAlignment: MainAxisAlignment.center,
+                                      children: [
+                                        Container(
+                                          padding: const EdgeInsets.all(16),
+                                          decoration: BoxDecoration(
+                                            color: theme.colorScheme.primary.withValues(alpha: 0.1),
+                                            shape: BoxShape.circle,
+                                          ),
+                                          child: Icon(Icons.add_a_photo_rounded, size: 32, color: theme.colorScheme.primary),
                                         ),
-                                        child: Icon(Icons.add_a_photo_rounded, size: 32, color: theme.colorScheme.primary),
-                                      ),
-                                      const SizedBox(height: 12),
-                                      Text('unggah_foto_11_44'.tr(context: context), style: TextStyle(color: theme.colorScheme.onSurfaceVariant, fontWeight: FontWeight.w600)),
-                                    ],
-                                  ),
+                                        const SizedBox(height: 12),
+                                        Text('unggah_foto_11_44'.tr(context: context), style: TextStyle(color: theme.colorScheme.onSurfaceVariant, fontWeight: FontWeight.w600)),
+                                      ],
+                                    ),
+                        ),
                       ),
-                    ),
-                    const SizedBox(height: 32),
+                      const SizedBox(height: 32),
+                    ],
 
                     // INFORMASI DASAR
                     Text('informasi_dasar_45'.tr(context: context), style: theme.textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold)),
