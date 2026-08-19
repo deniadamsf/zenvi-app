@@ -1005,6 +1005,52 @@ class _POSScreenState extends State<POSScreen> {
     );
   }
 
+  IconData _getProductCategoryIcon(ProductModel product) {
+    final cat = (product.category ?? '').toLowerCase();
+    final name = product.name.toLowerCase();
+    final combined = '$cat $name';
+
+    if (combined.contains('kopi') ||
+        combined.contains('coffee') ||
+        combined.contains('tea') ||
+        combined.contains('teh') ||
+        combined.contains('minum') ||
+        combined.contains('drink') ||
+        combined.contains('jus') ||
+        combined.contains('juice') ||
+        combined.contains('latte') ||
+        combined.contains('boba')) {
+      return Icons.local_cafe_rounded;
+    }
+    if (combined.contains('potong') ||
+        combined.contains('cukur') ||
+        combined.contains('rambut') ||
+        combined.contains('hair') ||
+        combined.contains('barber') ||
+        combined.contains('salon') ||
+        combined.contains('creambath') ||
+        combined.contains('shampoo') ||
+        combined.contains('facial') ||
+        combined.contains('massage') ||
+        combined.contains('pijat') ||
+        combined.contains('spa') ||
+        combined.contains('treatment') ||
+        combined.contains('service') ||
+        combined.contains('jasa') ||
+        combined.contains('cuci')) {
+      return Icons.content_cut_rounded;
+    }
+    if (combined.contains('baju') ||
+        combined.contains('kaos') ||
+        combined.contains('pakaian') ||
+        combined.contains('cloth') ||
+        combined.contains('retail') ||
+        combined.contains('barang')) {
+      return Icons.shopping_bag_rounded;
+    }
+    return Icons.restaurant_rounded;
+  }
+
   Widget _buildMenuCard(BuildContext context, ProductModel product) {
     final theme = Theme.of(context);
 
@@ -1054,12 +1100,34 @@ class _POSScreenState extends State<POSScreen> {
                               fit: BoxFit.cover,
                               errorBuilder: (context, error, stackTrace) {
                                 return Center(
-                                  child: Icon(Icons.fastfood_rounded, size: 48, color: theme.colorScheme.primary.withValues(alpha: 0.3)),
+                                  child: Container(
+                                    padding: const EdgeInsets.all(14),
+                                    decoration: BoxDecoration(
+                                      color: theme.colorScheme.primary.withValues(alpha: 0.08),
+                                      shape: BoxShape.circle,
+                                    ),
+                                    child: Icon(
+                                      _getProductCategoryIcon(product),
+                                      size: 34,
+                                      color: theme.colorScheme.primary.withValues(alpha: 0.6),
+                                    ),
+                                  ),
                                 );
                               },
                             )
                           : Center(
-                              child: Icon(Icons.fastfood_rounded, size: 48, color: theme.colorScheme.primary.withValues(alpha: 0.3)),
+                              child: Container(
+                                padding: const EdgeInsets.all(14),
+                                decoration: BoxDecoration(
+                                  color: theme.colorScheme.primary.withValues(alpha: 0.08),
+                                  shape: BoxShape.circle,
+                                ),
+                                child: Icon(
+                                  _getProductCategoryIcon(product),
+                                  size: 34,
+                                  color: theme.colorScheme.primary.withValues(alpha: 0.6),
+                                ),
+                              ),
                             ),
                       if (product.category != null && product.category!.trim().isNotEmpty)
                         Positioned(

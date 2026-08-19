@@ -2,6 +2,7 @@ import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../providers/product_provider.dart';
+import '../../models/product_model.dart';
 import 'add_product_screen.dart';
 import '../../widgets/zenvi_header.dart';
 
@@ -116,16 +117,16 @@ class _ProductListScreenState extends State<ProductListScreen> {
                                       borderRadius: BorderRadius.circular(16),
                                       border: Border.all(color: theme.dividerColor.withValues(alpha: 0.05)),
                                     ),
-                                    child: product.imageUrl != null
+                                    child: (product.imageUrl != null && product.imageUrl!.isNotEmpty)
                                         ? ClipRRect(
                                             borderRadius: BorderRadius.circular(16),
                                             child: Image.network(
                                               product.imageUrl!,
                                               fit: BoxFit.cover,
-                                              errorBuilder: (context, error, stackTrace) => Icon(Icons.fastfood_rounded, color: theme.colorScheme.primary.withValues(alpha: 0.5), size: 32),
+                                              errorBuilder: (context, error, stackTrace) => Icon(_getProductCategoryIcon(product), color: theme.colorScheme.primary.withValues(alpha: 0.6), size: 30),
                                             ),
                                           )
-                                        : Icon(Icons.fastfood_rounded, color: theme.colorScheme.primary.withValues(alpha: 0.5), size: 32),
+                                        : Icon(_getProductCategoryIcon(product), color: theme.colorScheme.primary.withValues(alpha: 0.6), size: 30),
                                   ),
                                   const SizedBox(width: 16),
                                   Expanded(
@@ -248,6 +249,52 @@ class _ProductListScreenState extends State<ProductListScreen> {
         label: Text('tambah_produk_172'.tr(context: context), style: TextStyle(fontWeight: FontWeight.bold)),
       ),
     );
+  }
+
+  IconData _getProductCategoryIcon(ProductModel product) {
+    final cat = (product.category ?? '').toLowerCase();
+    final name = product.name.toLowerCase();
+    final combined = '$cat $name';
+
+    if (combined.contains('kopi') ||
+        combined.contains('coffee') ||
+        combined.contains('tea') ||
+        combined.contains('teh') ||
+        combined.contains('minum') ||
+        combined.contains('drink') ||
+        combined.contains('jus') ||
+        combined.contains('juice') ||
+        combined.contains('latte') ||
+        combined.contains('boba')) {
+      return Icons.local_cafe_rounded;
+    }
+    if (combined.contains('potong') ||
+        combined.contains('cukur') ||
+        combined.contains('rambut') ||
+        combined.contains('hair') ||
+        combined.contains('barber') ||
+        combined.contains('salon') ||
+        combined.contains('creambath') ||
+        combined.contains('shampoo') ||
+        combined.contains('facial') ||
+        combined.contains('massage') ||
+        combined.contains('pijat') ||
+        combined.contains('spa') ||
+        combined.contains('treatment') ||
+        combined.contains('service') ||
+        combined.contains('jasa') ||
+        combined.contains('cuci')) {
+      return Icons.content_cut_rounded;
+    }
+    if (combined.contains('baju') ||
+        combined.contains('kaos') ||
+        combined.contains('pakaian') ||
+        combined.contains('cloth') ||
+        combined.contains('retail') ||
+        combined.contains('barang')) {
+      return Icons.shopping_bag_rounded;
+    }
+    return Icons.restaurant_rounded;
   }
 }
 
