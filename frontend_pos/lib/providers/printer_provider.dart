@@ -122,7 +122,14 @@ class PrinterProvider extends ChangeNotifier {
     }
     
     try {
-      await _bluetooth.writeBytes(Uint8List.fromList(bytes));
+      // Chunked transmission to prevent UART buffer overflow on 58mm bluetooth printers
+      const int chunkSize = 80;
+      for (int i = 0; i < bytes.length; i += chunkSize) {
+        final end = (i + chunkSize < bytes.length) ? i + chunkSize : bytes.length;
+        final chunk = bytes.sublist(i, end);
+        await _bluetooth.writeBytes(Uint8List.fromList(chunk));
+        await Future.delayed(const Duration(milliseconds: 25));
+      }
       return true;
     } catch (e) {
       debugPrint("Print error: $e");
@@ -155,8 +162,7 @@ class PrinterProvider extends ChangeNotifier {
     bytes += generator.text('Kertas: 58mm Thermal');
     bytes += generator.hr();
     bytes += generator.text('1234567890 ABCD WXYZ');
-    bytes += generator.feed(2);
-    bytes += generator.cut();
+    bytes += generator.feed(3);
 
     return printBytes(bytes);
   }
