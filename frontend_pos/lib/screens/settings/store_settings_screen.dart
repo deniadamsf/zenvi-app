@@ -1030,6 +1030,77 @@ class _StoreSettingsScreenState extends State<StoreSettingsScreen> {
           },
         ),
 
+        // 4. Katalog Foto Produk Toggle Card
+        Container(
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+          margin: const EdgeInsets.only(bottom: 12),
+          decoration: BoxDecoration(
+            color: theme.colorScheme.surfaceContainerHighest.withValues(alpha: 0.35),
+            borderRadius: BorderRadius.circular(20),
+          ),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Expanded(
+                child: Row(
+                  children: [
+                    Container(
+                      padding: const EdgeInsets.all(10),
+                      decoration: BoxDecoration(
+                        color: const Color(0xFF6366F1).withValues(alpha: 0.15),
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      child: const Icon(Icons.photo_library_rounded, color: Color(0xFF6366F1), size: 22),
+                    ),
+                    const SizedBox(width: 14),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Wrap(
+                            crossAxisAlignment: WrapCrossAlignment.center,
+                            spacing: 6,
+                            runSpacing: 4,
+                            children: [
+                              Text(
+                                'katalog_foto_produk_title'.tr(context: context),
+                                style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
+                              ),
+                              Container(
+                                padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                                decoration: BoxDecoration(
+                                  color: const Color(0xFF6366F1).withValues(alpha: 0.15),
+                                  borderRadius: BorderRadius.circular(6),
+                                ),
+                                child: Text(
+                                  'pro_feature_badge'.tr(context: context),
+                                  style: const TextStyle(color: Color(0xFF6366F1), fontSize: 9, fontWeight: FontWeight.bold),
+                                ),
+                              ),
+                            ],
+                          ),
+                          const SizedBox(height: 2),
+                          Text(
+                            'katalog_foto_produk_desc'.tr(context: context),
+                            style: TextStyle(color: theme.colorScheme.onSurfaceVariant, fontSize: 12),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              Switch(
+                value: authProvider.isProductImageEnabled,
+                activeThumbColor: theme.colorScheme.primary,
+                onChanged: (val) async {
+                  await authProvider.updateCompanySetting(isProductImageEnabled: val);
+                },
+              ),
+            ],
+          ),
+        ),
+
         // Active Portal Link & Actions (If either Menu or Reservation is enabled)
         if (isQrEnabled || isReservationEnabled) ...[
           const SizedBox(height: 8),

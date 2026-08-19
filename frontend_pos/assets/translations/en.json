@@ -1121,5 +1121,8 @@
     "gross_margin_percent_subtitle": "Margin {}%",
     "shift_active_short": "Active",
     "shift_closed_short": "Closed",
-    "shift_since_time": "Since {}"
+    "shift_since_time": "Since {}",
+    "katalog_foto_produk_title": "Product Photo Catalog",
+    "katalog_foto_produk_desc": "Display product images in POS and catalog. Disable to save storage and data.",
+    "pro_feature_badge": "PRO"
 }

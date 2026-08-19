@@ -33,6 +33,7 @@ class AuthProvider extends ChangeNotifier {
   double get pointRedeemRate => double.tryParse(_user?.company?['point_redeem_rate']?.toString() ?? '1') ?? 1.0;
   double get defaultMemberDiscountPercent => double.tryParse(_user?.company?['default_member_discount_percent']?.toString() ?? (_user?.company?['member_default_discount']?.toString() ?? '0')) ?? 0.0;
   String get companySlug => _user?.company?['slug']?.toString() ?? '';
+  bool get isProductImageEnabled => _user?.company?['is_product_image_enabled'] == null || _user?.company?['is_product_image_enabled'] == 1 || _user?.company?['is_product_image_enabled'] == true;
 
   bool get canAccessPos => _user?.canAccessPos ?? true;
   bool get canAccessStock => _user?.canAccessStock ?? false;
@@ -333,6 +334,7 @@ class AuthProvider extends ChangeNotifier {
     String? reservationDescription,
     String? name,
     bool? isKdsEnabled,
+    bool? isProductImageEnabled,
     String? defaultLanguage,
   }) async {
     if (_token == null || _user == null) return false;
@@ -358,6 +360,7 @@ class AuthProvider extends ChangeNotifier {
     final currentReservationDesc = _user!.company?['reservation_description'];
     final currentName = _user!.company?['name'];
     final currentKds = _user!.company?['is_kds_enabled'] == 1;
+    final currentProductImage = _user!.company?['is_product_image_enabled'];
     final currentDefaultLanguage = _user!.company?['default_language'];
 
     if (requireOpname != null) _user!.company?['require_opname_on_shift_close'] = requireOpname ? 1 : 0;
@@ -383,6 +386,7 @@ class AuthProvider extends ChangeNotifier {
     if (reservationDescription != null) _user!.company?['reservation_description'] = reservationDescription;
     if (name != null) _user!.company?['name'] = name;
     if (isKdsEnabled != null) _user!.company?['is_kds_enabled'] = isKdsEnabled ? 1 : 0;
+    if (isProductImageEnabled != null) _user!.company?['is_product_image_enabled'] = isProductImageEnabled ? 1 : 0;
     if (defaultLanguage != null) _user!.company?['default_language'] = defaultLanguage;
     notifyListeners();
 
@@ -411,6 +415,7 @@ class AuthProvider extends ChangeNotifier {
       if (reservationDescription != null) body['reservation_description'] = reservationDescription;
       if (name != null) body['name'] = name;
       if (isKdsEnabled != null) body['is_kds_enabled'] = isKdsEnabled;
+      if (isProductImageEnabled != null) body['is_product_image_enabled'] = isProductImageEnabled;
       if (defaultLanguage != null) body['default_language'] = defaultLanguage;
 
       final response = await http.post(
@@ -455,6 +460,7 @@ class AuthProvider extends ChangeNotifier {
       _user!.company?['reservation_description'] = currentReservationDesc;
       _user!.company?['name'] = currentName;
       _user!.company?['is_kds_enabled'] = currentKds ? 1 : 0;
+      _user!.company?['is_product_image_enabled'] = currentProductImage;
       _user!.company?['default_language'] = currentDefaultLanguage;
       notifyListeners();
       return false;
@@ -467,6 +473,23 @@ class AuthProvider extends ChangeNotifier {
       _user!.company?['require_cash_drawer_balance'] = currentCashDrawer;
       _user!.company?['is_qris_enabled'] = currentQris;
       _user!.company?['is_transfer_enabled'] = currentTransfer;
+      _user!.company?['late_tolerance_minutes'] = currentTolerance;
+      _user!.company?['shift_schedules'] = currentShiftSchedules;
+      _user!.company?['is_qr_menu_enabled'] = currentQrMenuEnabled;
+      _user!.company?['is_reservation_enabled'] = currentReservationEnabled;
+      _user!.company?['is_membership_enabled'] = currentMembershipEnabled;
+      _user!.company?['default_member_discount_percent'] = currentMemberDefaultDiscount;
+      _user!.company?['member_default_discount'] = currentMemberDefaultDiscount;
+      _user!.company?['is_points_enabled'] = currentPointsEnabled;
+      _user!.company?['point_earning_amount'] = currentPointEarningAmount;
+      _user!.company?['point_redeem_rate'] = currentPointRedeemRate;
+      _user!.company?['slug'] = currentSlug;
+      _user!.company?['qr_menu_description'] = currentQrMenuDesc;
+      _user!.company?['reservation_description'] = currentReservationDesc;
+      _user!.company?['name'] = currentName;
+      _user!.company?['is_kds_enabled'] = currentKds ? 1 : 0;
+      _user!.company?['is_product_image_enabled'] = currentProductImage;
+      _user!.company?['default_language'] = currentDefaultLanguage;
       _user!.company?['late_tolerance_minutes'] = currentTolerance;
       _user!.company?['shift_schedules'] = currentShiftSchedules;
       _user!.company?['is_qr_menu_enabled'] = currentQrMenuEnabled;

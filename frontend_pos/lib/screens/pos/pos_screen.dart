@@ -1053,6 +1053,7 @@ class _POSScreenState extends State<POSScreen> {
 
   Widget _buildMenuCard(BuildContext context, ProductModel product) {
     final theme = Theme.of(context);
+    final isProductImageEnabled = Provider.of<AuthProvider>(context, listen: false).isProductImageEnabled;
 
     return Container(
       decoration: BoxDecoration(
@@ -1094,7 +1095,7 @@ class _POSScreenState extends State<POSScreen> {
                   child: Stack(
                     fit: StackFit.expand,
                     children: [
-                      (product.imageUrl != null && product.imageUrl!.isNotEmpty)
+                      (isProductImageEnabled && product.imageUrl != null && product.imageUrl!.isNotEmpty)
                           ? Image.network(
                               product.imageUrl!,
                               fit: BoxFit.cover,

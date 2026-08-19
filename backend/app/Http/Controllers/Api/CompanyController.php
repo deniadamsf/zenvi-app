@@ -240,6 +240,7 @@ class CompanyController extends Controller
             'qr_menu_description' => 'sometimes|nullable|string|max:1000',
             'reservation_description' => 'sometimes|nullable|string|max:1000',
             'is_kds_enabled' => 'sometimes|boolean',
+            'is_product_image_enabled' => 'sometimes|boolean',
             'default_language' => 'sometimes|string|in:id,en',
         ]);
 
@@ -287,6 +288,9 @@ class CompanyController extends Controller
         }
         if ($request->has('is_kds_enabled')) {
             $updates['is_kds_enabled'] = $request->is_kds_enabled;
+        }
+        if ($request->has('is_product_image_enabled')) {
+            $updates['is_product_image_enabled'] = $request->is_product_image_enabled;
         }
         if ($request->has('is_qr_menu_enabled')) {
             $updates['is_qr_menu_enabled'] = $request->is_qr_menu_enabled;
