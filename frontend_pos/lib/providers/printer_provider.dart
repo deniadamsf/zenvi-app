@@ -98,15 +98,13 @@ class PrinterProvider extends ChangeNotifier {
       final data = jsonDecode(savedData);
       final address = data['address'];
       
-      // Find in scanned devices
-      try {
-        _selectedDevice = _devices.firstWhere((d) => d.address == address);
+      final match = _devices.where((d) => d.address == address).firstOrNull;
+      if (match != null) {
+        _selectedDevice = match;
         // Try to connect automatically
         if (!_isConnected) {
           await connect(_selectedDevice!);
         }
-      } catch (e) {
-        // Device not found in paired list
       }
     }
   }
