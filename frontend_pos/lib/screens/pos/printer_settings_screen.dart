@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:easy_localization/easy_localization.dart';
 import '../../providers/printer_provider.dart';
+import '../../providers/auth_provider.dart';
 import '../../widgets/zenvi_header.dart';
 
 class PrinterSettingsScreen extends StatefulWidget {
@@ -23,6 +24,7 @@ class _PrinterSettingsScreenState extends State<PrinterSettingsScreen> {
   @override
   Widget build(BuildContext context) {
     final printerProvider = Provider.of<PrinterProvider>(context);
+    final authProvider = Provider.of<AuthProvider>(context, listen: false);
     final theme = Theme.of(context);
 
     return Scaffold(
@@ -43,34 +45,58 @@ class _PrinterSettingsScreenState extends State<PrinterSettingsScreen> {
           Container(
             padding: const EdgeInsets.all(16),
             color: printerProvider.isConnected ? Colors.green.shade50 : Colors.red.shade50,
-            child: Row(
+            child: Column(
               children: [
-                Icon(
-                  printerProvider.isConnected ? Icons.bluetooth_connected : Icons.bluetooth_disabled,
-                  color: printerProvider.isConnected ? Colors.green : Colors.red,
-                ),
-                const SizedBox(width: 16),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        printerProvider.isConnected ? 'terhubung_9'.tr(context: context) : 'terputus_8'.tr(context: context),
-                        style: TextStyle(
-                          fontWeight: FontWeight.bold,
-                          color: printerProvider.isConnected ? Colors.green.shade800 : Colors.red.shade800,
-                        ),
+                Row(
+                  children: [
+                    Icon(
+                      printerProvider.isConnected ? Icons.bluetooth_connected : Icons.bluetooth_disabled,
+                      color: printerProvider.isConnected ? Colors.green : Colors.red,
+                    ),
+                    const SizedBox(width: 16),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            printerProvider.isConnected ? 'terhubung_9'.tr(context: context) : 'terputus_8'.tr(context: context),
+                            style: TextStyle(
+                              fontWeight: FontWeight.bold,
+                              color: printerProvider.isConnected ? Colors.green.shade800 : Colors.red.shade800,
+                            ),
+                          ),
+                          if (printerProvider.selectedDevice != null)
+                            Text(printerProvider.selectedDevice!.name ?? 'unknown_device_14'.tr(context: context)),
+                        ],
                       ),
-                      if (printerProvider.selectedDevice != null)
-                        Text(printerProvider.selectedDevice!.name ?? 'unknown_device_14'.tr(context: context)),
+                    ),
+                    if (printerProvider.isConnected) ...[
+                      TextButton.icon(
+                        onPressed: () async {
+                          final storeName = authProvider.user?.company?['name']?.toString();
+                          final success = await printerProvider.printTestReceipt(storeName: storeName);
+                          if (context.mounted) {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(
+                                content: Text(success
+                                    ? 'test_print_success'.tr(context: context)
+                                    : 'test_print_failed'.tr(context: context)),
+                                backgroundColor: success ? Colors.green : Colors.red,
+                              ),
+                            );
+                          }
+                        },
+                        icon: const Icon(Icons.print_rounded, size: 18),
+                        label: Text('test_print_btn'.tr(context: context)),
+                        style: TextButton.styleFrom(foregroundColor: theme.colorScheme.primary),
+                      ),
+                      TextButton(
+                        onPressed: () => printerProvider.disconnect(),
+                        child: Text('putuskan_304'.tr(context: context), style: const TextStyle(color: Colors.red)),
+                      ),
                     ],
-                  ),
+                  ],
                 ),
-                if (printerProvider.isConnected)
-                  TextButton(
-                    onPressed: () => printerProvider.disconnect(),
-                    child: Text('putuskan_304'.tr(context: context), style: const TextStyle(color: Colors.red)),
-                  ),
               ],
             ),
           ),

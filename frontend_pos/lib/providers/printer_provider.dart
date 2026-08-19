@@ -3,6 +3,8 @@ import 'dart:typed_data';
 import 'package:flutter/material.dart';
 import 'package:blue_thermal_printer/blue_thermal_printer.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:esc_pos_utils_plus/esc_pos_utils_plus.dart';
+import 'package:intl/intl.dart';
 
 class PrinterProvider extends ChangeNotifier {
   final BlueThermalPrinter _bluetooth = BlueThermalPrinter.instance;
@@ -126,5 +128,36 @@ class PrinterProvider extends ChangeNotifier {
       debugPrint("Print error: $e");
       return false;
     }
+  }
+
+  Future<bool> printTestReceipt({String? storeName}) async {
+    final profile = await CapabilityProfile.load();
+    final generator = Generator(PaperSize.mm58, profile);
+    List<int> bytes = [];
+
+    bytes += generator.reset();
+    bytes += generator.text(
+      (storeName ?? 'ZENVI POS').toUpperCase(),
+      styles: const PosStyles(
+        align: PosAlign.center,
+        height: PosTextSize.size2,
+        width: PosTextSize.size2,
+        bold: true,
+      ),
+    );
+    bytes += generator.text(
+      'TEST PRINT BERHASIL',
+      styles: const PosStyles(align: PosAlign.center, bold: true),
+    );
+    bytes += generator.hr();
+    bytes += generator.text('Waktu : ${DateFormat('dd/MM/yyyy HH:mm:ss').format(DateTime.now())}');
+    bytes += generator.text('Status: Terhubung OK');
+    bytes += generator.text('Kertas: 58mm Thermal');
+    bytes += generator.hr();
+    bytes += generator.text('1234567890 ABCD WXYZ');
+    bytes += generator.feed(2);
+    bytes += generator.cut();
+
+    return printBytes(bytes);
   }
 }

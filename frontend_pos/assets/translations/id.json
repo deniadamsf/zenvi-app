@@ -1124,5 +1124,8 @@
     "shift_since_time": "Mulai {}",
     "katalog_foto_produk_title": "Katalog Foto Produk",
     "katalog_foto_produk_desc": "Menampilkan foto produk di menu POS dan katalog. Nonaktifkan untuk mode hemat penyimpanan.",
-    "pro_feature_badge": "PRO"
+    "pro_feature_badge": "PRO",
+    "test_print_btn": "Cetak Tes",
+    "test_print_success": "Perintah tes cetak berhasil dikirim!",
+    "test_print_failed": "Gagal mengirim tes cetak."
 }

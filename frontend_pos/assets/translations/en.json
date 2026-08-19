@@ -1124,5 +1124,8 @@
     "shift_since_time": "Since {}",
     "katalog_foto_produk_title": "Product Photo Catalog",
     "katalog_foto_produk_desc": "Display product images in POS and catalog. Disable to save storage and data.",
-    "pro_feature_badge": "PRO"
+    "pro_feature_badge": "PRO",
+    "test_print_btn": "Test Print",
+    "test_print_success": "Test print command sent successfully!",
+    "test_print_failed": "Failed to send test print."
 }
