@@ -14,7 +14,7 @@ class ZenviLogo extends StatelessWidget {
   const ZenviLogo({
     super.key,
     this.size = 100.0,
-    this.primaryColor = const Color(0xFF00796B), // Dark Teal
+    this.primaryColor = const Color(0xFF0D7C83), // Zenvi Teal
     this.variant = ZenviLogoVariant.solid,
   });
 
