@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 import 'package:easy_localization/easy_localization.dart';
 import '../../providers/theme_provider.dart';
 import '../../providers/auth_provider.dart';
+import 'package:url_launcher/url_launcher.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import '../auth/login_screen.dart';
 import 'employee_settings_screen.dart';
@@ -181,6 +182,23 @@ class _SettingsScreenState extends State<SettingsScreen> {
                             ),
                           ),
                         ).animate().fade(delay: 150.ms).slideY(begin: 0.1, end: 0),
+                        
+                        const SizedBox(height: 16),
+                        
+                        // Privacy Policy
+                        _buildSettingsCard(
+                          theme: theme,
+                          title: 'privacy_policy_title'.tr(context: context),
+                          subtitle: 'privacy_policy_subtitle'.tr(context: context),
+                          icon: Icons.shield_outlined,
+                          onTap: () async {
+                            final lang = context.locale.languageCode;
+                            final uri = Uri.parse('https://zenvi.cellanoma.my.id/privacy-policy?lang=$lang');
+                            if (await canLaunchUrl(uri)) {
+                              await launchUrl(uri, mode: LaunchMode.externalApplication);
+                            }
+                          },
+                        ).animate().fade(delay: 180.ms).slideY(begin: 0.1, end: 0),
                         
                         const SizedBox(height: 32),
                         
