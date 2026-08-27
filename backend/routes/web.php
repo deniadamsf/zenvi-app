@@ -57,7 +57,20 @@ Route::post('/api/public/reservations/{slug}', [PublicMenuController::class, 'su
 Route::post('/api/public/members/{slug}', [PublicMenuController::class, 'registerMember']);
 Route::get('/api/public/members/{slug}/check', [PublicMenuController::class, 'checkMember']);
 
+// Disclaimer / Penafian Routes
+Route::get('/disclaimer', function () {
+    return view('disclaimer');
+})->name('disclaimer');
+
+Route::get('/penafian', function () {
+    return view('disclaimer');
+});
+
+Route::get('/api/disclaimer', function () {
+    return view('disclaimer');
+});
+
 // Store Portal Landing Page (e.g. zenvi.cellanoma.my.id/toko-kopi)
-Route::get('/{slug}', [PublicMenuController::class, 'show'])->where('slug', '^(?!api|storage|build|css|js|images|vendor|privacy-policy|kebijakan-privasi|privacy|delete-account|hapus-akun|favicon\.ico|robots\.txt).*$')->name('public.store');
+Route::get('/{slug}', [PublicMenuController::class, 'show'])->where('slug', '^(?!api|storage|build|css|js|images|vendor|privacy-policy|kebijakan-privasi|privacy|delete-account|hapus-akun|disclaimer|penafian|favicon\.ico|robots\.txt).*$')->name('public.store');
 
 
