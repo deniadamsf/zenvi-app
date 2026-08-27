@@ -1127,5 +1127,9 @@
     "pro_feature_badge": "PRO",
     "test_print_btn": "Test Print",
     "test_print_success": "Test print command sent successfully!",
-    "test_print_failed": "Failed to send test print."
+    "test_print_failed": "Failed to send test print.",
+    "privacy_policy_title": "Privacy Policy",
+    "privacy_policy_subtitle": "Data privacy compliance & device permissions in Zenvi",
+    "account_deletion_title": "Delete Account & Data",
+    "account_deletion_desc": "Request permanent deletion of account and store data"
 }

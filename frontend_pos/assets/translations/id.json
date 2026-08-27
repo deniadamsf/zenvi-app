@@ -1127,5 +1127,9 @@
     "pro_feature_badge": "PRO",
     "test_print_btn": "Cetak Tes",
     "test_print_success": "Perintah tes cetak berhasil dikirim!",
-    "test_print_failed": "Gagal mengirim tes cetak."
+    "test_print_failed": "Gagal mengirim tes cetak.",
+    "privacy_policy_title": "Kebijakan Privasi",
+    "privacy_policy_subtitle": "Kepatuhan privasi data & izin perangkat Zenvi",
+    "account_deletion_title": "Hapus Akun & Data",
+    "account_deletion_desc": "Permohonan penghapusan akun dan data toko permanen"
 }
