@@ -8,10 +8,24 @@ plugins {
     id("com.google.gms.google-services")
 }
 
+import java.io.File
+
 val keystoreProperties = Properties()
-val keystorePropertiesFile = rootProject.file("key.properties")
-if (keystorePropertiesFile.exists()) {
-    keystoreProperties.load(FileInputStream(keystorePropertiesFile))
+val possibleKeyFiles = listOf(
+    File(projectDir, "key.properties"),
+    File(projectDir, "../key.properties"),
+    File(rootDir, "key.properties"),
+    File(rootDir, "app/key.properties"),
+    File("d:/zenvi/frontend_pos/android/key.properties"),
+    File("d:/zenvi/frontend_pos/android/app/key.properties")
+)
+
+val keyFile = possibleKeyFiles.firstOrNull { it.exists() }
+if (keyFile != null) {
+    keystoreProperties.load(FileInputStream(keyFile))
+    println("Loaded keystore properties from: " + keyFile.absolutePath)
+} else {
+    println("WARNING: key.properties not found, using release defaults")
 }
 
 android {
@@ -27,24 +41,33 @@ android {
 
     signingConfigs {
         create("release") {
-            val keyAliasVal = keystoreProperties["keyAlias"] as String?
-            val keyPasswordVal = keystoreProperties["keyPassword"] as String?
-            val storeFileVal = keystoreProperties["storeFile"] as String?
-            val storePasswordVal = keystoreProperties["storePassword"] as String?
-            if (keyAliasVal != null && keyPasswordVal != null && storeFileVal != null && storePasswordVal != null) {
-                keyAlias = keyAliasVal
-                keyPassword = keyPasswordVal
-                storeFile = rootProject.file(storeFileVal)
-                storePassword = storePasswordVal
-            }
+            val keyAliasVal = keystoreProperties.getProperty("keyAlias") ?: "zenvi_upload"
+            val keyPasswordVal = keystoreProperties.getProperty("keyPassword") ?: "ZenviRelease2026!"
+            val storePasswordVal = keystoreProperties.getProperty("storePassword") ?: "ZenviRelease2026!"
+            val storeFileVal = keystoreProperties.getProperty("storeFile") ?: "app/zenvi-upload-keystore.jks"
+            
+            val possibleKeystores = listOf(
+                File(projectDir, storeFileVal),
+                File(projectDir, "zenvi-upload-keystore.jks"),
+                File(rootDir, storeFileVal),
+                File(rootDir, "app/zenvi-upload-keystore.jks"),
+                File("d:/zenvi/frontend_pos/android/app/zenvi-upload-keystore.jks"),
+                File("d:/zenvi/frontend_pos/android/zenvi-upload-keystore.jks")
+            )
+            
+            val resolvedKeystore = possibleKeystores.firstOrNull { it.exists() }
+            
+            keyAlias = keyAliasVal
+            keyPassword = keyPasswordVal
+            storePassword = storePasswordVal
+            storeFile = resolvedKeystore
+            
+            println("Release Signing Config: alias=" + keyAlias + " storeFile=" + storeFile?.absolutePath + " (exists=" + storeFile?.exists() + ")")
         }
     }
 
     defaultConfig {
-        // TODO: Specify your own unique Application ID (https://developer.android.com/studio/build/application-id.html).
         applicationId = "com.cellanoma.zenvi"
-        // You can update the following values to match your application needs.
-        // For more information, see: https://flutter.dev/to/review-gradle-config.
         minSdk = flutter.minSdkVersion
         targetSdk = flutter.targetSdkVersion
         versionCode = flutter.versionCode
@@ -54,12 +77,7 @@ android {
 
     buildTypes {
         release {
-            val releaseSigning = signingConfigs.getByName("release")
-            signingConfig = if (releaseSigning.storeFile?.exists() == true) {
-                releaseSigning
-            } else {
-                signingConfigs.getByName("debug")
-            }
+            signingConfig = signingConfigs.getByName("release")
         }
     }
 }
