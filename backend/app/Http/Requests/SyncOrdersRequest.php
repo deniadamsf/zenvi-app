@@ -15,6 +15,7 @@ class SyncOrdersRequest extends FormRequest
     {
         return [
             'orders' => 'required|array',
+            'orders.*.client_order_id' => 'nullable|string|max:64',
             'orders.*.shift_id' => 'required|exists:shifts,id',
             'orders.*.serviced_by_user_id' => 'nullable|exists:users,id',
             'orders.*.member_id' => 'nullable|exists:members,id',

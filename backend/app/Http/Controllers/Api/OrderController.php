@@ -9,6 +9,7 @@ use App\Models\Ingredient;
 use App\Models\Member;
 use App\Models\Order;
 use App\Models\Product;
+use App\Models\ProductVariant;
 use App\Services\FirebaseNotificationService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -54,6 +55,63 @@ class OrderController extends Controller
     }
 
     /**
+     * Recompute what an order's total_amount *should* be from server-side product
+     * prices, independent of whatever the offline client calculated. Used to flag
+     * (not block) orders whose reported total doesn't match reality - e.g. the
+     * product price changed while the order sat offline, or the app/client was
+     * tampered with.
+     *
+     * Returns ['expected_total' => float, 'note' => string|null on mismatch].
+     */
+    private function calculateExpectedTotal(array $orderData): array
+    {
+        $expectedSubtotal = 0.0;
+
+        foreach ($orderData['items'] as $itemData) {
+            $product = Product::find($itemData['product_id']);
+            if (!$product) {
+                continue;
+            }
+
+            $unitPrice = (float) $product->price;
+
+            if (!empty($itemData['variant_name'])) {
+                $variant = ProductVariant::where('product_id', $product->id)
+                    ->where('name', $itemData['variant_name'])
+                    ->first();
+                if ($variant) {
+                    $unitPrice = (float) $variant->price;
+                }
+            } else {
+                $afterPercent = $unitPrice - ($unitPrice * ((float) ($product->discount_percent ?? 0)) / 100);
+                $afterNominal = $afterPercent - (float) ($product->discount_nominal ?? 0);
+                $unitPrice = max($afterNominal, 0);
+            }
+
+            $expectedSubtotal += $unitPrice * (int) $itemData['qty'];
+        }
+
+        $memberDiscount = (float) ($orderData['member_discount_amount'] ?? 0);
+        $pointRedeemAmount = (float) ($orderData['point_redeem_amount'] ?? 0);
+        $expectedTotal = max($expectedSubtotal - $memberDiscount - $pointRedeemAmount, 0);
+
+        $submittedTotal = (float) $orderData['total_amount'];
+        $tolerance = 2.0; // toleransi pembulatan rupiah
+        $note = null;
+
+        if (abs($expectedTotal - $submittedTotal) > $tolerance) {
+            $note = sprintf(
+                'Total dari kasir Rp%s, seharusnya Rp%s (selisih Rp%s) berdasarkan harga produk saat sinkronisasi.',
+                number_format($submittedTotal, 0, ',', '.'),
+                number_format($expectedTotal, 0, ',', '.'),
+                number_format(abs($expectedTotal - $submittedTotal), 0, ',', '.')
+            );
+        }
+
+        return ['expected_total' => $expectedTotal, 'note' => $note];
+    }
+
+    /**
      * Sync bulk orders from offline-first mobile app
      */
     public function sync(SyncOrdersRequest $request)
@@ -68,11 +126,33 @@ class OrderController extends Controller
             $userId = $request->user()->id;
             $syncedOrders = [];
             $lowStockIngredients = [];
+            $priceMismatchOrders = [];
 
             foreach ($request->orders as $orderData) {
+                // Idempotency guard: skip orders already synced before (e.g. client retried
+                // after a response timeout even though the server had already committed it).
+                $clientOrderId = $orderData['client_order_id'] ?? null;
+                if ($clientOrderId) {
+                    $existingOrder = Order::where('company_id', $companyId)
+                        ->where('client_order_id', $clientOrderId)
+                        ->first();
+
+                    if ($existingOrder) {
+                        \Illuminate\Support\Facades\Log::info("Duplicate order sync ignored for client_order_id {$clientOrderId} (order #{$existingOrder->id}).");
+                        $syncedOrders[] = $existingOrder->load(['items', 'user', 'shift.branch', 'member']);
+                        continue;
+                    }
+                }
+
+                // Recompute the total server-side from actual product prices. We still
+                // accept the order either way (offline POS can't be blocked on this),
+                // but flag it for Owner review when it doesn't line up.
+                $priceCheck = $this->calculateExpectedTotal($orderData);
+
                 // Create Order
                 $order = Order::create([
                     'company_id' => $companyId,
+                    'client_order_id' => $clientOrderId,
                     'user_id' => $userId,
                     'serviced_by_user_id' => $orderData['serviced_by_user_id'] ?? null,
                     'member_id' => $orderData['member_id'] ?? null,
@@ -83,15 +163,28 @@ class OrderController extends Controller
                     'point_redeem_amount' => $orderData['point_redeem_amount'] ?? 0,
                     'shift_id' => $orderData['shift_id'],
                     'total_amount' => $orderData['total_amount'],
+                    'price_mismatch' => $priceCheck['note'] !== null,
+                    'price_mismatch_note' => $priceCheck['note'],
                     'payment_method' => $orderData['payment_method'] ?? 'cash',
                     'cash_received' => $orderData['cash_received'] ?? null,
                     'cash_change' => $orderData['cash_change'] ?? null,
                     'status' => 'synced',
                 ]);
 
+                if ($priceCheck['note'] !== null) {
+                    \Illuminate\Support\Facades\Log::warning("Price mismatch on order sync: {$priceCheck['note']}");
+                    $priceMismatchOrders[] = $order;
+                }
+
                 // Update Member statistics and points if member_id is provided
                 if (!empty($orderData['member_id'])) {
-                    $member = Member::where('company_id', $companyId)->find($orderData['member_id']);
+                    // Lock the member row so two devices syncing an order for the same
+                    // member at the same time can't both read a stale points balance and
+                    // push it negative (check-then-decrement race).
+                    $member = Member::where('company_id', $companyId)
+                        ->where('id', $orderData['member_id'])
+                        ->lockForUpdate()
+                        ->first();
                     if ($member) {
                         $pointsRedeemed = (int) ($orderData['points_redeemed'] ?? 0);
                         if ($pointsRedeemed > 0) {
@@ -129,14 +222,35 @@ class OrderController extends Controller
 
                         foreach ($product->ingredients as $ingredientInfo) {
                             $amountToDeduct = $ingredientInfo->pivot->amount_needed * $itemData['qty'];
-                            $ingredientModel = Ingredient::find($ingredientInfo->id);
+                            // Lock the ingredient row for the whole check-then-decrement below so
+                            // concurrent syncs (e.g. two POS devices reconnecting at once) can't
+                            // both read the same stock_qty and both pass the "enough stock" check.
+                            $ingredientModel = Ingredient::where('id', $ingredientInfo->id)->lockForUpdate()->first();
 
                             if ($ingredientModel) {
                                 if ($branchId) {
-                                    $branchStock = \App\Models\BranchIngredient::firstOrCreate(
-                                        ['branch_id' => $branchId, 'ingredient_id' => $ingredientModel->id],
-                                        ['stock_qty' => $ingredientModel->stock_qty ?? 0, 'min_stock' => $ingredientModel->min_stock ?? 5]
-                                    );
+                                    $branchStock = \App\Models\BranchIngredient::where('branch_id', $branchId)
+                                        ->where('ingredient_id', $ingredientModel->id)
+                                        ->lockForUpdate()
+                                        ->first();
+
+                                    if (!$branchStock) {
+                                        try {
+                                            $branchStock = \App\Models\BranchIngredient::create([
+                                                'branch_id' => $branchId,
+                                                'ingredient_id' => $ingredientModel->id,
+                                                'stock_qty' => $ingredientModel->stock_qty ?? 0,
+                                                'min_stock' => $ingredientModel->min_stock ?? 5,
+                                            ]);
+                                        } catch (\Illuminate\Database\QueryException $e) {
+                                            // Another concurrent request created it first (unique
+                                            // branch_id+ingredient_id constraint) - re-fetch with the lock.
+                                            $branchStock = \App\Models\BranchIngredient::where('branch_id', $branchId)
+                                                ->where('ingredient_id', $ingredientModel->id)
+                                                ->lockForUpdate()
+                                                ->first();
+                                        }
+                                    }
 
                                     if ($branchStock->stock_qty >= $amountToDeduct) {
                                         $branchStock->decrement('stock_qty', $amountToDeduct);
@@ -202,6 +316,23 @@ class OrderController extends Controller
                     }
                 } catch (\Exception $e) {
                     \Log::warning('Low stock notification failed: ' . $e->getMessage());
+                }
+            }
+
+            // Push Notification for Price Mismatch (to Owner only - needs review, not a stock-out)
+            if (!empty($priceMismatchOrders)) {
+                try {
+                    foreach ($priceMismatchOrders as $mismatchedOrder) {
+                        FirebaseNotificationService::sendToOwner(
+                            $companyId,
+                            'Order Perlu Ditinjau',
+                            "Total order #{$mismatchedOrder->id} tidak sesuai perhitungan harga saat ini. Cek Log Transaksi untuk detail.",
+                            'order',
+                            ['order_id' => $mismatchedOrder->id, 'type' => 'price_mismatch', 'route' => '/orders']
+                        );
+                    }
+                } catch (\Exception $e) {
+                    \Log::warning('Price mismatch notification failed: ' . $e->getMessage());
                 }
             }
 

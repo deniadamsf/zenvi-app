@@ -91,12 +91,19 @@ class SyncService {
 
         final payload = {
           'orders': [{
+            'client_order_id': order['client_order_id'],
             'shift_id': order['shift_id'],
             'total_amount': order['total_amount'],
             'payment_method': order['payment_method'] ?? 'cash',
             'cash_received': order['cash_received'],
             'cash_change': order['cash_change'],
             'serviced_by_user_id': order['serviced_by_user_id'],
+            'member_id': order['member_id'],
+            'member_name': order['member_name'],
+            'member_phone': order['member_phone'],
+            'member_discount_amount': order['member_discount_amount'],
+            'points_redeemed': order['points_redeemed'],
+            'point_redeem_amount': order['point_redeem_amount'],
             'items': order['items'],
           }],
         };
