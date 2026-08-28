@@ -1,5 +1,6 @@
 import 'package:sqflite/sqflite.dart';
 import 'package:path/path.dart';
+import 'package:uuid/uuid.dart';
 import '../models/product_model.dart';
 
 class DatabaseHelper {
@@ -20,7 +21,7 @@ class DatabaseHelper {
 
     return await openDatabase(
       path,
-      version: 10, // Upgraded version for Point Redemption support
+      version: 11, // Upgraded version for client_order_id (idempotent sync)
       onCreate: _createDB,
       onUpgrade: _upgradeDB,
     );
@@ -100,6 +101,11 @@ class DatabaseHelper {
       await db.execute("ALTER TABLE offline_orders ADD COLUMN points_redeemed INTEGER DEFAULT 0");
       await db.execute("ALTER TABLE offline_orders ADD COLUMN point_redeem_amount REAL DEFAULT 0");
     }
+    if (oldVersion < 11) {
+      // Idempotency key so a retried sync (e.g. after a response timeout) never
+      // creates a duplicate order / double stock-deduction on the server.
+      await db.execute("ALTER TABLE offline_orders ADD COLUMN client_order_id TEXT");
+    }
   }
 
   Future _createDB(Database db, int version) async {
@@ -143,6 +149,7 @@ class DatabaseHelper {
         member_discount_amount REAL DEFAULT 0,
         points_redeemed INTEGER DEFAULT 0,
         point_redeem_amount REAL DEFAULT 0,
+        client_order_id TEXT,
         created_at $textType
       )
     ''');
@@ -241,7 +248,11 @@ class DatabaseHelper {
     double? pointRedeemAmount,
   }) async {
     final db = await instance.database;
-    
+
+    // Digenerate sekali di sini (bukan saat sync) supaya kalau order ini di-retry
+    // beberapa kali oleh SyncService, ID-nya tetap sama dan server bisa mendeteksi duplikat.
+    final clientOrderId = const Uuid().v4();
+
     await db.transaction((txn) async {
       // 1. Simpan Header Order
       final orderId = await txn.insert('offline_orders', {
@@ -260,6 +271,7 @@ class DatabaseHelper {
         'member_discount_amount': memberDiscountAmount ?? 0,
         'points_redeemed': pointsRedeemed ?? 0,
         'point_redeem_amount': pointRedeemAmount ?? 0,
+        'client_order_id': clientOrderId,
         'created_at': DateTime.now().toIso8601String(),
       });
 
@@ -312,6 +324,7 @@ class DatabaseHelper {
       
       syncPayload.add({
         'local_id': order['id'], // Digunakan untuk menghapus nanti
+        'client_order_id': order['client_order_id'],
         'shift_id': order['shift_id'],
         'total_amount': order['total_amount'],
         'payment_method': order['payment_method'] ?? 'cash',

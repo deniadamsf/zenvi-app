@@ -61,4 +61,33 @@ class Member extends Model
     {
         return $this->hasMany(Order::class);
     }
+
+    /**
+     * Create a member, retrying on the rare case where two requests for the same
+     * company generate the same auto member_code at the same time (the count-based
+     * generator in boot() isn't safe against true concurrent inserts - the unique
+     * (company_id, member_code) DB constraint is what actually catches it here).
+     */
+    public static function createUnique(array $attributes): self
+    {
+        $maxAttempts = 5;
+
+        for ($attempt = 1; $attempt <= $maxAttempts; $attempt++) {
+            try {
+                return static::create($attributes);
+            } catch (\Illuminate\Database\QueryException $e) {
+                $isDuplicateMemberCode = ($e->errorInfo[1] ?? null) == 1062
+                    && str_contains($e->getMessage(), 'member_code');
+
+                if (!$isDuplicateMemberCode || $attempt === $maxAttempts) {
+                    throw $e;
+                }
+                // Let the next attempt's boot() hook recompute member_code against
+                // the now-existing colliding row.
+            }
+        }
+
+        // Unreachable, but keeps static analysis happy about the return type.
+        throw new \RuntimeException('Gagal membuat member setelah beberapa percobaan.');
+    }
 }

@@ -11,6 +11,7 @@ class Order extends Model
 
     protected $fillable = [
         'company_id',
+        'client_order_id',
         'user_id',
         'serviced_by_user_id',
         'member_id',
@@ -18,6 +19,8 @@ class Order extends Model
         'member_phone',
         'shift_id',
         'total_amount',
+        'price_mismatch',
+        'price_mismatch_note',
         'payment_method',
         'cash_received',
         'cash_change',
@@ -30,6 +33,7 @@ class Order extends Model
 
     protected $casts = [
         'total_amount' => 'double',
+        'price_mismatch' => 'boolean',
         'cash_received' => 'double',
         'cash_change' => 'double',
         'member_discount_amount' => 'double',

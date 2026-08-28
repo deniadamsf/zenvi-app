@@ -48,6 +48,8 @@ class OrderModel {
   final double? memberDiscountAmount;
   final int? pointsRedeemed;
   final double? pointRedeemAmount;
+  final bool priceMismatch;
+  final String? priceMismatchNote;
 
   OrderModel({
     required this.id,
@@ -69,6 +71,8 @@ class OrderModel {
     this.memberDiscountAmount,
     this.pointsRedeemed,
     this.pointRedeemAmount,
+    this.priceMismatch = false,
+    this.priceMismatchNote,
   });
 
   factory OrderModel.fromMap(Map<String, dynamic> map) {
@@ -97,6 +101,8 @@ class OrderModel {
       pointRedeemAmount: map['point_redeem_amount'] != null
           ? double.tryParse(map['point_redeem_amount'].toString())
           : null,
+      priceMismatch: map['price_mismatch'] == true || map['price_mismatch'] == 1,
+      priceMismatchNote: map['price_mismatch_note']?.toString(),
       items: map['items'] != null
           ? List<OrderItemModel>.from(map['items'].map((x) => OrderItemModel.fromMap(x)))
           : [],

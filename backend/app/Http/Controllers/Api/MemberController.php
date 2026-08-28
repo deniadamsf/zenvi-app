@@ -110,7 +110,7 @@ class MemberController extends Controller
         }
 
         $validated['company_id'] = $companyId;
-        $member = Member::create($validated);
+        $member = Member::createUnique($validated);
 
         return response()->json([
             'message' => 'Member berhasil didaftarkan.',

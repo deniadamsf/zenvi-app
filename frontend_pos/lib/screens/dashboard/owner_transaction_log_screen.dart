@@ -73,6 +73,31 @@ class _OwnerTransactionLogScreenState extends State<OwnerTransactionLogScreen> {
             Container(width: 40, height: 4, decoration: BoxDecoration(color: Colors.grey[300], borderRadius: BorderRadius.circular(2))),
             const SizedBox(height: 24),
             Text('transaction_detail_number'.tr(context: context, args: [order.id.toString()]), style: Theme.of(context).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold)),
+            if (order.priceMismatch && order.priceMismatchNote != null) ...[
+              const SizedBox(height: 12),
+              Container(
+                width: double.infinity,
+                padding: const EdgeInsets.all(12),
+                decoration: BoxDecoration(
+                  color: Colors.orange.withValues(alpha: 0.1),
+                  borderRadius: BorderRadius.circular(12),
+                  border: Border.all(color: Colors.orange.withValues(alpha: 0.3)),
+                ),
+                child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const Icon(Icons.error_outline, size: 18, color: Colors.orange),
+                    const SizedBox(width: 8),
+                    Expanded(
+                      child: Text(
+                        order.priceMismatchNote!,
+                        style: const TextStyle(color: Colors.orange, fontSize: 12, fontWeight: FontWeight.w600),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
             const SizedBox(height: 16),
             Expanded(
               child: SingleChildScrollView(
@@ -248,6 +273,26 @@ class _OwnerTransactionLogScreenState extends State<OwnerTransactionLogScreen> {
                                         borderRadius: BorderRadius.circular(4),
                                       ),
                                       child: Text('void_167'.tr(context: context), style: TextStyle(color: Colors.red, fontSize: 10, fontWeight: FontWeight.bold)),
+                                    )
+                                  else if (order.priceMismatch)
+                                    Container(
+                                      margin: const EdgeInsets.only(top: 4),
+                                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                                      decoration: BoxDecoration(
+                                        color: Colors.orange.withValues(alpha: 0.12),
+                                        borderRadius: BorderRadius.circular(4),
+                                      ),
+                                      child: Row(
+                                        mainAxisSize: MainAxisSize.min,
+                                        children: [
+                                          const Icon(Icons.error_outline, size: 11, color: Colors.orange),
+                                          const SizedBox(width: 3),
+                                          Text(
+                                            'order_needs_review_badge'.tr(context: context),
+                                            style: const TextStyle(color: Colors.orange, fontSize: 10, fontWeight: FontWeight.bold),
+                                          ),
+                                        ],
+                                      ),
                                     )
                                 ],
                               )

@@ -255,7 +255,7 @@ class PublicMenuController extends Controller
             ], 200);
         }
 
-        $member = Member::create([
+        $member = Member::createUnique([
             'company_id' => $company->id,
             'name' => $validated['name'],
             'phone' => $standardPhone,
