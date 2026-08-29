@@ -46,3 +46,28 @@ Setiap kali ada perubahan pada backend (Laravel) baik berupa:
 ## 4. Mandatory Automated Git Version Control
 - Setiap kali selesai melakukan perbaikan bug, penambahan fitur, atau modifikasi file di Zenvi, **WAJIB** membuat Git commit otomatis dengan format pesan deskriptif (Conventional Commits: `feat(...)`, `fix(...)`, `refactor(...)`, dll).
 - Jika remote repository (`origin`) sudah terhubung, lakukan `git push origin <branch>` secara otomatis agar backup kode selalu up-to-date.
+
+## 5. Aturan Pemilihan Model & Delegasi Sub-Agent OTOMATIS
+Konteks: sesi utama selalu jalan dengan model tertinggi (**Opus 5**) sebagai orkestrator. Pemilihan model untuk sub-agent DAN keputusan mendelegasikan tugas ke sub-agent **wajib dilakukan otomatis oleh AI itu sendiri** berdasarkan kriteria di bawah — **JANGAN tanya/konfirmasi ke user dulu** ("mau pakai model apa?", "boleh saya delegasikan?"). AI langsung menilai kompleksitas & sifat tugas, lalu langsung pilih tingkatan model yang sesuai dan langsung spawn sub-agent kalau memang kriterianya terpenuhi — tanpa menunggu instruksi eksplisit dari user setiap kali.
+
+**Tingkatan model:**
+- **Opus 5 (orkestrator)** — tetap di sesi utama untuk reasoning inti, perencanaan, keputusan arsitektur/desain, dan sintesis akhir. Jangan didelegasikan ke sub-agent kecuali sub-task itu sendiri butuh reasoning berat yang tidak bisa diturunkan.
+- **Sonnet 5 (default sub-agent)** — dipakai untuk delegasi multi-step: eksplorasi lintas banyak file, riset yang butuh sintesis, implementasi perubahan multi-file, code review. Kalau ragu tingkatan mana yang dipakai, pakai ini.
+- **Haiku 4.5 (tugas ringan/mekanis)** — dipakai untuk pencarian lokasi file/simbol (grep/glob-style lookup), tugas bervolume tinggi tapi berpola jelas, ringkasan singkat, validasi format. Jangan pakai Opus/Sonnet untuk ini karena hanya menambah biaya & latensi tanpa manfaat.
+
+**Kapan BOLEH spawn sub-agent:**
+- Riset terbuka yang butuh lebih dari ±3 kali pencarian/pembacaan file dan hasilnya perlu dirangkum.
+- Task yang independen dan bisa dikerjakan paralel dengan pekerjaan lain di sesi utama.
+
+**Kapan TIDAK BOLEH spawn sub-agent (kerjakan langsung di sesi utama pakai Glob/Grep/Read):**
+- Kalau lokasi file/simbol yang dicari bisa ditemukan dengan 1-3 kali panggilan Glob/Grep langsung — spawn agent di sini hanya menambah latensi start-up dan agent harus re-derive konteks yang sudah diketahui sesi utama.
+- Kalau sub-agent sebelumnya gagal/terputus di tengah jalan: **jangan** retry dengan agent besar yang sama. Turun dulu ke pencarian langsung (Grep/Glob/Read) sebelum mempertimbangkan spawn ulang.
+
+**Instruksi konkret untuk Claude Code** (tool `Agent`, parameter `model`) — semua ini dilakukan otomatis tanpa bertanya ke user:
+- Default: `sonnet` untuk task delegasi multi-step biasa.
+- Set eksplisit `haiku` untuk lookup/pencarian sederhana yang jelas polanya.
+- Set eksplisit `opus` hanya kalau task benar-benar butuh reasoning setara orkestrator dan tidak bisa dikerjakan langsung di sesi utama.
+- Sebelum spawn agent apa pun untuk "mencari file/kode", coba dulu Glob/Grep langsung — baru pertimbangkan delegasi kalau memang scope-nya luas.
+- Kalau kriteria "BOLEH spawn sub-agent" di atas terpenuhi, langsung spawn dengan tingkatan model yang sesuai — tidak perlu minta izin user, karena ini murni keputusan teknis/eksekusi, bukan keputusan yang berdampak besar/berisiko.
+
+> **Scope: bagian ini HANYA berlaku untuk Claude Code.** Nama model (Opus 5, Sonnet 5, Haiku 4.5) itu spesifik Anthropic/Claude — tidak ada padanannya di Gemini/Antigravity atau Codex, jadi seluruh Bagian 5 ini **tidak berlaku** saat mengerjakan project ini lewat Gemini/Antigravity atau Codex. Kalau tool tersebut punya mekanisme delegasi/sub-agent sendiri, ikuti konvensi native tool itu masing-masing, bukan tingkatan di atas.
