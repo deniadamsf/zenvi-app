@@ -36,6 +36,7 @@ import 'providers/member_promo_provider.dart';
 import 'providers/notification_provider.dart';
 import 'services/sync_service.dart';
 import 'services/notification_service.dart';
+import 'services/product_image_cache.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -46,6 +47,14 @@ void main() async {
     await NotificationService().initialize();
   } catch (e) {
     debugPrint('Notification service init failed: $e');
+  }
+
+  // Membaca daftar foto produk yang sudah tersimpan, supaya gambar offline
+  // bisa langsung tampil di frame pertama tanpa menunggu I/O.
+  try {
+    await ProductImageCache.instance.warmUp();
+  } catch (e) {
+    debugPrint('Product image cache warm-up failed: $e');
   }
 
   // Memulai pemantauan sinyal internet secara background

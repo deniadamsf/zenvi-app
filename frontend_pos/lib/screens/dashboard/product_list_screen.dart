@@ -5,6 +5,7 @@ import '../../providers/product_provider.dart';
 import '../../providers/auth_provider.dart';
 import '../../models/product_model.dart';
 import 'add_product_screen.dart';
+import '../../widgets/product_image.dart';
 import '../../widgets/zenvi_header.dart';
 
 class ProductListScreen extends StatefulWidget {
@@ -122,10 +123,10 @@ class _ProductListScreenState extends State<ProductListScreen> {
                                     child: (isProductImageEnabled && product.imageUrl != null && product.imageUrl!.isNotEmpty)
                                         ? ClipRRect(
                                             borderRadius: BorderRadius.circular(16),
-                                            child: Image.network(
-                                              product.imageUrl!,
+                                            child: ProductImage(
+                                              imageUrl: product.imageUrl,
                                               fit: BoxFit.cover,
-                                              errorBuilder: (context, error, stackTrace) => Icon(_getProductCategoryIcon(product), color: theme.colorScheme.primary.withValues(alpha: 0.6), size: 30),
+                                              fallback: Icon(_getProductCategoryIcon(product), color: theme.colorScheme.primary.withValues(alpha: 0.6), size: 30),
                                             ),
                                           )
                                         : Icon(_getProductCategoryIcon(product), color: theme.colorScheme.primary.withValues(alpha: 0.6), size: 30),

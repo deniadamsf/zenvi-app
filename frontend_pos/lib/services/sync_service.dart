@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:convert';
 import 'package:flutter/foundation.dart';
 import 'package:http/http.dart' as http;
@@ -6,6 +7,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import '../database/database_helper.dart';
 import '../models/product_model.dart';
 import '../config/api_config.dart';
+import 'product_image_cache.dart';
 
 class SyncService {
   static const String _apiUrl = ApiConfig.baseUrl;
@@ -51,6 +53,11 @@ class SyncService {
         // Simpan ke SQLite
         await _dbHelper.syncLocalProducts(products);
         debugPrint('✅ Berhasil menarik ${products.length} produk ke database lokal.');
+
+        // Unduh foto produk ke penyimpanan lokal supaya POS tetap menampilkan
+        // gambar saat offline. Sengaja tanpa await: membuka POS tidak boleh
+        // menunggu seluruh foto selesai diunduh.
+        unawaited(ProductImageCache.instance.syncProducts(products));
         return true;
       }
       return false;

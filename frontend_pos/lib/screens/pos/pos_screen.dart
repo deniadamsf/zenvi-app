@@ -18,6 +18,7 @@ import '../../providers/reservation_provider.dart';
 import '../../models/reservation_model.dart';
 import 'member_selection_modal.dart';
 import 'reservation_selection_modal.dart';
+import '../../widgets/product_image.dart';
 import '../../widgets/zenvi_header.dart';
 
 class POSScreen extends StatefulWidget {
@@ -1096,25 +1097,23 @@ class _POSScreenState extends State<POSScreen> {
                     fit: StackFit.expand,
                     children: [
                       (isProductImageEnabled && product.imageUrl != null && product.imageUrl!.isNotEmpty)
-                          ? Image.network(
-                              product.imageUrl!,
+                          ? ProductImage(
+                              imageUrl: product.imageUrl,
                               fit: BoxFit.cover,
-                              errorBuilder: (context, error, stackTrace) {
-                                return Center(
-                                  child: Container(
-                                    padding: const EdgeInsets.all(14),
-                                    decoration: BoxDecoration(
-                                      color: theme.colorScheme.primary.withValues(alpha: 0.08),
-                                      shape: BoxShape.circle,
-                                    ),
-                                    child: Icon(
-                                      _getProductCategoryIcon(product),
-                                      size: 34,
-                                      color: theme.colorScheme.primary.withValues(alpha: 0.6),
-                                    ),
+                              fallback: Center(
+                                child: Container(
+                                  padding: const EdgeInsets.all(14),
+                                  decoration: BoxDecoration(
+                                    color: theme.colorScheme.primary.withValues(alpha: 0.08),
+                                    shape: BoxShape.circle,
                                   ),
-                                );
-                              },
+                                  child: Icon(
+                                    _getProductCategoryIcon(product),
+                                    size: 34,
+                                    color: theme.colorScheme.primary.withValues(alpha: 0.6),
+                                  ),
+                                ),
+                              ),
                             )
                           : Center(
                               child: Container(
