@@ -2897,7 +2897,15 @@ class _DashboardOverviewState extends State<_DashboardOverview> {
         const SizedBox(height: 12),
         SizedBox(
           height: 94,
-          child: ListView.separated(
+          child: ShaderMask(
+            shaderCallback: (rect) => const LinearGradient(
+              begin: Alignment.centerLeft,
+              end: Alignment.centerRight,
+              colors: [Colors.white, Colors.white, Colors.transparent],
+              stops: [0.0, 0.93, 1.0],
+            ).createShader(rect),
+            blendMode: BlendMode.dstIn,
+            child: ListView.separated(
             scrollDirection: Axis.horizontal,
             physics: const BouncingScrollPhysics(),
             itemCount: actions.length,
@@ -2958,6 +2966,7 @@ class _DashboardOverviewState extends State<_DashboardOverview> {
                 ),
               );
             },
+          ),
           ),
         ),
       ],
