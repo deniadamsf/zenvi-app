@@ -41,9 +41,8 @@ class AuthProvider extends ChangeNotifier {
   bool get canAccessReservations => isReservationEnabled && (_user?.canAccessReservations ?? false);
   bool get canAccessExpenses => _user?.canAccessExpenses ?? false;
   
-  // TODO: WAJIB DIISI! Masukkan "Web application" Client ID dari Google Cloud Console
-  // Jika tidak diisi, login akan terus gagal!
-  static const String _serverClientId = '75036756497-o64941g9qq3trla7rrh2lqv8ip130fsu.apps.googleusercontent.com';
+  // Web application Client ID dari Firebase / Google Cloud Console (zenvi-erp)
+  static const String _serverClientId = '919665567596-b0lf3pcf00273dc2n98ep0o6oecsd9a7.apps.googleusercontent.com';
   
   // URL API Laravel Anda
   static const String _apiUrl = ApiConfig.baseUrl; 

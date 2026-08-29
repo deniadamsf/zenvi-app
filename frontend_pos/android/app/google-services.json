@@ -12,7 +12,28 @@
           "package_name": "com.cellanoma.zenvi"
         }
       },
-      "oauth_client": [],
+      "oauth_client": [
+        {
+          "client_id": "919665567596-k14ic8o53hfl3p5g7g2al1rp4kog570d.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.cellanoma.zenvi",
+            "certificate_hash": "14a6c010c5d4a53f8f06c52fc2652b7dbeffe93e"
+          }
+        },
+        {
+          "client_id": "919665567596-ppmg08ejhb3pjggpv20bns7549o8k5vd.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.cellanoma.zenvi",
+            "certificate_hash": "8cb22adfff5868556364765ed2eab94113497f58"
+          }
+        },
+        {
+          "client_id": "919665567596-b0lf3pcf00273dc2n98ep0o6oecsd9a7.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
       "api_key": [
         {
           "current_key": "AIzaSyArAObNFnI8hH1Hrdm6teVPIkXzSrf6bdY"
@@ -20,7 +41,12 @@
       ],
       "services": {
         "appinvite_service": {
-          "other_platform_oauth_client": []
+          "other_platform_oauth_client": [
+            {
+              "client_id": "919665567596-b0lf3pcf00273dc2n98ep0o6oecsd9a7.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
         }
       }
     }
