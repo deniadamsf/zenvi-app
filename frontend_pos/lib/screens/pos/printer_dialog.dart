@@ -60,7 +60,7 @@ class _PrinterDialogState extends State<PrinterDialog> {
       if (mounted) {
         setState(() {
           _step = 3;
-          _errorMessage = 'Belum ada printer yang dipilih.\nSilakan atur printer bluetooth terlebih dahulu.';
+          _errorMessage = 'print_err_no_printer'.tr(context: context);
         });
       }
       return;
@@ -77,7 +77,10 @@ class _PrinterDialogState extends State<PrinterDialog> {
       if (mounted) {
         setState(() {
           _step = 3;
-          _errorMessage = 'Gagal terhubung ke printer bluetooth (${printerProvider.selectedDevice?.name ?? 'device_6'.tr(context: context)}).';
+          _errorMessage = 'print_err_connect'.tr(
+            context: context,
+            args: [printerProvider.selectedDevice?.name ?? 'device_6'.tr(context: context)],
+          );
         });
       }
       return;
@@ -112,6 +115,7 @@ class _PrinterDialogState extends State<PrinterDialog> {
         memberName: widget.memberName,
         memberPhone: widget.memberPhone,
         memberDiscountAmount: widget.memberDiscountAmount,
+        paperWidthMm: printerProvider.paperWidthMm,
       );
       
       final success = await printerProvider.printBytes(bytes);
@@ -119,14 +123,14 @@ class _PrinterDialogState extends State<PrinterDialog> {
       if (mounted) {
         setState(() {
           _step = success ? 2 : 3;
-          if (!success) _errorMessage = 'Gagal mengirim data cetak ke printer.';
+          if (!success) _errorMessage = 'print_err_send'.tr(context: context);
         });
       }
     } catch (e) {
       if (mounted) {
         setState(() {
           _step = 3;
-          _errorMessage = 'Error saat mencetak: $e';
+          _errorMessage = 'print_err_generic'.tr(context: context, args: ['$e']);
         });
       }
     }
@@ -253,17 +257,17 @@ class _PrinterDialogState extends State<PrinterDialog> {
     String title;
     switch (_step) {
       case 0:
-        title = 'Menghubungkan...';
+        title = 'print_title_connecting'.tr(context: context);
         break;
       case 1:
-        title = 'Mencetak Struk...';
+        title = 'print_title_printing'.tr(context: context);
         break;
       case 3:
-        title = 'Gagal Mencetak';
+        title = 'print_title_failed'.tr(context: context);
         break;
       case 2:
       default:
-        title = 'Cetak Selesai!';
+        title = 'print_title_done'.tr(context: context);
         break;
     }
     return Text(
@@ -277,17 +281,17 @@ class _PrinterDialogState extends State<PrinterDialog> {
     String subtitle;
     switch (_step) {
       case 0:
-        subtitle = 'Sedang memastikan koneksi ke printer bluetooth.';
+        subtitle = 'print_sub_connecting'.tr(context: context);
         break;
       case 1:
-        subtitle = 'Mohon tunggu, struk sedang dicetak ke printer thermal.';
+        subtitle = 'print_sub_printing'.tr(context: context);
         break;
       case 3:
         subtitle = _errorMessage;
         break;
       case 2:
       default:
-        subtitle = 'Struk berhasil dicetak.';
+        subtitle = 'print_sub_done'.tr(context: context);
         break;
     }
     return Text(

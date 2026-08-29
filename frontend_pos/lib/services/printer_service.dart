@@ -5,6 +5,53 @@ import 'package:image/image.dart' as img;
 import '../providers/cart_provider.dart';
 import '../models/order_model.dart';
 
+/// Helper konversi lebar kertas (mm) ke parameter cetak ESC/POS.
+/// Dipakai bersama oleh PrinterService & PrinterProvider supaya lebar
+/// kertas yang dipilih user konsisten di struk maupun test print.
+class ReceiptPaper {
+  static const int defaultWidthMm = 58;
+  static const List<int> supportedWidthsMm = [58, 72, 80];
+
+  static int normalize(int widthMm) {
+    return supportedWidthsMm.contains(widthMm) ? widthMm : defaultWidthMm;
+  }
+
+  static PaperSize toPaperSize(int widthMm) {
+    switch (normalize(widthMm)) {
+      case 80:
+        return PaperSize.mm80;
+      case 72:
+        return PaperSize.mm72;
+      default:
+        return PaperSize.mm58;
+    }
+  }
+
+  /// Jumlah karakter per baris pada Font A (dipakai untuk perataan kolom manual).
+  static int maxChars(int widthMm) {
+    switch (normalize(widthMm)) {
+      case 80:
+        return 48;
+      case 72:
+        return 42;
+      default:
+        return 32;
+    }
+  }
+
+  /// Lebar logo optimal (px) agar tidak melebihi lebar dot printer.
+  static int logoWidth(int widthMm) {
+    switch (normalize(widthMm)) {
+      case 80:
+        return 380;
+      case 72:
+        return 300;
+      default:
+        return 200;
+    }
+  }
+}
+
 class PrintReceiptItem {
   final String name;
   final int qty;
@@ -79,9 +126,12 @@ class PrinterService {
     String? memberName,
     String? memberPhone,
     double? memberDiscountAmount,
+    int paperWidthMm = ReceiptPaper.defaultWidthMm,
   }) async {
+    final int paperWidth = ReceiptPaper.normalize(paperWidthMm);
+    final int maxChar = ReceiptPaper.maxChars(paperWidth);
     final profile = await CapabilityProfile.load();
-    final generator = Generator(PaperSize.mm58, profile);
+    final generator = Generator(ReceiptPaper.toPaperSize(paperWidth), profile);
     List<int> bytes = [];
 
     bytes += generator.reset();
@@ -97,7 +147,7 @@ class PrinterService {
 
     if (logoUrl != null && logoUrl.isNotEmpty) {
       try {
-        final logoImage = await _fetchAndProcessLogo(logoUrl);
+        final logoImage = await _fetchAndProcessLogo(logoUrl, ReceiptPaper.logoWidth(paperWidth));
         if (logoImage != null) {
           bytes += generator.imageRaster(logoImage, align: PosAlign.center);
           bytes += generator.feed(1);
@@ -159,8 +209,7 @@ class PrinterService {
       
       final String qtyAndPrice = '${item.qty} x Rp${item.unitPrice.toStringAsFixed(0)}';
       final String itemTotal = 'Rp${item.subtotal.toStringAsFixed(0)}';
-      
-      const int maxChar = 32;
+
       final int spaces = maxChar - qtyAndPrice.length - itemTotal.length;
       
       String line = qtyAndPrice;
@@ -176,19 +225,19 @@ class PrinterService {
     
     // Member Discount & Subtotal (if discount exists)
     if (memberDiscountAmount != null && memberDiscountAmount > 0) {
-      bytes += _buildTotalLine(generator, 'Subtotal:', 'Rp${(total + memberDiscountAmount).toStringAsFixed(0)}');
-      bytes += _buildTotalLine(generator, 'Diskon Member:', '-Rp${memberDiscountAmount.toStringAsFixed(0)}');
+      bytes += _buildTotalLine(generator, 'Subtotal:', 'Rp${(total + memberDiscountAmount).toStringAsFixed(0)}', maxChar);
+      bytes += _buildTotalLine(generator, 'Diskon Member:', '-Rp${memberDiscountAmount.toStringAsFixed(0)}', maxChar);
     }
 
     // Totals
     if (tax > 0) {
-      bytes += _buildTotalLine(generator, 'Subtotal:', 'Rp${subtotal.toStringAsFixed(0)}');
-      bytes += _buildTotalLine(generator, 'Pajak:', 'Rp${tax.toStringAsFixed(0)}');
+      bytes += _buildTotalLine(generator, 'Subtotal:', 'Rp${subtotal.toStringAsFixed(0)}', maxChar);
+      bytes += _buildTotalLine(generator, 'Pajak:', 'Rp${tax.toStringAsFixed(0)}', maxChar);
     }
-    
+
     // Final Total
     bytes += generator.text(
-      _formatTotalLine('TOTAL:', 'Rp${total.toStringAsFixed(0)}'),
+      _formatTotalLine('TOTAL:', 'Rp${total.toStringAsFixed(0)}', maxChar),
       styles: const PosStyles(bold: true, align: PosAlign.right, height: PosTextSize.size2, width: PosTextSize.size1),
     );
 
@@ -199,15 +248,15 @@ class PrinterService {
     } else if (paymentMethod == 'transfer') {
       payType = 'TRANSFER';
     }
-    bytes += _buildTotalLine(generator, 'Metode Bayar:', payType);
+    bytes += _buildTotalLine(generator, 'Metode Bayar:', payType, maxChar);
     if (paymentMethod == 'cash' && cashReceived != null) {
-      bytes += _buildTotalLine(generator, 'Bayar Tunai:', 'Rp${cashReceived.toStringAsFixed(0)}');
-      bytes += _buildTotalLine(generator, 'Kembali:', 'Rp${(cashChange ?? (cashReceived - total)).toStringAsFixed(0)}');
+      bytes += _buildTotalLine(generator, 'Bayar Tunai:', 'Rp${cashReceived.toStringAsFixed(0)}', maxChar);
+      bytes += _buildTotalLine(generator, 'Kembali:', 'Rp${(cashChange ?? (cashReceived - total)).toStringAsFixed(0)}', maxChar);
     }
 
     if (memberName != null && memberName.isNotEmpty) {
       final pointsEarned = (total / 1000).floor();
-      bytes += _buildTotalLine(generator, 'Poin Diperoleh:', '+$pointsEarned Pts');
+      bytes += _buildTotalLine(generator, 'Poin Diperoleh:', '+$pointsEarned Pts', maxChar);
     }
 
     bytes += generator.feed(1);
@@ -224,12 +273,11 @@ class PrinterService {
     return bytes;
   }
 
-  static List<int> _buildTotalLine(Generator generator, String label, String value) {
-    return generator.text(_formatTotalLine(label, value), styles: const PosStyles(align: PosAlign.right));
+  static List<int> _buildTotalLine(Generator generator, String label, String value, int maxChar) {
+    return generator.text(_formatTotalLine(label, value, maxChar), styles: const PosStyles(align: PosAlign.right));
   }
 
-  static String _formatTotalLine(String label, String value) {
-    const int maxChar = 32;
+  static String _formatTotalLine(String label, String value, int maxChar) {
     final int spaces = maxChar - label.length - value.length;
     String line = label;
     for (int i = 0; i < (spaces > 0 ? spaces : 1); i++) {
@@ -239,14 +287,14 @@ class PrinterService {
     return line;
   }
 
-  static Future<img.Image?> _fetchAndProcessLogo(String logoUrl) async {
+  static Future<img.Image?> _fetchAndProcessLogo(String logoUrl, int maxLogoWidth) async {
     try {
       final response = await http.get(Uri.parse(logoUrl)).timeout(const Duration(seconds: 4));
       if (response.statusCode == 200) {
         final original = img.decodeImage(response.bodyBytes);
         if (original != null) {
-          // Resize for 58mm printer (optimal width 200px)
-          int targetWidth = 200;
+          // Resize mengikuti lebar kertas yang dipilih user
+          int targetWidth = maxLogoWidth;
           if (original.width < targetWidth) {
             targetWidth = original.width;
           }
