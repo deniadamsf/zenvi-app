@@ -6,9 +6,11 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:esc_pos_utils_plus/esc_pos_utils_plus.dart';
 import 'package:intl/intl.dart';
 import '../services/printer_service.dart';
+import '../services/label_printer_service.dart';
 
 class PrinterProvider extends ChangeNotifier {
   static const String _paperSizeKey = 'printer_paper_width_mm';
+  static const String _languageKey = 'printer_language';
 
   final BlueThermalPrinter _bluetooth = BlueThermalPrinter.instance;
 
@@ -17,6 +19,7 @@ class PrinterProvider extends ChangeNotifier {
   bool _isConnected = false;
   bool _isLoading = false;
   int _paperWidthMm = ReceiptPaper.defaultWidthMm;
+  PrintLanguage _language = PrintLanguage.escPosText;
 
   List<BluetoothDevice> get devices => _devices;
   BluetoothDevice? get selectedDevice => _selectedDevice;
@@ -27,12 +30,15 @@ class PrinterProvider extends ChangeNotifier {
   int get paperWidthMm => _paperWidthMm;
   List<int> get supportedPaperWidths => ReceiptPaper.supportedWidthsMm;
 
+  /// Bahasa perintah yang dipakai saat mencetak.
+  PrintLanguage get language => _language;
+
   PrinterProvider() {
     _initPrinter();
   }
 
   Future<void> _initPrinter() async {
-    await _loadPaperSize();
+    await _loadPrintSettings();
 
     _bluetooth.onStateChanged().listen((state) {
       switch (state) {
@@ -94,12 +100,22 @@ class PrinterProvider extends ChangeNotifier {
     notifyListeners();
   }
 
-  Future<void> _loadPaperSize() async {
+  Future<void> _loadPrintSettings() async {
     final prefs = await SharedPreferences.getInstance();
     final saved = prefs.getInt(_paperSizeKey);
     if (saved != null) {
       _paperWidthMm = ReceiptPaper.normalize(saved);
     }
+    _language = PrintLanguageCodec.fromStorage(prefs.getString(_languageKey));
+  }
+
+  /// Ubah bahasa perintah printer (ESC/POS teks, ESC/POS gambar, TSPL, CPCL).
+  Future<void> setLanguage(PrintLanguage language) async {
+    if (language == _language) return;
+    _language = language;
+    notifyListeners();
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString(_languageKey, language.storageKey);
   }
 
   /// Ubah lebar kertas thermal (58 / 72 / 80 mm) dan simpan permanen.
@@ -162,6 +178,52 @@ class PrinterProvider extends ChangeNotifier {
     } catch (e) {
       debugPrint("Print error: $e");
       return false;
+    }
+  }
+
+  /// Cetak sampel diagnosa memakai satu bahasa printer tertentu.
+  ///
+  /// Dipakai untuk mencari tahu bahasa apa yang dimengerti printer: kalau
+  /// hanya salah satu mode yang menghasilkan tulisan, mode itulah yang benar.
+  Future<bool> printTestWithLanguage(PrintLanguage language, {String? storeName}) async {
+    final name = (storeName ?? 'ZENVI POS').toUpperCase();
+
+    if (language == PrintLanguage.escPosText) {
+      return printTestReceipt(storeName: storeName);
+    }
+
+    final image = LabelPrinterService.buildDiagnosticImage(
+      modeLabel: 'MODE: ${_languageLabel(language)}',
+      dotWidth: ReceiptPaper.dotWidth(_paperWidthMm),
+      storeName: name,
+      timestamp: DateFormat('dd/MM/yyyy HH:mm:ss').format(DateTime.now()),
+    );
+
+    switch (language) {
+      case PrintLanguage.tspl:
+        return printBytes(LabelPrinterService.buildTsplImage(image));
+      case PrintLanguage.cpcl:
+        return printBytes(LabelPrinterService.buildCpclImage(image));
+      case PrintLanguage.escPosImage:
+        return printBytes(await LabelPrinterService.buildEscPosImage(
+          image,
+          ReceiptPaper.toPaperSize(_paperWidthMm),
+        ));
+      case PrintLanguage.escPosText:
+        return printTestReceipt(storeName: storeName);
+    }
+  }
+
+  static String _languageLabel(PrintLanguage language) {
+    switch (language) {
+      case PrintLanguage.escPosText:
+        return 'ESC/POS TEKS';
+      case PrintLanguage.escPosImage:
+        return 'ESC/POS GAMBAR';
+      case PrintLanguage.tspl:
+        return 'TSPL LABEL';
+      case PrintLanguage.cpcl:
+        return 'CPCL LABEL';
     }
   }
 

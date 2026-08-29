@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 import 'package:easy_localization/easy_localization.dart';
 import '../../providers/printer_provider.dart';
 import '../../providers/auth_provider.dart';
+import '../../services/label_printer_service.dart';
 import '../../widgets/zenvi_header.dart';
 
 class PrinterSettingsScreen extends StatefulWidget {
@@ -40,7 +41,7 @@ class _PrinterSettingsScreenState extends State<PrinterSettingsScreen> {
           ),
         ],
       ),
-      body: Column(
+      body: ListView(
         children: [
           Container(
             padding: const EdgeInsets.all(16),
@@ -139,14 +140,94 @@ class _PrinterSettingsScreenState extends State<PrinterSettingsScreen> {
           ),
           const Divider(height: 1),
 
-          Expanded(
-            child: printerProvider.isLoading
-                ? const Center(child: CircularProgressIndicator())
-                : printerProvider.devices.isEmpty
-                    ? Center(
-                        child: Text('tidak_ada_perangkat_bluetooth_305'.tr(context: context)),
-                      )
-                    : ListView.builder(
+          // Pemilih bahasa perintah printer + tes per mode
+          Padding(
+            padding: const EdgeInsets.fromLTRB(16, 16, 16, 8),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  children: [
+                    Icon(Icons.terminal_rounded, size: 18, color: theme.colorScheme.primary),
+                    const SizedBox(width: 8),
+                    Expanded(
+                      child: Text(
+                        'print_mode_title'.tr(context: context),
+                        style: const TextStyle(fontWeight: FontWeight.bold),
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 4),
+                Text(
+                  'print_mode_desc'.tr(context: context),
+                  style: TextStyle(fontSize: 12, color: theme.colorScheme.onSurfaceVariant),
+                ),
+                const SizedBox(height: 10),
+                ...PrintLanguage.values.map((language) {
+                  final isActive = printerProvider.language == language;
+                  return Padding(
+                    padding: const EdgeInsets.only(bottom: 6),
+                    child: Row(
+                      children: [
+                        Expanded(
+                          child: ChoiceChip(
+                            label: Text(_languageLabel(context, language)),
+                            selected: isActive,
+                            onSelected: (_) => printerProvider.setLanguage(language),
+                          ),
+                        ),
+                        const SizedBox(width: 8),
+                        TextButton.icon(
+                          onPressed: printerProvider.isConnected
+                              ? () async {
+                                  final scaffoldMessenger = ScaffoldMessenger.of(context);
+                                  final successText = 'test_print_success'.tr(context: context);
+                                  final failureText = 'test_print_failed'.tr(context: context);
+                                  final storeName = authProvider.user?.company?['name']?.toString();
+
+                                  final success = await printerProvider.printTestWithLanguage(
+                                    language,
+                                    storeName: storeName,
+                                  );
+
+                                  if (!mounted) return;
+                                  scaffoldMessenger.showSnackBar(
+                                    SnackBar(
+                                      content: Text(success ? successText : failureText),
+                                      backgroundColor: success ? Colors.green : Colors.red,
+                                    ),
+                                  );
+                                }
+                              : null,
+                          icon: const Icon(Icons.print_rounded, size: 16),
+                          label: Text('print_mode_test_btn'.tr(context: context)),
+                        ),
+                      ],
+                    ),
+                  );
+                }),
+              ],
+            ),
+          ),
+          const Divider(height: 1),
+
+          if (printerProvider.isLoading)
+            const Padding(
+              padding: EdgeInsets.symmetric(vertical: 32),
+              child: Center(child: CircularProgressIndicator()),
+            )
+          else if (printerProvider.devices.isEmpty)
+            Padding(
+              padding: const EdgeInsets.symmetric(vertical: 32),
+              child: Center(
+                child: Text('tidak_ada_perangkat_bluetooth_305'.tr(context: context)),
+              ),
+            )
+          else
+            ListView.builder(
+                        shrinkWrap: true,
+                        physics: const NeverScrollableScrollPhysics(),
                         itemCount: printerProvider.devices.length,
                         itemBuilder: (context, index) {
                           final device = printerProvider.devices[index];
@@ -191,9 +272,21 @@ class _PrinterSettingsScreenState extends State<PrinterSettingsScreen> {
                           );
                         },
                       ),
-          ),
         ],
       ),
     );
+  }
+
+  String _languageLabel(BuildContext context, PrintLanguage language) {
+    switch (language) {
+      case PrintLanguage.escPosText:
+        return 'print_mode_escpos_text'.tr(context: context);
+      case PrintLanguage.escPosImage:
+        return 'print_mode_escpos_image'.tr(context: context);
+      case PrintLanguage.tspl:
+        return 'print_mode_tspl'.tr(context: context);
+      case PrintLanguage.cpcl:
+        return 'print_mode_cpcl'.tr(context: context);
+    }
   }
 }

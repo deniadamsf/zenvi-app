@@ -10,7 +10,11 @@ import '../models/order_model.dart';
 /// kertas yang dipilih user konsisten di struk maupun test print.
 class ReceiptPaper {
   static const int defaultWidthMm = 58;
-  static const List<int> supportedWidthsMm = [58, 72, 80];
+
+  /// 110mm adalah lebar printer label/resi. ESC/POS sendiri hanya mengenal
+  /// sampai 80mm, jadi lebar ini hanya benar-benar terpakai pada mode gambar
+  /// (TSPL/CPCL/ESC-POS raster).
+  static const List<int> supportedWidthsMm = [58, 72, 80, 110];
 
   static int normalize(int widthMm) {
     return supportedWidthsMm.contains(widthMm) ? widthMm : defaultWidthMm;
@@ -18,6 +22,7 @@ class ReceiptPaper {
 
   static PaperSize toPaperSize(int widthMm) {
     switch (normalize(widthMm)) {
+      case 110:
       case 80:
         return PaperSize.mm80;
       case 72:
@@ -30,6 +35,8 @@ class ReceiptPaper {
   /// Jumlah karakter per baris pada Font A (dipakai untuk perataan kolom manual).
   static int maxChars(int widthMm) {
     switch (normalize(widthMm)) {
+      case 110:
+        return 64;
       case 80:
         return 48;
       case 72:
@@ -39,9 +46,26 @@ class ReceiptPaper {
     }
   }
 
+  /// Lebar area cetak dalam dot pada kepala printer 203 dpi (8 dot/mm).
+  /// Dipakai saat struk dirender sebagai gambar (TSPL/CPCL/raster).
+  static int dotWidth(int widthMm) {
+    switch (normalize(widthMm)) {
+      case 110:
+        return 832;
+      case 80:
+        return 576;
+      case 72:
+        return 512;
+      default:
+        return 384;
+    }
+  }
+
   /// Lebar logo optimal (px) agar tidak melebihi lebar dot printer.
   static int logoWidth(int widthMm) {
     switch (normalize(widthMm)) {
+      case 110:
+        return 600;
       case 80:
         return 380;
       case 72:
