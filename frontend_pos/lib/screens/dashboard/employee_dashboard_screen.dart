@@ -513,7 +513,7 @@ class _EmployeeOverviewScreen extends StatelessWidget {
 
             // ── Konten Dashboard ──
             SliverPadding(
-              padding: const EdgeInsets.fromLTRB(16, 16, 16, 100),
+              padding: const EdgeInsets.fromLTRB(16, 16, 16, 130),
               sliver: SliverToBoxAdapter(
                 child: Center(
                   child: ConstrainedBox(

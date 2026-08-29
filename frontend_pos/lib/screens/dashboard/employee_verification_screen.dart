@@ -183,7 +183,7 @@ class _EmployeeVerificationScreenState extends State<EmployeeVerificationScreen>
                               Text(
                                 '${employee['name']} (${employee['email']})',
                                 style: TextStyle(color: theme.colorScheme.onSurfaceVariant, fontSize: 13),
-                                maxLines: 1,
+                                maxLines: 2,
                                 overflow: TextOverflow.ellipsis,
                               ),
                             ],
