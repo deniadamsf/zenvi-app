@@ -696,8 +696,8 @@ class _StoreSettingsScreenState extends State<StoreSettingsScreen> {
                             boxShadow: [
                               BoxShadow(
                                 color: theme.shadowColor.withValues(alpha: 0.05),
-                                blurRadius: 30,
-                                offset: const Offset(0, 10),
+                                blurRadius: 16,
+                                offset: const Offset(0, 6),
                               ),
                             ],
                           ),
@@ -728,8 +728,8 @@ class _StoreSettingsScreenState extends State<StoreSettingsScreen> {
                             boxShadow: [
                               BoxShadow(
                                 color: theme.shadowColor.withValues(alpha: 0.05),
-                                blurRadius: 30,
-                                offset: const Offset(0, 10),
+                                blurRadius: 16,
+                                offset: const Offset(0, 6),
                               ),
                             ],
                           ),
