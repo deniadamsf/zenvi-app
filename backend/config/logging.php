@@ -52,9 +52,14 @@ return [
     */
 
     'channels' => [
+        // Memakai 'daily', bukan 'single'. Channel 'single' menulis ke satu
+        // file laravel.log yang tidak pernah dipotong: ukurannya tumbuh
+        // selamanya, makin lambat ditulis, dan akhirnya tidak bisa dibuka saat
+        // justru sedang dibutuhkan untuk diagnosis. 'daily' memecah per tanggal
+        // dan menghapus otomatis yang lebih tua dari LOG_DAILY_DAYS.
         'stack' => [
             'driver' => 'stack',
-            'channels' => ['single'],
+            'channels' => ['daily'],
             'ignore_exceptions' => false,
         ],
 
@@ -69,7 +74,7 @@ return [
             'driver' => 'daily',
             'path' => storage_path('logs/laravel.log'),
             'level' => env('LOG_LEVEL', 'debug'),
-            'days' => 14,
+            'days' => env('LOG_DAILY_DAYS', 14),
             'replace_placeholders' => true,
         ],
 
