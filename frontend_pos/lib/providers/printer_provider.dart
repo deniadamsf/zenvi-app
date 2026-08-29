@@ -5,25 +5,35 @@ import 'package:blue_thermal_printer/blue_thermal_printer.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:esc_pos_utils_plus/esc_pos_utils_plus.dart';
 import 'package:intl/intl.dart';
+import '../services/printer_service.dart';
 
 class PrinterProvider extends ChangeNotifier {
+  static const String _paperSizeKey = 'printer_paper_width_mm';
+
   final BlueThermalPrinter _bluetooth = BlueThermalPrinter.instance;
-  
+
   List<BluetoothDevice> _devices = [];
   BluetoothDevice? _selectedDevice;
   bool _isConnected = false;
   bool _isLoading = false;
+  int _paperWidthMm = ReceiptPaper.defaultWidthMm;
 
   List<BluetoothDevice> get devices => _devices;
   BluetoothDevice? get selectedDevice => _selectedDevice;
   bool get isConnected => _isConnected;
   bool get isLoading => _isLoading;
 
+  /// Lebar kertas thermal aktif dalam mm (58 / 72 / 80).
+  int get paperWidthMm => _paperWidthMm;
+  List<int> get supportedPaperWidths => ReceiptPaper.supportedWidthsMm;
+
   PrinterProvider() {
     _initPrinter();
   }
 
   Future<void> _initPrinter() async {
+    await _loadPaperSize();
+
     _bluetooth.onStateChanged().listen((state) {
       switch (state) {
         case BlueThermalPrinter.CONNECTED:
@@ -84,6 +94,24 @@ class PrinterProvider extends ChangeNotifier {
     notifyListeners();
   }
 
+  Future<void> _loadPaperSize() async {
+    final prefs = await SharedPreferences.getInstance();
+    final saved = prefs.getInt(_paperSizeKey);
+    if (saved != null) {
+      _paperWidthMm = ReceiptPaper.normalize(saved);
+    }
+  }
+
+  /// Ubah lebar kertas thermal (58 / 72 / 80 mm) dan simpan permanen.
+  Future<void> setPaperWidth(int widthMm) async {
+    final normalized = ReceiptPaper.normalize(widthMm);
+    if (normalized == _paperWidthMm) return;
+    _paperWidthMm = normalized;
+    notifyListeners();
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setInt(_paperSizeKey, normalized);
+  }
+
   Future<void> _savePrinter(BluetoothDevice device) async {
     final prefs = await SharedPreferences.getInstance();
     final data = {
@@ -139,7 +167,7 @@ class PrinterProvider extends ChangeNotifier {
 
   Future<bool> printTestReceipt({String? storeName}) async {
     final profile = await CapabilityProfile.load();
-    final generator = Generator(PaperSize.mm58, profile);
+    final generator = Generator(ReceiptPaper.toPaperSize(_paperWidthMm), profile);
     List<int> bytes = [];
 
     bytes += generator.reset();
@@ -159,8 +187,15 @@ class PrinterProvider extends ChangeNotifier {
     bytes += generator.hr();
     bytes += generator.text('Waktu : ${DateFormat('dd/MM/yyyy HH:mm:ss').format(DateTime.now())}');
     bytes += generator.text('Status: Terhubung OK');
-    bytes += generator.text('Kertas: 58mm Thermal');
+    bytes += generator.text('Kertas: ${_paperWidthMm}mm Thermal');
     bytes += generator.hr();
+    // Penggaris karakter: kalau baris ini terpotong, lebar kertas kebesaran.
+    final int maxChar = ReceiptPaper.maxChars(_paperWidthMm);
+    final ruler = StringBuffer();
+    for (int i = 1; i <= maxChar; i++) {
+      ruler.write((i % 10).toString());
+    }
+    bytes += generator.text(ruler.toString());
     bytes += generator.text('1234567890 ABCD WXYZ');
     bytes += generator.feed(3);
 

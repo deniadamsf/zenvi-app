@@ -101,6 +101,44 @@ class _PrinterSettingsScreenState extends State<PrinterSettingsScreen> {
             ),
           ),
           
+          // Pemilih ukuran kertas thermal (58 / 72 / 80 mm)
+          Padding(
+            padding: const EdgeInsets.fromLTRB(16, 16, 16, 8),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  children: [
+                    Icon(Icons.straighten_rounded, size: 18, color: theme.colorScheme.primary),
+                    const SizedBox(width: 8),
+                    Text(
+                      'paper_size_title'.tr(context: context),
+                      style: const TextStyle(fontWeight: FontWeight.bold),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 4),
+                Text(
+                  'paper_size_desc'.tr(context: context),
+                  style: TextStyle(fontSize: 12, color: theme.colorScheme.onSurfaceVariant),
+                ),
+                const SizedBox(height: 10),
+                Wrap(
+                  spacing: 8,
+                  children: printerProvider.supportedPaperWidths.map((widthMm) {
+                    final isActive = printerProvider.paperWidthMm == widthMm;
+                    return ChoiceChip(
+                      label: Text('paper_size_mm'.tr(context: context, args: [widthMm.toString()])),
+                      selected: isActive,
+                      onSelected: (_) => printerProvider.setPaperWidth(widthMm),
+                    );
+                  }).toList(),
+                ),
+              ],
+            ),
+          ),
+          const Divider(height: 1),
+
           Expanded(
             child: printerProvider.isLoading
                 ? const Center(child: CircularProgressIndicator())
