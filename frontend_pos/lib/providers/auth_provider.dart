@@ -1,4 +1,3 @@
-import 'package:easy_localization/easy_localization.dart';
 import 'dart:convert';
 import 'dart:io';
 import 'package:flutter/material.dart';
@@ -12,11 +11,13 @@ import '../services/notification_service.dart';
 class AuthProvider extends ChangeNotifier {
   UserModel? _user;
   String? _token;
+  String? _lastError;
   bool _isLoading = false;
   bool _isInitializing = true;
 
   UserModel? get user => _user;
   String? get token => _token;
+  String? get lastError => _lastError;
   bool get isLoading => _isLoading;
   bool get isInitializing => _isInitializing;
   bool get isAuthenticated => _token != null && _user != null;
@@ -102,7 +103,8 @@ class AuthProvider extends ChangeNotifier {
 
   // --- Fungsi Login Menggunakan Google (v7 API) ---
   Future<bool> loginWithGoogle({String? bypassRole}) async {
-    bypassRole ??= 'owner_5'.tr();
+    bypassRole ??= 'Owner';
+    _lastError = null;
     _setLoading(true);
     try {
       final gsi.GoogleSignInAccount googleUser = await gsi.GoogleSignIn.instance.authenticate(scopeHint: ['email']);
@@ -111,7 +113,7 @@ class AuthProvider extends ChangeNotifier {
       final idToken = auth.idToken;
 
       if (idToken == null) {
-        throw Exception('Tidak bisa mendapatkan id token dari Google');
+        throw Exception('Google idToken kosong. Pastikan serverClientId/Web Client ID sudah cocok dengan SHA-1 di Google Cloud / Firebase.');
       }
 
       final response = await http.post(
@@ -133,13 +135,15 @@ class AuthProvider extends ChangeNotifier {
         await prefs.setString('cached_user_profile', jsonEncode(_user!.toJson()));
         
         NotificationService().syncTokenWithBackend();
+        _lastError = null;
         _setLoading(false);
         return true;
       } else {
-        throw Exception('Gagal otentikasi dengan Server Laravel: ${response.body}');
+        throw Exception('Server backend menolak (${response.statusCode}): ${response.body}');
       }
     } catch (e) {
       debugPrint('Error Login: $e');
+      _lastError = e.toString();
       _setLoading(false);
       return false;
     }

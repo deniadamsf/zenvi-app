@@ -72,6 +72,21 @@ class _LoginScreenState extends State<LoginScreen> with SingleTickerProviderStat
     }
   }
 
+  void _showLoginError(String? error) {
+    if (error == null || !mounted) return;
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(
+          '${'login_failed_msg'.tr()}: $error',
+          style: const TextStyle(color: Colors.white, fontSize: 13),
+        ),
+        backgroundColor: Colors.red.shade700,
+        duration: const Duration(seconds: 5),
+        behavior: SnackBarBehavior.floating,
+      ),
+    );
+  }
+
   @override
   void dispose() {
     _blobController.dispose();
@@ -257,9 +272,12 @@ class _LoginScreenState extends State<LoginScreen> with SingleTickerProviderStat
                                   height: 52,
                                   child: ElevatedButton.icon(
                                     onPressed: authProvider.isLoading ? null : () async {
-                                      final success = await authProvider.loginWithGoogle(bypassRole: 'owner_5'.tr(context: context));
-                                      if (success && mounted) {
+                                      final success = await authProvider.loginWithGoogle(bypassRole: 'Owner');
+                                      if (!mounted) return;
+                                      if (success) {
                                         _routeUser(authProvider);
+                                      } else {
+                                        _showLoginError(authProvider.lastError);
                                       }
                                     },
                                     style: ElevatedButton.styleFrom(
@@ -309,9 +327,12 @@ class _LoginScreenState extends State<LoginScreen> with SingleTickerProviderStat
                                   height: 52,
                                   child: OutlinedButton.icon(
                                     onPressed: authProvider.isLoading ? null : () async {
-                                      final success = await authProvider.loginWithGoogle(bypassRole: 'employee_8'.tr(context: context));
-                                      if (success && mounted) {
+                                      final success = await authProvider.loginWithGoogle(bypassRole: 'Employee');
+                                      if (!mounted) return;
+                                      if (success) {
                                         _routeUser(authProvider);
+                                      } else {
+                                        _showLoginError(authProvider.lastError);
                                       }
                                     },
                                     style: OutlinedButton.styleFrom(

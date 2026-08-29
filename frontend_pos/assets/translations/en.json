@@ -1,5 +1,6 @@
 {
     "login_title": "Sign in to Zenvi",
+    "login_failed_msg": "Login failed",
     "welcome_to_zenvi": "Welcome to Zenvi",
     "smart_pos_subtitle": "Smart Point of Sale & Multi-Branch Management",
     "sign_in_as_owner": "Sign in as Owner",

@@ -1,5 +1,6 @@
 {
     "login_title": "Masuk ke Zenvi",
+    "login_failed_msg": "Gagal masuk",
     "welcome_to_zenvi": "Selamat Datang di Zenvi",
     "smart_pos_subtitle": "Kasir Pintar & Manajemen Multi-Cabang",
     "sign_in_as_owner": "Masuk sebagai Pemilik",
