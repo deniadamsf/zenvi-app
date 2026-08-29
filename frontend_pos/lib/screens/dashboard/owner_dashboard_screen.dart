@@ -1290,7 +1290,7 @@ class _DashboardOverviewState extends State<_DashboardOverview> {
               Expanded(
                 child: Text(
                   label,
-                  style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 12),
+                  style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 11, letterSpacing: -0.2),
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                 ),
@@ -1588,7 +1588,7 @@ class _DashboardOverviewState extends State<_DashboardOverview> {
                                     fontSize: 10.5,
                                     fontWeight: FontWeight.w500,
                                   ),
-                                  maxLines: 1,
+                                  maxLines: 2,
                                   overflow: TextOverflow.ellipsis,
                                 ),
                               ],
@@ -1650,8 +1650,8 @@ class _DashboardOverviewState extends State<_DashboardOverview> {
                           children: [
                             Text(
                               'gross_revenue'.tr(context: context),
-                              style: TextStyle(color: Colors.white.withValues(alpha: 0.75), fontSize: 9.5, fontWeight: FontWeight.w600),
-                              maxLines: 1,
+                              style: TextStyle(color: Colors.white.withValues(alpha: 0.75), fontSize: 9, fontWeight: FontWeight.w600, height: 1.15),
+                              maxLines: 2,
                               overflow: TextOverflow.ellipsis,
                             ),
                             const SizedBox(height: 2),
@@ -1680,8 +1680,8 @@ class _DashboardOverviewState extends State<_DashboardOverview> {
                           children: [
                             Text(
                               'total_cogs_title'.tr(context: context),
-                              style: TextStyle(color: Colors.white.withValues(alpha: 0.75), fontSize: 9.5, fontWeight: FontWeight.w600),
-                              maxLines: 1,
+                              style: TextStyle(color: Colors.white.withValues(alpha: 0.75), fontSize: 9, fontWeight: FontWeight.w600, height: 1.15),
+                              maxLines: 2,
                               overflow: TextOverflow.ellipsis,
                             ),
                             const SizedBox(height: 2),
@@ -1710,8 +1710,8 @@ class _DashboardOverviewState extends State<_DashboardOverview> {
                           children: [
                             Text(
                               'gross_profit_title'.tr(context: context),
-                              style: TextStyle(color: Colors.white.withValues(alpha: 0.75), fontSize: 9.5, fontWeight: FontWeight.w600),
-                              maxLines: 1,
+                              style: TextStyle(color: Colors.white.withValues(alpha: 0.75), fontSize: 9, fontWeight: FontWeight.w600, height: 1.15),
+                              maxLines: 2,
                               overflow: TextOverflow.ellipsis,
                             ),
                             const SizedBox(height: 2),
@@ -1740,8 +1740,8 @@ class _DashboardOverviewState extends State<_DashboardOverview> {
                           children: [
                             Text(
                               'total_expense'.tr(context: context),
-                              style: TextStyle(color: Colors.white.withValues(alpha: 0.75), fontSize: 9.5, fontWeight: FontWeight.w600),
-                              maxLines: 1,
+                              style: TextStyle(color: Colors.white.withValues(alpha: 0.75), fontSize: 9, fontWeight: FontWeight.w600, height: 1.15),
+                              maxLines: 2,
                               overflow: TextOverflow.ellipsis,
                             ),
                             const SizedBox(height: 2),

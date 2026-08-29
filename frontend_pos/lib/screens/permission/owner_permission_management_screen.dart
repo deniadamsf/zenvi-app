@@ -156,13 +156,13 @@ class _OwnerPermissionManagementScreenState
             Icon(Icons.mark_email_read_outlined,
                 size: 64, color: Colors.grey.shade400),
             const SizedBox(height: 16),
-            const Text(
-              'Tidak Ada Pengajuan Izin',
-              style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+            Text(
+              'tidak_ada_pengajuan_izin_251'.tr(context: context),
+              style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 6),
             Text(
-              'Saat ini belum ada pengajuan izin dari karyawan pada filter ini.',
+              'saat_ini_belum_ada_252'.tr(context: context),
               textAlign: TextAlign.center,
               style: TextStyle(color: Colors.grey.shade600, fontSize: 13),
             ),
@@ -170,6 +170,15 @@ class _OwnerPermissionManagementScreenState
         ),
       ),
     );
+  }
+
+  String _formatPermissionDate(BuildContext context, String rawDate) {
+    try {
+      final date = DateTime.parse(rawDate);
+      return DateFormat('EEEE, d MMM yyyy', context.locale.languageCode).format(date);
+    } catch (_) {
+      return rawDate;
+    }
   }
 
   Widget _buildPermissionReviewCard(EmployeePermission item, ThemeData theme,
@@ -305,7 +314,7 @@ class _OwnerPermissionManagementScreenState
                 const Icon(Icons.calendar_today, size: 14, color: Colors.grey),
                 const SizedBox(width: 4),
                 Text(
-                  item.permissionDate,
+                  _formatPermissionDate(context, item.permissionDate),
                   style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 13),
                 ),
               ],

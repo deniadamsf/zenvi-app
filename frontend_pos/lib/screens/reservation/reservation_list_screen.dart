@@ -258,7 +258,7 @@ class _ReservationListScreenState extends State<ReservationListScreen> {
               SliverFillRemaining(child: _buildEmptyState(theme, resProvider))
             else
               SliverPadding(
-                padding: const EdgeInsets.fromLTRB(16, 8, 16, 90),
+                padding: const EdgeInsets.fromLTRB(16, 8, 16, 130),
                 sliver: SliverList(
                   delegate: SliverChildBuilderDelegate(
                     (context, index) {
