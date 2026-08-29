@@ -17,12 +17,15 @@ class FirebaseNotificationService
      */
     protected static function getCredentialsPath(): ?string
     {
-        $customPath = env('FIREBASE_CREDENTIALS');
+        // config() dipakai (bukan env() langsung) supaya tetap terbaca setelah
+        // `php artisan config:cache` - env() di luar folder config/ balik null.
+        $customPath = config('services.firebase.credentials');
         if ($customPath && file_exists(base_path($customPath))) {
             return base_path($customPath);
         }
 
         $candidates = [
+            storage_path('app/firebase/firebase-service-account.json'),
             storage_path('app/firebase/service-account.json'),
             storage_path('app/firebase-service-account.json'),
             storage_path('app/service-account.json'),

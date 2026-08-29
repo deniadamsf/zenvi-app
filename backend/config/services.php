@@ -37,4 +37,10 @@ return [
         'redirect' => env('GOOGLE_REDIRECT_URI'),
     ],
 
+    'firebase' => [
+        // Harus dibaca lewat config(), bukan env() langsung, supaya tetap
+        // terbaca setelah `php artisan config:cache` dijalankan.
+        'credentials' => env('FIREBASE_CREDENTIALS'),
+    ],
+
 ];

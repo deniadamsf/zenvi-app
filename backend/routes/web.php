@@ -9,41 +9,23 @@ use Illuminate\Support\Facades\Route;
 |--------------------------------------------------------------------------
 */
 
-Route::get('/', function () {
-    return view('welcome');
-});
+Route::view('/', 'welcome');
 
 // Privacy Policy & Google Play Compliance Routes
-Route::get('/privacy-policy', function () {
-    return view('privacy_policy');
-})->name('privacy.policy');
+Route::view('/privacy-policy', 'privacy_policy')->name('privacy.policy');
 
-Route::get('/kebijakan-privasi', function () {
-    return view('privacy_policy');
-})->name('privacy.policy.id');
+Route::view('/kebijakan-privasi', 'privacy_policy')->name('privacy.policy.id');
 
-Route::get('/privacy', function () {
-    return view('privacy_policy');
-});
+Route::view('/privacy', 'privacy_policy');
 
-Route::get('/delete-account', function () {
-    return view('privacy_policy');
-})->name('account.deletion');
+Route::view('/delete-account', 'privacy_policy')->name('account.deletion');
 
-Route::get('/hapus-akun', function () {
-    return view('privacy_policy');
-});
+Route::view('/hapus-akun', 'privacy_policy');
 
 // Fallback when APP_URL contains /api prefix
-Route::get('/api/privacy-policy', function () {
-    return view('privacy_policy');
-});
-Route::get('/api/kebijakan-privasi', function () {
-    return view('privacy_policy');
-});
-Route::get('/api/delete-account', function () {
-    return view('privacy_policy');
-});
+Route::view('/api/privacy-policy', 'privacy_policy');
+Route::view('/api/kebijakan-privasi', 'privacy_policy');
+Route::view('/api/delete-account', 'privacy_policy');
 
 // Public Digital Menu, Member & Store Portal Routes
 Route::get('/menu/{slug}', [PublicMenuController::class, 'show'])->name('public.menu');
@@ -58,17 +40,11 @@ Route::post('/api/public/members/{slug}', [PublicMenuController::class, 'registe
 Route::get('/api/public/members/{slug}/check', [PublicMenuController::class, 'checkMember']);
 
 // Disclaimer / Penafian Routes
-Route::get('/disclaimer', function () {
-    return view('disclaimer');
-})->name('disclaimer');
+Route::view('/disclaimer', 'disclaimer')->name('disclaimer');
 
-Route::get('/penafian', function () {
-    return view('disclaimer');
-});
+Route::view('/penafian', 'disclaimer');
 
-Route::get('/api/disclaimer', function () {
-    return view('disclaimer');
-});
+Route::view('/api/disclaimer', 'disclaimer');
 
 // Store Portal Landing Page (e.g. zenvi.cellanoma.my.id/toko-kopi)
 Route::get('/{slug}', [PublicMenuController::class, 'show'])->where('slug', '^(?!api|storage|build|css|js|images|vendor|privacy-policy|kebijakan-privasi|privacy|delete-account|hapus-akun|disclaimer|penafian|favicon\.ico|robots\.txt).*$')->name('public.store');

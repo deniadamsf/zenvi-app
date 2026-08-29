@@ -25,10 +25,15 @@ Setiap kali ada perubahan pada backend (Laravel) baik berupa:
    ```bash
    scp -P 65002 -i ~/.ssh/id_rsa backend/path/to/file u731410318@153.92.8.198:/home/u731410318/domains/cellanoma.my.id/public_html/zenvi/api/path/to/
    ```
-2. **Jalankan Migrasi & Clear Cache (SSH):**
+2. **Jalankan Migrasi & Bangun Ulang Cache (SSH):**
    ```bash
-   ssh -p 65002 -i ~/.ssh/id_rsa u731410318@153.92.8.198 "cd /home/u731410318/domains/cellanoma.my.id/public_html/zenvi/api && php artisan migrate --force && php artisan optimize:clear"
+   ssh -p 65002 -i ~/.ssh/id_rsa u731410318@153.92.8.198 "cd /home/u731410318/domains/cellanoma.my.id/public_html/zenvi/api && php artisan migrate --force && php artisan config:cache && php artisan route:cache"
    ```
+   > **JANGAN pakai `php artisan optimize:clear` sendirian.** Perintah itu menghapus config & route cache dan tidak pernah membangunnya kembali, sehingga Laravel mem-parsing ulang seluruh config dan route di SETIAP request (~0,4 detik tambahan per request di shared hosting). Selalu akhiri deploy dengan `config:cache && route:cache`.
+   >
+   > Konsekuensi `config:cache`: `env()` di luar folder `config/` **selalu mengembalikan null**. Kalau butuh nilai dari `.env` di controller/service/model, daftarkan dulu di `config/*.php` lalu baca dengan `config('...')`. Jangan pernah panggil `env()` langsung di luar `config/`.
+   >
+   > Konsekuensi `route:cache`: route berbentuk closure tidak bisa di-cache. Pakai `Route::view()` untuk halaman statis, atau controller — jangan `Route::get('/x', function () { ... })`.
 3. Pastikan permission folder upload selalu siap:
    ```bash
    ssh -p 65002 -i ~/.ssh/id_rsa u731410318@153.92.8.198 "mkdir -p /home/u731410318/domains/cellanoma.my.id/public_html/zenvi/api/public/uploads/logos && chmod -R 775 /home/u731410318/domains/cellanoma.my.id/public_html/zenvi/api/public/uploads"

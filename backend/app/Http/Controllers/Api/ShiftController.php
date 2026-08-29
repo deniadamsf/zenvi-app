@@ -11,6 +11,7 @@ use App\Models\IngredientHistory;
 use App\Services\FirebaseNotificationService;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Cache;
 
 class ShiftController extends Controller
 {
@@ -39,6 +40,14 @@ class ShiftController extends Controller
      */
     private function runPassiveTasks($companyId)
     {
+        // Tugas ini menghapus file selfie satu per satu; operasi filesystem di
+        // shared hosting lambat dan dulu ditanggung oleh setiap request shift.
+        // Cache::add() bersifat atomik: baris ini hanya lolos sekali per jam per
+        // perusahaan, request lain langsung lewat tanpa biaya.
+        if (!Cache::add('passive_tasks_ran_' . $companyId, true, now()->addHour())) {
+            return;
+        }
+
         // 1. Auto close shifts older than 12 hours
         Shift::where('company_id', $companyId)
             ->where('status', 'active')
