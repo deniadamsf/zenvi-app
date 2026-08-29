@@ -1,5 +1,5 @@
 import java.util.Properties
-import java.io.FileInputStream
+import java.io.StringReader
 
 plugins {
     id("com.android.application")
@@ -22,10 +22,37 @@ val possibleKeyFiles = listOf(
 
 val keyFile = possibleKeyFiles.firstOrNull { it.exists() }
 if (keyFile != null) {
-    keystoreProperties.load(FileInputStream(keyFile))
+    // Dibaca sebagai teks lalu BOM-nya dibuang: kalau file disimpan sebagai UTF-8 with BOM,
+    // Properties.load(InputStream) akan membaca key pertama sebagai "\uFEFFstorePassword"
+    // sehingga getProperty("storePassword") mengembalikan null.
+    keystoreProperties.load(StringReader(keyFile.readText(Charsets.UTF_8).removePrefix("\uFEFF")))
     println("Loaded keystore properties from: " + keyFile.absolutePath)
 } else {
-    println("WARNING: key.properties not found, using release defaults")
+    println("INFO: key.properties tidak ditemukan (hanya diperlukan untuk build release)")
+}
+
+// PENTING: file ini di-track git, jadi JANGAN PERNAH menaruh password/alias signing
+// sebagai nilai fallback hardcoded di sini. Semua kredensial signing hanya boleh
+// datang dari key.properties (file itu wajib tetap gitignored).
+val isReleaseBuild = gradle.startParameter.taskNames.any { it.contains("release", ignoreCase = true) }
+
+fun missingSigningConfig(detail: String): Nothing = throw GradleException(
+    "Release signing gagal: " + detail + "\n" +
+    "Buat file frontend_pos/android/key.properties (JANGAN di-commit) dengan isi:\n" +
+    "  storePassword=<password keystore>\n" +
+    "  keyPassword=<password key>\n" +
+    "  keyAlias=<alias key>\n" +
+    "  storeFile=<path ke file .jks>\n" +
+    "Lokasi key.properties yang dicari:\n  " +
+    possibleKeyFiles.joinToString("\n  ") { it.absolutePath }
+)
+
+fun requireSigningProperty(name: String): String {
+    val value = keystoreProperties.getProperty(name)
+    if (value.isNullOrBlank()) {
+        missingSigningConfig("properti '" + name + "' tidak ada / kosong di key.properties.")
+    }
+    return value
 }
 
 android {
@@ -41,28 +68,36 @@ android {
 
     signingConfigs {
         create("release") {
-            val keyAliasVal = keystoreProperties.getProperty("keyAlias") ?: "zenvi_upload"
-            val keyPasswordVal = keystoreProperties.getProperty("keyPassword") ?: "ZenviRelease2026!"
-            val storePasswordVal = keystoreProperties.getProperty("storePassword") ?: "ZenviRelease2026!"
-            val storeFileVal = keystoreProperties.getProperty("storeFile") ?: "app/zenvi-upload-keystore.jks"
-            
-            val possibleKeystores = listOf(
-                File(projectDir, storeFileVal),
-                File(projectDir, "zenvi-upload-keystore.jks"),
-                File(rootDir, storeFileVal),
-                File(rootDir, "app/zenvi-upload-keystore.jks"),
-                File("d:/zenvi/frontend_pos/android/app/zenvi-upload-keystore.jks"),
-                File("d:/zenvi/frontend_pos/android/zenvi-upload-keystore.jks")
-            )
-            
-            val resolvedKeystore = possibleKeystores.firstOrNull { it.exists() }
-            
-            keyAlias = keyAliasVal
-            keyPassword = keyPasswordVal
-            storePassword = storePasswordVal
-            storeFile = resolvedKeystore
-            
-            println("Release Signing Config: alias=" + keyAlias + " storeFile=" + storeFile?.absolutePath + " (exists=" + storeFile?.exists() + ")")
+            // Hanya divalidasi saat build release. Build debug tidak butuh kredensial signing,
+            // jadi jangan sampai ikut gagal kalau key.properties belum ada.
+            if (isReleaseBuild) {
+                if (keyFile == null) {
+                    missingSigningConfig("file key.properties tidak ditemukan.")
+                }
+
+                keyAlias = requireSigningProperty("keyAlias")
+                keyPassword = requireSigningProperty("keyPassword")
+                storePassword = requireSigningProperty("storePassword")
+
+                val storeFileVal = keystoreProperties.getProperty("storeFile") ?: "zenvi-upload-keystore.jks"
+
+                val possibleKeystores = listOf(
+                    File(projectDir, storeFileVal),
+                    File(projectDir, "zenvi-upload-keystore.jks"),
+                    File(rootDir, storeFileVal),
+                    File(rootDir, "app/zenvi-upload-keystore.jks"),
+                    File("d:/zenvi/frontend_pos/android/app/zenvi-upload-keystore.jks"),
+                    File("d:/zenvi/frontend_pos/android/zenvi-upload-keystore.jks")
+                )
+
+                storeFile = possibleKeystores.firstOrNull { it.exists() }
+                    ?: missingSigningConfig(
+                        "file keystore tidak ditemukan. Lokasi yang dicari:\n  " +
+                        possibleKeystores.joinToString("\n  ") { it.absolutePath }
+                    )
+
+                println("Release Signing Config: alias=" + keyAlias + " storeFile=" + storeFile?.absolutePath)
+            }
         }
     }
 
