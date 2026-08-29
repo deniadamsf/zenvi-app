@@ -301,39 +301,50 @@ class OrderController extends Controller
 
             DB::commit();
 
-            // Push Notification for Low Stock (to Owner & Employees)
-            if (!empty($lowStockIngredients)) {
-                try {
-                    foreach ($lowStockIngredients as $ing) {
-                        $branchSuffix = !empty($ing['branch_name']) ? " di {$ing['branch_name']}" : '';
-                        FirebaseNotificationService::sendToCompany(
-                            $companyId,
-                            'Peringatan Stok Rendah!',
-                            "Bahan '{$ing['name']}'{$branchSuffix} tersisa {$ing['stock_qty']} {$ing['unit']}. Segera lakukan restock!",
-                            'stock',
-                            ['ingredient_id' => $ing['id'], 'type' => 'low_stock', 'route' => '/stock']
-                        );
-                    }
-                } catch (\Exception $e) {
-                    \Log::warning('Low stock notification failed: ' . $e->getMessage());
-                }
-            }
+            // Notifikasi push dikirim SETELAH respons diterima kasir.
+            //
+            // Sebelumnya setiap bahan yang stoknya menipis memicu satu panggilan
+            // HTTPS ke server Google secara berurutan, di dalam request - jadi
+            // kasir menunggu N kali bolak-balik ke Google sebelum transaksinya
+            // dianggap selesai. app()->terminating() dipakai (bukan queue)
+            // karena server belum punya queue worker maupun cron, sehingga job
+            // yang diantrekan tidak akan pernah dieksekusi.
+            $lowStockToNotify = $lowStockIngredients;
+            $mismatchToNotify = $priceMismatchOrders;
 
-            // Push Notification for Price Mismatch (to Owner only - needs review, not a stock-out)
-            if (!empty($priceMismatchOrders)) {
-                try {
-                    foreach ($priceMismatchOrders as $mismatchedOrder) {
-                        FirebaseNotificationService::sendToOwner(
-                            $companyId,
-                            'Order Perlu Ditinjau',
-                            "Total order #{$mismatchedOrder->id} tidak sesuai perhitungan harga saat ini. Cek Log Transaksi untuk detail.",
-                            'order',
-                            ['order_id' => $mismatchedOrder->id, 'type' => 'price_mismatch', 'route' => '/orders']
-                        );
+            if (!empty($lowStockToNotify) || !empty($mismatchToNotify)) {
+                app()->terminating(function () use ($companyId, $lowStockToNotify, $mismatchToNotify) {
+                    // Push Notification for Low Stock (to Owner & Employees)
+                    foreach ($lowStockToNotify as $ing) {
+                        try {
+                            $branchSuffix = !empty($ing['branch_name']) ? " di {$ing['branch_name']}" : '';
+                            FirebaseNotificationService::sendToCompany(
+                                $companyId,
+                                'Peringatan Stok Rendah!',
+                                "Bahan '{$ing['name']}'{$branchSuffix} tersisa {$ing['stock_qty']} {$ing['unit']}. Segera lakukan restock!",
+                                'stock',
+                                ['ingredient_id' => $ing['id'], 'type' => 'low_stock', 'route' => '/stock']
+                            );
+                        } catch (\Throwable $e) {
+                            \Log::warning('Low stock notification failed: ' . $e->getMessage());
+                        }
                     }
-                } catch (\Exception $e) {
-                    \Log::warning('Price mismatch notification failed: ' . $e->getMessage());
-                }
+
+                    // Push Notification for Price Mismatch (to Owner only - needs review, not a stock-out)
+                    foreach ($mismatchToNotify as $mismatchedOrder) {
+                        try {
+                            FirebaseNotificationService::sendToOwner(
+                                $companyId,
+                                'Order Perlu Ditinjau',
+                                "Total order #{$mismatchedOrder->id} tidak sesuai perhitungan harga saat ini. Cek Log Transaksi untuk detail.",
+                                'order',
+                                ['order_id' => $mismatchedOrder->id, 'type' => 'price_mismatch', 'route' => '/orders']
+                            );
+                        } catch (\Throwable $e) {
+                            \Log::warning('Price mismatch notification failed: ' . $e->getMessage());
+                        }
+                    }
+                });
             }
 
             return response()->json([

@@ -35,6 +35,12 @@ class ShiftController extends Controller
         return $earthRadius * $c; // Distance in meters
     }
 
+    /** Rentang default Log Shift saat tidak ada filter tanggal (hari). */
+    private const LOG_DEFAULT_DAYS = 365;
+
+    /** Batas atas jumlah baris Log Shift dalam satu respons. */
+    private const LOG_MAX_ROWS = 500;
+
     /**
      * Passive task: Auto-close stale shifts and delete old selfies
      */
@@ -83,11 +89,27 @@ class ShiftController extends Controller
         
         $this->runPassiveTasks($user->company_id);
 
+        // `orders` hanya dipakai untuk menghitung rincian omzet di bawah;
+        // aplikasi tidak pernah membaca isinya (ShiftModel.fromJson hanya
+        // memakai field *_revenue). Ambil kolom seperlunya saja supaya respons
+        // tidak membengkak seiring bertambahnya transaksi.
         $query = Shift::where('company_id', $user->company_id)
-            ->with(['user:id,name', 'branch:id,name', 'orders']);
+            ->with([
+                'user:id,name',
+                'branch:id,name',
+                'orders' => function ($q) {
+                    $q->select('id', 'shift_id', 'status', 'payment_method', 'total_amount');
+                },
+            ]);
 
         if ($request->has('date')) {
             $query->whereDate('start_time', $request->date);
+        } else {
+            // Tanpa filter tanggal, query ini dulu mengambil SELURUH shift yang
+            // pernah ada beserta seluruh ordernya, sehingga makin lambat seumur
+            // pemakaian toko. Rentang & jumlah baris dibatasi; keduanya masih
+            // jauh di atas kebutuhan tampilan Log Shift.
+            $query->where('start_time', '>=', Carbon::now()->subDays(self::LOG_DEFAULT_DAYS));
         }
         
         if ($request->has('user_id')) {
@@ -98,7 +120,9 @@ class ShiftController extends Controller
             $query->where('branch_id', $request->branch_id);
         }
 
-        $shifts = $query->orderBy('start_time', 'desc')->get();
+        $shifts = $query->orderBy('start_time', 'desc')
+            ->limit(self::LOG_MAX_ROWS)
+            ->get();
 
         $company = \App\Models\Company::find($user->company_id);
         
