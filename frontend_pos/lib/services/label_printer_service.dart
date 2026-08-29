@@ -10,29 +10,59 @@ import 'package:image/image.dart' as img;
 /// Perintah ESC/POS yang dikirim ke printer TSPL/CPCL tidak dikenali, sehingga
 /// kertas tetap jalan tapi tidak ada tulisan yang tercetak.
 enum PrintLanguage {
-  /// ESC/POS command teks (default printer struk).
-  escPosText,
+  /// ESC/POS — standar printer struk.
+  escPos,
 
-  /// ESC/POS tapi struk dirender jadi gambar raster (GS v 0).
-  /// Dipakai kalau printer ESC/POS-nya tidak merender command teks.
-  escPosImage,
-
-  /// TSPL / TSPL2 — Eppos, Xprinter, TSC label printer.
+  /// TSPL / TSPL2 — Xprinter, Eppos, TSC label printer.
   tspl,
 
   /// CPCL — Zebra dan sebagian printer label mobile.
   cpcl,
 }
 
-extension PrintLanguageCodec on PrintLanguage {
-  String get storageKey => name;
+/// Cara isi struk dikirim: sebagai perintah teks native printer, atau
+/// dirender lebih dulu jadi gambar bitmap lalu dikirim sebagai satu blok.
+enum PrintRender { text, image }
 
-  static PrintLanguage fromStorage(String? value) {
-    return PrintLanguage.values.firstWhere(
-      (lang) => lang.name == value,
-      orElse: () => PrintLanguage.escPosText,
+/// Kombinasi bahasa + cara render yang dipakai printer.
+class PrintMode {
+  final PrintLanguage language;
+  final PrintRender render;
+
+  const PrintMode(this.language, this.render);
+
+  static const PrintMode escPosText = PrintMode(PrintLanguage.escPos, PrintRender.text);
+  static const PrintMode escPosImage = PrintMode(PrintLanguage.escPos, PrintRender.image);
+  static const PrintMode tsplText = PrintMode(PrintLanguage.tspl, PrintRender.text);
+  static const PrintMode tsplImage = PrintMode(PrintLanguage.tspl, PrintRender.image);
+  static const PrintMode cpclText = PrintMode(PrintLanguage.cpcl, PrintRender.text);
+  static const PrintMode cpclImage = PrintMode(PrintLanguage.cpcl, PrintRender.image);
+
+  /// Urutan tampil di layar pengaturan.
+  static const List<PrintMode> all = [
+    escPosText,
+    escPosImage,
+    tsplText,
+    tsplImage,
+    cpclText,
+    cpclImage,
+  ];
+
+  String get storageKey => '${language.name}_${render.name}';
+
+  static PrintMode fromStorage(String? value) {
+    return all.firstWhere(
+      (mode) => mode.storageKey == value,
+      orElse: () => escPosText,
     );
   }
+
+  @override
+  bool operator ==(Object other) =>
+      other is PrintMode && other.language == language && other.render == render;
+
+  @override
+  int get hashCode => Object.hash(language, render);
 }
 
 /// Builder perintah cetak berbasis bitmap untuk printer label (TSPL/CPCL)
@@ -85,6 +115,43 @@ class LabelPrinterService {
     bytes.addAll(data);
     bytes.addAll(latin1.encode('\r\n'));
     bytes.addAll(latin1.encode('PRINT 1,1\r\n'));
+    return bytes;
+  }
+
+  /// Perintah TSPL memakai font bawaan printer (tanpa bitmap).
+  ///
+  /// Payload-nya hanya puluhan byte, jadi tes ini bebas dari masalah
+  /// pengiriman data bitmap yang besar — kalau ini tercetak, bahasa printer
+  /// sudah pasti TSPL.
+  static List<int> buildTsplText(List<String> lines) {
+    final List<int> bytes = [];
+    bytes.addAll(latin1.encode('CLS\r\n'));
+
+    int y = 24;
+    for (final line in lines) {
+      final safe = line.replaceAll('"', "'");
+      bytes.addAll(latin1.encode('TEXT 24,$y,"3",0,1,1,"$safe"\r\n'));
+      y += 40;
+    }
+
+    bytes.addAll(latin1.encode('PRINT 1,1\r\n'));
+    return bytes;
+  }
+
+  /// Perintah CPCL memakai font bawaan printer (tanpa bitmap).
+  static List<int> buildCpclText(List<String> lines, {int dpi = 200}) {
+    final int formHeight = 40 + lines.length * 40;
+    final List<int> bytes = [];
+    bytes.addAll(latin1.encode('! 0 $dpi $dpi $formHeight 1\r\n'));
+
+    int y = 20;
+    for (final line in lines) {
+      bytes.addAll(latin1.encode('TEXT 4 0 24 $y $line\r\n'));
+      y += 40;
+    }
+
+    bytes.addAll(latin1.encode('FORM\r\n'));
+    bytes.addAll(latin1.encode('PRINT\r\n'));
     return bytes;
   }
 

@@ -10,7 +10,7 @@ import '../services/label_printer_service.dart';
 
 class PrinterProvider extends ChangeNotifier {
   static const String _paperSizeKey = 'printer_paper_width_mm';
-  static const String _languageKey = 'printer_language';
+  static const String _printModeKey = 'printer_print_mode';
 
   final BlueThermalPrinter _bluetooth = BlueThermalPrinter.instance;
 
@@ -19,7 +19,7 @@ class PrinterProvider extends ChangeNotifier {
   bool _isConnected = false;
   bool _isLoading = false;
   int _paperWidthMm = ReceiptPaper.defaultWidthMm;
-  PrintLanguage _language = PrintLanguage.escPosText;
+  PrintMode _printMode = PrintMode.escPosText;
 
   List<BluetoothDevice> get devices => _devices;
   BluetoothDevice? get selectedDevice => _selectedDevice;
@@ -30,8 +30,8 @@ class PrinterProvider extends ChangeNotifier {
   int get paperWidthMm => _paperWidthMm;
   List<int> get supportedPaperWidths => ReceiptPaper.supportedWidthsMm;
 
-  /// Bahasa perintah yang dipakai saat mencetak.
-  PrintLanguage get language => _language;
+  /// Bahasa + cara render yang dipakai saat mencetak.
+  PrintMode get printMode => _printMode;
 
   PrinterProvider() {
     _initPrinter();
@@ -106,16 +106,16 @@ class PrinterProvider extends ChangeNotifier {
     if (saved != null) {
       _paperWidthMm = ReceiptPaper.normalize(saved);
     }
-    _language = PrintLanguageCodec.fromStorage(prefs.getString(_languageKey));
+    _printMode = PrintMode.fromStorage(prefs.getString(_printModeKey));
   }
 
-  /// Ubah bahasa perintah printer (ESC/POS teks, ESC/POS gambar, TSPL, CPCL).
-  Future<void> setLanguage(PrintLanguage language) async {
-    if (language == _language) return;
-    _language = language;
+  /// Ubah bahasa + cara render printer dan simpan permanen.
+  Future<void> setPrintMode(PrintMode mode) async {
+    if (mode == _printMode) return;
+    _printMode = mode;
     notifyListeners();
     final prefs = await SharedPreferences.getInstance();
-    await prefs.setString(_languageKey, language.storageKey);
+    await prefs.setString(_printModeKey, mode.storageKey);
   }
 
   /// Ubah lebar kertas thermal (58 / 72 / 80 mm) dan simpan permanen.
@@ -181,50 +181,59 @@ class PrinterProvider extends ChangeNotifier {
     }
   }
 
-  /// Cetak sampel diagnosa memakai satu bahasa printer tertentu.
+  /// Cetak sampel diagnosa memakai satu mode printer tertentu.
   ///
   /// Dipakai untuk mencari tahu bahasa apa yang dimengerti printer: kalau
   /// hanya salah satu mode yang menghasilkan tulisan, mode itulah yang benar.
-  Future<bool> printTestWithLanguage(PrintLanguage language, {String? storeName}) async {
+  Future<bool> printTestWithMode(PrintMode mode, {String? storeName}) async {
     final name = (storeName ?? 'ZENVI POS').toUpperCase();
+    final timestamp = DateFormat('dd/MM/yyyy HH:mm:ss').format(DateTime.now());
+    final label = _modeLabel(mode);
 
-    if (language == PrintLanguage.escPosText) {
+    if (mode == PrintMode.escPosText) {
       return printTestReceipt(storeName: storeName);
     }
 
+    if (mode.render == PrintRender.text) {
+      final lines = [name, 'MODE: $label', timestamp, 'Lebar: ${_paperWidthMm}mm'];
+      switch (mode.language) {
+        case PrintLanguage.tspl:
+          return printBytes(LabelPrinterService.buildTsplText(lines));
+        case PrintLanguage.cpcl:
+          return printBytes(LabelPrinterService.buildCpclText(lines));
+        case PrintLanguage.escPos:
+          return printTestReceipt(storeName: storeName);
+      }
+    }
+
     final image = LabelPrinterService.buildDiagnosticImage(
-      modeLabel: 'MODE: ${_languageLabel(language)}',
+      modeLabel: 'MODE: $label',
       dotWidth: ReceiptPaper.dotWidth(_paperWidthMm),
       storeName: name,
-      timestamp: DateFormat('dd/MM/yyyy HH:mm:ss').format(DateTime.now()),
+      timestamp: timestamp,
     );
 
-    switch (language) {
+    switch (mode.language) {
       case PrintLanguage.tspl:
         return printBytes(LabelPrinterService.buildTsplImage(image));
       case PrintLanguage.cpcl:
         return printBytes(LabelPrinterService.buildCpclImage(image));
-      case PrintLanguage.escPosImage:
+      case PrintLanguage.escPos:
         return printBytes(await LabelPrinterService.buildEscPosImage(
           image,
           ReceiptPaper.toPaperSize(_paperWidthMm),
         ));
-      case PrintLanguage.escPosText:
-        return printTestReceipt(storeName: storeName);
     }
   }
 
-  static String _languageLabel(PrintLanguage language) {
-    switch (language) {
-      case PrintLanguage.escPosText:
-        return 'ESC/POS TEKS';
-      case PrintLanguage.escPosImage:
-        return 'ESC/POS GAMBAR';
-      case PrintLanguage.tspl:
-        return 'TSPL LABEL';
-      case PrintLanguage.cpcl:
-        return 'CPCL LABEL';
-    }
+  static String _modeLabel(PrintMode mode) {
+    final String lang = switch (mode.language) {
+      PrintLanguage.escPos => 'ESC/POS',
+      PrintLanguage.tspl => 'TSPL',
+      PrintLanguage.cpcl => 'CPCL',
+    };
+    final String render = mode.render == PrintRender.text ? 'TEKS' : 'GAMBAR';
+    return '$lang $render';
   }
 
   Future<bool> printTestReceipt({String? storeName}) async {

@@ -164,17 +164,17 @@ class _PrinterSettingsScreenState extends State<PrinterSettingsScreen> {
                   style: TextStyle(fontSize: 12, color: theme.colorScheme.onSurfaceVariant),
                 ),
                 const SizedBox(height: 10),
-                ...PrintLanguage.values.map((language) {
-                  final isActive = printerProvider.language == language;
+                ...PrintMode.all.map((mode) {
+                  final isActive = printerProvider.printMode == mode;
                   return Padding(
                     padding: const EdgeInsets.only(bottom: 6),
                     child: Row(
                       children: [
                         Expanded(
                           child: ChoiceChip(
-                            label: Text(_languageLabel(context, language)),
+                            label: Text(_modeLabel(context, mode)),
                             selected: isActive,
-                            onSelected: (_) => printerProvider.setLanguage(language),
+                            onSelected: (_) => printerProvider.setPrintMode(mode),
                           ),
                         ),
                         const SizedBox(width: 8),
@@ -186,8 +186,8 @@ class _PrinterSettingsScreenState extends State<PrinterSettingsScreen> {
                                   final failureText = 'test_print_failed'.tr(context: context);
                                   final storeName = authProvider.user?.company?['name']?.toString();
 
-                                  final success = await printerProvider.printTestWithLanguage(
-                                    language,
+                                  final success = await printerProvider.printTestWithMode(
+                                    mode,
                                     storeName: storeName,
                                   );
 
@@ -277,16 +277,15 @@ class _PrinterSettingsScreenState extends State<PrinterSettingsScreen> {
     );
   }
 
-  String _languageLabel(BuildContext context, PrintLanguage language) {
-    switch (language) {
-      case PrintLanguage.escPosText:
-        return 'print_mode_escpos_text'.tr(context: context);
-      case PrintLanguage.escPosImage:
-        return 'print_mode_escpos_image'.tr(context: context);
-      case PrintLanguage.tspl:
-        return 'print_mode_tspl'.tr(context: context);
-      case PrintLanguage.cpcl:
-        return 'print_mode_cpcl'.tr(context: context);
-    }
+  String _modeLabel(BuildContext context, PrintMode mode) {
+    final String language = switch (mode.language) {
+      PrintLanguage.escPos => 'print_lang_escpos'.tr(context: context),
+      PrintLanguage.tspl => 'print_lang_tspl'.tr(context: context),
+      PrintLanguage.cpcl => 'print_lang_cpcl'.tr(context: context),
+    };
+    final String render = mode.render == PrintRender.text
+        ? 'print_render_text'.tr(context: context)
+        : 'print_render_image'.tr(context: context);
+    return '$language · $render';
   }
 }
