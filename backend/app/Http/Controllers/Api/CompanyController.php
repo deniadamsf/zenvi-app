@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Support\Entitlements;
 use App\Http\Requests\JoinCompanyRequest;
 use App\Http\Requests\StoreCompanyRequest;
 use App\Models\Branch;
@@ -245,7 +246,32 @@ class CompanyController extends Controller
         ]);
 
         $company = $user->company;
-        
+
+        // Toggle fitur berbayar tidak boleh DINYALAKAN di luar paketnya.
+        // Mematikannya selalu boleh - kalau toko turun paket, setelan lamanya
+        // tetap tersimpan dan hidup kembali begitu paketnya naik lagi.
+        $featureToggles = [
+            'is_membership_enabled'    => 'membership',
+            'is_points_enabled'        => 'points',
+            'is_kds_enabled'           => 'kds',
+            'is_reservation_enabled'   => 'reservation',
+            'is_qr_menu_enabled'       => 'qr_menu',
+            'is_product_image_enabled' => 'product_image',
+        ];
+        $entitlements = Entitlements::for($company);
+        foreach ($featureToggles as $field => $feature) {
+            if ($request->boolean($field) && $request->has($field) && !$entitlements->hasFeature($feature)) {
+                return response()->json([
+                    'error'         => 'feature_locked',
+                    'feature'       => $feature,
+                    'required_plan' => Entitlements::planRequiredFor($feature),
+                    'current_plan'  => $entitlements->planCode(),
+                    'message'       => 'Fitur ' . config('plans.features.' . $feature, $feature)
+                        . ' tidak tersedia di paket Anda saat ini.',
+                ], 403);
+            }
+        }
+
         $updates = [];
         if ($request->has('require_opname_on_shift_close')) {
             $updates['require_opname_on_shift_close'] = $request->require_opname_on_shift_close;

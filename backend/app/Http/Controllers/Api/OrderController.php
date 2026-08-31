@@ -11,6 +11,7 @@ use App\Models\Order;
 use App\Models\Product;
 use App\Models\ProductVariant;
 use App\Services\FirebaseNotificationService;
+use App\Support\Entitlements;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
@@ -23,6 +24,13 @@ class OrderController extends Controller
     {
         $query = Order::with(['items.product', 'user', 'servicedBy', 'shift.branch', 'member'])
             ->where('company_id', $request->user()->company_id);
+
+        // Batas riwayat sesuai paket. Data TIDAK dihapus - hanya tidak
+        // ditampilkan; begitu paket ditingkatkan, seluruh riwayat muncul lagi.
+        $historyDays = Entitlements::for($request->user()->company)->historyDays();
+        if ($historyDays !== null) {
+            $query->where('created_at', '>=', now()->subDays($historyDays)->startOfDay());
+        }
 
         // Filter by date
         if ($request->has('date')) {

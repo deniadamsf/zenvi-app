@@ -10,6 +10,7 @@ use App\Models\Order;
 use App\Models\OrderItem;
 use App\Models\Product;
 use App\Models\Shift;
+use App\Support\Entitlements;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
@@ -120,6 +121,18 @@ class ExpenseController extends Controller
                     $startDate = $now->copy()->startOfDay();
                     $endDate = $now->copy()->endOfDay();
                     break;
+            }
+        }
+
+        // Batas riwayat sesuai paket: rentang yang diminta dipangkas, BUKAN
+        // ditolak. Laporan tetap tampil dan tetap benar untuk rentang yang
+        // boleh dilihat - menolak seluruh permintaan akan mengosongkan
+        // dashboard paket gratis dan membuatnya terasa rusak, bukan terbatas.
+        $historyDays = Entitlements::for($request->user()->company)->historyDays();
+        if ($historyDays !== null) {
+            $earliest = $now->copy()->subDays($historyDays)->startOfDay();
+            if ($startDate->lessThan($earliest)) {
+                $startDate = $earliest;
             }
         }
 

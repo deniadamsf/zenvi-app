@@ -12,6 +12,7 @@ use App\Services\FirebaseNotificationService;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Cache;
+use App\Support\Entitlements;
 
 class ShiftController extends Controller
 {
@@ -101,6 +102,13 @@ class ShiftController extends Controller
                     $q->select('id', 'shift_id', 'status', 'payment_method', 'total_amount');
                 },
             ]);
+
+        // Batas riwayat sesuai paket, berlaku juga saat ada filter tanggal supaya
+        // tidak bisa ditembus dengan meminta tanggal lama satu per satu.
+        $historyDays = Entitlements::for($user->company)->historyDays();
+        if ($historyDays !== null) {
+            $query->where('start_time', '>=', now()->subDays($historyDays)->startOfDay());
+        }
 
         if ($request->has('date')) {
             $query->whereDate('start_time', $request->date);
@@ -266,10 +274,14 @@ class ShiftController extends Controller
             'opening_balance' => $requireCashDrawer ? 'required|numeric|min:0' : 'nullable|numeric|min:0',
         ];
 
+        // Paket gratis tetap dapat absensi ber-GPS; yang berbayar adalah BUKTI
+        // FOTO-nya. Selfie juga satu-satunya bagian absensi yang memakan storage.
+        $allowSelfie = Entitlements::for($company)->hasFeature('attendance_selfie');
+
         if ($requireAttendance) {
             $rules['latitude'] = 'nullable|numeric';
             $rules['longitude'] = 'nullable|numeric';
-            $rules['selfie'] = 'required|image|max:5120';
+            $rules['selfie'] = $allowSelfie ? 'required|image|max:5120' : 'nullable|image|max:5120';
         }
 
         $request->validate($rules);
@@ -303,7 +315,9 @@ class ShiftController extends Controller
         }
 
         $path = null;
-        if ($requireAttendance && $request->hasFile('selfie')) {
+        // Aplikasi versi lama tetap mengirim selfie walau paketnya tidak mencakup;
+        // sengaja tidak disimpan supaya storage tidak terpakai untuk paket gratis.
+        if ($requireAttendance && $allowSelfie && $request->hasFile('selfie')) {
             $image = $request->file('selfie');
             $filename = 'selfie_' . $user->id . '_' . time() . '.' . $image->getClientOriginalExtension();
             $path = 'uploads/selfies/' . $filename;
