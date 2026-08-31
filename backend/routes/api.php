@@ -52,21 +52,32 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/companies/logo', [CompanyController::class, 'uploadLogo']);
     Route::get('/companies/employees/pending', [CompanyController::class, 'pendingEmployees']);
     Route::get('/companies/employees/active', [CompanyController::class, 'activeEmployees']);
-    Route::post('/companies/employees/{id}/approve', [CompanyController::class, 'approveEmployee']);
+    // Kuota karyawan ditegakkan saat OWNER MENYETUJUI, bukan saat karyawan
+    // mendaftar: pendaftar tetap boleh masuk antrean, dan yang melihat tawaran
+    // upgrade adalah owner - tepat saat sedang menatap nama orang yang mau
+    // diterima kerja. Itu momen konversi terbaik yang tersedia.
+    Route::post('/companies/employees/{id}/approve', [CompanyController::class, 'approveEmployee'])
+        ->middleware('plan.limit:employees');
     Route::post('/companies/employees/{id}/permissions', [CompanyController::class, 'updateEmployeePermissions']);
     Route::delete('/companies/employees/{id}', [CompanyController::class, 'removeEmployee']);
 
     // Branch APIs
-    Route::apiResource('branches', BranchController::class);
+    // Batas cabang hanya dipasang di pembuatan. Membaca daftar cabang tetap
+    // terbuka untuk semua paket - aplikasi memakainya untuk pemilih cabang, dan
+    // menguncinya akan merusak POS di paket gratis.
+    Route::post('/branches', [BranchController::class, 'store'])->middleware('plan.limit:branches');
+    Route::apiResource('branches', BranchController::class)->except(['store']);
 
     // Master Data APIs
     Route::apiResource('ingredients', IngredientController::class);
-    Route::apiResource('products', ProductController::class);
-    Route::post('/products/{id}/image', [ProductController::class, 'uploadImage']);
+    Route::post('/products', [ProductController::class, 'store'])->middleware('plan.limit:products');
+    Route::apiResource('products', ProductController::class)->except(['store']);
+    Route::post('/products/{id}/image', [ProductController::class, 'uploadImage'])
+        ->middleware('feature:product_image');
 
     // Membership & Promo Member APIs
-    Route::apiResource('members', MemberController::class);
-    Route::apiResource('member-promos', MemberPromoController::class);
+    Route::apiResource('members', MemberController::class)->middleware('feature:membership');
+    Route::apiResource('member-promos', MemberPromoController::class)->middleware('feature:membership');
 
     // Shift APIs
     Route::get('/shifts', [ShiftController::class, 'index']);
@@ -77,9 +88,9 @@ Route::middleware('auth:sanctum')->group(function () {
 
     // Order (Sync) APIs
     Route::get('/orders', [OrderController::class, 'index']);
-    Route::get('/orders/kds', [OrderController::class, 'getKdsOrders']);
-    Route::patch('/orders/{id}/kds-status', [OrderController::class, 'updateKdsStatus']);
-    Route::patch('/orders/{orderId}/items/{itemId}/kds-status', [OrderController::class, 'updateItemKdsStatus']);
+    Route::get('/orders/kds', [OrderController::class, 'getKdsOrders'])->middleware('feature:kds');
+    Route::patch('/orders/{id}/kds-status', [OrderController::class, 'updateKdsStatus'])->middleware('feature:kds');
+    Route::patch('/orders/{orderId}/items/{itemId}/kds-status', [OrderController::class, 'updateItemKdsStatus'])->middleware('feature:kds');
     Route::post('/orders/sync', [OrderController::class, 'sync']);
     Route::post('/orders/{id}/void', [OrderController::class, 'voidOrder']);
 
@@ -106,8 +117,8 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/chat', [MessageController::class, 'store']);
 
     // Reservation APIs (Salon & Table Booking)
-    Route::apiResource('reservations', ReservationController::class);
-    Route::patch('/reservations/{id}/status', [ReservationController::class, 'updateStatus']);
+    Route::apiResource('reservations', ReservationController::class)->middleware('feature:reservation');
+    Route::patch('/reservations/{id}/status', [ReservationController::class, 'updateStatus'])->middleware('feature:reservation');
 
     // Notifications & Device Tokens
     Route::post('/user/fcm-token', [NotificationController::class, 'storeToken']);

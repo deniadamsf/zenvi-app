@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use App\Support\Entitlements;
 use Illuminate\Support\Str;
 
 class Company extends Model
@@ -13,6 +14,10 @@ class Company extends Model
     protected $fillable = [
         'name',
         'default_language',
+        'plan_code',
+        'plan_status',
+        'plan_expires_at',
+        'is_founding_member',
         'code',
         'slug',
         'is_qr_menu_enabled',
@@ -41,6 +46,8 @@ class Company extends Model
     ];
 
     protected $casts = [
+        'plan_expires_at' => 'datetime',
+        'is_founding_member' => 'boolean',
         'is_qr_menu_enabled' => 'boolean',
         'is_reservation_enabled' => 'boolean',
         'is_membership_enabled' => 'boolean',
@@ -63,6 +70,7 @@ class Company extends Model
         'qr_menu_url',
         'store_url',
         'logo_url',
+        'plan',
     ];
 
     protected static function boot()
@@ -91,6 +99,69 @@ class Company extends Model
                 $company->slug = $slug;
             }
         });
+    }
+
+    /**
+     * Ringkasan paket yang ikut terbawa ke aplikasi lewat /auth/me.
+     *
+     * Murni dibaca dari config/plans.php sehingga tidak menambah satu query pun,
+     * dan `plan.code` di sini adalah paket YANG BERLAKU - kedaluwarsa serta masa
+     * tenggang sudah diperhitungkan, tidak sama dengan kolom `plan_code` mentah.
+     */
+    public function getPlanAttribute()
+    {
+        return Entitlements::for($this)->summary();
+    }
+
+    /*
+    |--------------------------------------------------------------------------
+    | Toggle fitur: nilai EFEKTIF
+    |--------------------------------------------------------------------------
+    |
+    | Toggle yang dinyalakan owner hanya berlaku kalau paketnya juga mengizinkan.
+    | Digabung di sini, di sumbernya, supaya APK LAMA yang sudah beredar pun ikut
+    | benar: aplikasi itu membaca `is_*_enabled` untuk memutuskan menampilkan menu,
+    | jadi kalau server mengirim `true` sementara endpointnya dikunci, pengguna
+    | melihat menu yang selalu gagal. Dengan digabung di sini, aplikasi versi apa
+    | pun menyembunyikan menu yang memang tidak termasuk paketnya.
+    |
+    | Ini TIDAK menggantikan middleware. Ini hanya menjaga tampilan tetap jujur;
+    | penegakan sesungguhnya tetap di `feature:` pada route.
+    */
+    private function featureAllowed(string $feature): bool
+    {
+        return Entitlements::for($this)->hasFeature($feature);
+    }
+
+    public function getIsMembershipEnabledAttribute($value)
+    {
+        return (bool) $value && $this->featureAllowed('membership');
+    }
+
+    public function getIsPointsEnabledAttribute($value)
+    {
+        // Default menyala saat nilainya belum pernah diset (kolom baru).
+        return ($value === null || (bool) $value) && $this->featureAllowed('points');
+    }
+
+    public function getIsKdsEnabledAttribute($value)
+    {
+        return (bool) $value && $this->featureAllowed('kds');
+    }
+
+    public function getIsReservationEnabledAttribute($value)
+    {
+        return (bool) $value && $this->featureAllowed('reservation');
+    }
+
+    public function getIsQrMenuEnabledAttribute($value)
+    {
+        return (bool) $value && $this->featureAllowed('qr_menu');
+    }
+
+    public function getIsProductImageEnabledAttribute($value)
+    {
+        return ($value === null || (bool) $value) && $this->featureAllowed('product_image');
     }
 
     public function getQrMenuUrlAttribute()
