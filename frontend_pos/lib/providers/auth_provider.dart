@@ -23,18 +23,60 @@ class AuthProvider extends ChangeNotifier {
   bool get isAuthenticated => _token != null && _user != null;
   bool get isOwner => _user?.isOwner ?? false;
 
-  bool get isReservationEnabled => _user?.company?['is_reservation_enabled'] == 1 || _user?.company?['is_reservation_enabled'] == true;
+  // --- Paket langganan ---
+  //
+  // Payload `plan` dikirim server lewat /auth/me (Company::getPlanAttribute) dan
+  // berisi paket YANG BERLAKU - kedaluwarsa serta masa tenggang sudah dihitung
+  // di sisi server, jadi di sini tidak perlu menghitung ulang apa pun.
+  Map<String, dynamic>? get _plan {
+    final raw = _user?.company?['plan'];
+    return raw is Map ? Map<String, dynamic>.from(raw) : null;
+  }
+
+  bool get hasPlanInfo => _plan != null;
+  String get planCode => _plan?['code']?.toString() ?? 'free';
+  String get planName => _plan?['name']?.toString() ?? '';
+  String get planStatus => _plan?['status']?.toString() ?? 'active';
+  bool get isPremiumPlan => planCode != 'free';
+  bool get isFoundingMember => _plan?['is_founding_member'] == true;
+
+  DateTime? get planExpiresAt {
+    final raw = _plan?['expires_at'];
+    if (raw == null) return null;
+    return DateTime.tryParse(raw.toString())?.toLocal();
+  }
+
+  /// Profil yang tersimpan di cache dari versi lama aplikasi belum punya payload
+  /// `plan`. Dalam keadaan itu UI sengaja TIDAK mengunci apa pun - server tetap
+  /// menjadi penegak sebenarnya, dan mengunci berdasarkan data yang tidak
+  /// diketahui hanya akan membuat aplikasi terasa rusak setelah pembaruan.
+  bool hasFeature(String feature) {
+    final plan = _plan;
+    if (plan == null) return true;
+    final features = plan['features'];
+    return features is List && features.contains(feature);
+  }
+
+  /// Batas paket untuk sebuah kunci. `null` berarti tak terbatas.
+  int? planLimit(String key) {
+    final limits = _plan?['limits'];
+    if (limits is! Map) return null;
+    final value = limits[key];
+    return value == null ? null : int.tryParse(value.toString());
+  }
+
+  bool get isReservationEnabled => (_user?.company?['is_reservation_enabled'] == 1 || _user?.company?['is_reservation_enabled'] == true) && hasFeature('reservation');
   String get reservationDescription => _user?.company?['reservation_description']?.toString() ?? '';
-  bool get isQrMenuEnabled => _user?.company?['is_qr_menu_enabled'] == 1 || _user?.company?['is_qr_menu_enabled'] == true;
+  bool get isQrMenuEnabled => (_user?.company?['is_qr_menu_enabled'] == 1 || _user?.company?['is_qr_menu_enabled'] == true) && hasFeature('qr_menu');
   String get qrMenuDescription => _user?.company?['qr_menu_description']?.toString() ?? '';
-  bool get isKdsEnabled => _user?.company?['is_kds_enabled'] == 1 || _user?.company?['is_kds_enabled'] == true;
-  bool get isMembershipEnabled => _user?.company?['is_membership_enabled'] == 1 || _user?.company?['is_membership_enabled'] == true;
-  bool get isPointsEnabled => _user?.company?['is_points_enabled'] == null || _user?.company?['is_points_enabled'] == 1 || _user?.company?['is_points_enabled'] == true;
+  bool get isKdsEnabled => (_user?.company?['is_kds_enabled'] == 1 || _user?.company?['is_kds_enabled'] == true) && hasFeature('kds');
+  bool get isMembershipEnabled => (_user?.company?['is_membership_enabled'] == 1 || _user?.company?['is_membership_enabled'] == true) && hasFeature('membership');
+  bool get isPointsEnabled => (_user?.company?['is_points_enabled'] == null || _user?.company?['is_points_enabled'] == 1 || _user?.company?['is_points_enabled'] == true) && hasFeature('points');
   double get pointEarningAmount => double.tryParse(_user?.company?['point_earning_amount']?.toString() ?? '1000') ?? 1000.0;
   double get pointRedeemRate => double.tryParse(_user?.company?['point_redeem_rate']?.toString() ?? '1') ?? 1.0;
   double get defaultMemberDiscountPercent => double.tryParse(_user?.company?['default_member_discount_percent']?.toString() ?? (_user?.company?['member_default_discount']?.toString() ?? '0')) ?? 0.0;
   String get companySlug => _user?.company?['slug']?.toString() ?? '';
-  bool get isProductImageEnabled => _user?.company?['is_product_image_enabled'] == null || _user?.company?['is_product_image_enabled'] == 1 || _user?.company?['is_product_image_enabled'] == true;
+  bool get isProductImageEnabled => (_user?.company?['is_product_image_enabled'] == null || _user?.company?['is_product_image_enabled'] == 1 || _user?.company?['is_product_image_enabled'] == true) && hasFeature('product_image');
 
   bool get canAccessPos => _user?.canAccessPos ?? true;
   bool get canAccessStock => _user?.canAccessStock ?? false;

@@ -5,6 +5,7 @@ import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 import '../models/product_model.dart';
 import '../config/api_config.dart';
+import '../services/api_client.dart';
 
 class ProductProvider extends ChangeNotifier {
   List<ProductModel> _products = [];
@@ -49,6 +50,7 @@ class ProductProvider extends ChangeNotifier {
           'Accept': 'application/json',
         },
       );
+      ApiClient.inspect(response);
 
       if (response.statusCode == 200) {
         final List<dynamic> data = jsonDecode(response.body)['data'];
@@ -112,6 +114,7 @@ class ProductProvider extends ChangeNotifier {
 
       final streamedResponse = await request.send();
       final response = await http.Response.fromStream(streamedResponse);
+      ApiClient.inspect(response);
 
       if (response.statusCode == 201) {
         await fetchProducts(); // Refresh list
@@ -178,6 +181,7 @@ class ProductProvider extends ChangeNotifier {
 
       final streamedResponse = await request.send();
       final response = await http.Response.fromStream(streamedResponse);
+      ApiClient.inspect(response);
 
       if (response.statusCode == 200 || response.statusCode == 201) {
         await fetchProducts(); // Refresh list

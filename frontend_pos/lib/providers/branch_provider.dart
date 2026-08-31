@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import '../models/branch_model.dart';
 import '../config/api_config.dart';
+import '../services/api_client.dart';
 
 class BranchProvider with ChangeNotifier {
   List<BranchModel> _branches = [];
@@ -28,6 +29,7 @@ class BranchProvider with ChangeNotifier {
           'Accept': 'application/json',
         },
       );
+      ApiClient.inspect(response);
 
       if (response.statusCode == 200) {
         final Map<String, dynamic> body = jsonDecode(response.body);
@@ -60,6 +62,7 @@ class BranchProvider with ChangeNotifier {
           'radius_meters': radius,
         }),
       );
+      ApiClient.inspect(response);
 
       if (response.statusCode == 201) {
         await fetchBranches(token);
@@ -87,6 +90,7 @@ class BranchProvider with ChangeNotifier {
           'radius_meters': radius,
         }),
       );
+      ApiClient.inspect(response);
 
       if (response.statusCode == 200) {
         await fetchBranches(token);
@@ -107,6 +111,7 @@ class BranchProvider with ChangeNotifier {
           'Accept': 'application/json',
         },
       );
+      ApiClient.inspect(response);
 
       if (response.statusCode == 200) {
         _branches.removeWhere((b) => b.id == id);

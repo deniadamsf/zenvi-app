@@ -16,6 +16,7 @@ use App\Http\Controllers\Api\ReservationController;
 use App\Http\Controllers\Api\MemberController;
 use App\Http\Controllers\Api\MemberPromoController;
 use App\Http\Controllers\Api\NotificationController;
+use App\Http\Controllers\Api\PlanController;
 use App\Http\Controllers\PublicMenuController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
@@ -60,6 +61,9 @@ Route::middleware('auth:sanctum')->group(function () {
         ->middleware('plan.limit:employees');
     Route::post('/companies/employees/{id}/permissions', [CompanyController::class, 'updateEmployeePermissions']);
     Route::delete('/companies/employees/{id}', [CompanyController::class, 'removeEmployee']);
+
+    // Paket Langganan
+    Route::get('/plans', [PlanController::class, 'index']);
 
     // Branch APIs
     // Batas cabang hanya dipasang di pembuatan. Membaca daftar cabang tetap

@@ -4,6 +4,7 @@ import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 import '../models/reservation_model.dart';
 import '../config/api_config.dart';
+import '../services/api_client.dart';
 
 class ReservationProvider extends ChangeNotifier {
   List<ReservationModel> _reservations = [];
@@ -98,6 +99,7 @@ class ReservationProvider extends ChangeNotifier {
           'Accept': 'application/json',
         },
       );
+      ApiClient.inspect(response);
 
       if (response.statusCode == 200) {
         final Map<String, dynamic> body = jsonDecode(response.body);
@@ -127,6 +129,7 @@ class ReservationProvider extends ChangeNotifier {
           'assigned_staff_id': ?assignedStaffId,
         }),
       );
+      ApiClient.inspect(response);
 
       if (response.statusCode == 200) {
         final Map<String, dynamic> body = jsonDecode(response.body);
@@ -185,6 +188,7 @@ class ReservationProvider extends ChangeNotifier {
         },
         body: jsonEncode(bodyMap),
       );
+      ApiClient.inspect(response);
 
       if (response.statusCode == 201) {
         await fetchReservations();
@@ -210,6 +214,7 @@ class ReservationProvider extends ChangeNotifier {
           'Accept': 'application/json',
         },
       );
+      ApiClient.inspect(response);
 
       if (response.statusCode == 200) {
         _reservations.removeWhere((r) => r.id == id);

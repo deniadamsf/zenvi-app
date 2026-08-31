@@ -6,6 +6,7 @@ import '../../providers/auth_provider.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import '../auth/login_screen.dart';
+import '../subscription/plan_screen.dart';
 import 'employee_settings_screen.dart';
 import 'store_settings_screen.dart';
 import 'payment_settings_screen.dart';
@@ -81,6 +82,14 @@ class _SettingsScreenState extends State<SettingsScreen> {
                             subtitle: 'payment_methods_desc'.tr(context: context),
                             icon: Icons.payments_rounded,
                             onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const PaymentSettingsScreen())),
+                          ),
+                          const SizedBox(height: 16),
+                          _buildSettingsCard(
+                            theme: theme,
+                            title: 'subscription_title'.tr(context: context),
+                            subtitle: 'subscription_menu_desc'.tr(context: context),
+                            icon: Icons.workspace_premium_rounded,
+                            onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const PlanScreen())),
                           ),
                           const SizedBox(height: 32),
                         ],

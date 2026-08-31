@@ -6,6 +6,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import '../config/api_config.dart';
 import '../database/database_helper.dart';
 import '../models/member_model.dart';
+import '../services/api_client.dart';
 
 class MemberProvider extends ChangeNotifier {
   List<MemberModel> _members = [];
@@ -62,6 +63,7 @@ class MemberProvider extends ChangeNotifier {
           'Authorization': 'Bearer $token',
         },
       );
+      ApiClient.inspect(response);
 
       if (response.statusCode == 200) {
         final Map<String, dynamic> data = jsonDecode(response.body);
@@ -132,6 +134,7 @@ class MemberProvider extends ChangeNotifier {
           'notes': notes,
         }),
       );
+      ApiClient.inspect(response);
 
       final data = jsonDecode(response.body);
       if (response.statusCode == 201 || response.statusCode == 200) {
@@ -193,6 +196,7 @@ class MemberProvider extends ChangeNotifier {
           'notes': notes,
         }),
       );
+      ApiClient.inspect(response);
 
       final data = jsonDecode(response.body);
       if (response.statusCode == 200) {
@@ -227,6 +231,7 @@ class MemberProvider extends ChangeNotifier {
           'Authorization': 'Bearer $token',
         },
       );
+      ApiClient.inspect(response);
 
       if (response.statusCode == 200) {
         _members.removeWhere((m) => m.id == id);
@@ -258,6 +263,7 @@ class MemberProvider extends ChangeNotifier {
           'Authorization': 'Bearer $token',
         },
       );
+      ApiClient.inspect(response);
 
       if (response.statusCode == 200) {
         final data = jsonDecode(response.body);
