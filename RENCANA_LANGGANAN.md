@@ -50,6 +50,7 @@ reservasi, KDS, laporan laba rugi penuh, export Excel/PDF + dashboard analitik.
 cabang, perbandingan performa antar cabang, transfer stok antar cabang.
 
 **Trial Premium 14 hari otomatis** untuk setiap toko baru.
+Lebih dari ~10 cabang → "Hubungi kami". Jangan bikin tingkat keempat.
 
 > **Catatan harga.** Rp 59rb dipilih untuk menekan hambatan masuk di pasar UMKM.
 > Konsekuensinya: (a) menurunkan harga adalah pintu satu arah — menaikkannya nanti
@@ -60,7 +61,6 @@ cabang, perbandingan performa antar cabang, transfer stok antar cabang.
 > Alternatif yang menjaga pintu tetap terbuka tanpa mengubah kode sama sekali:
 > pasang Rp 99rb sebagai harga normal dan Rp 59rb sebagai **harga perkenalan yang
 > dikunci selamanya untuk pelanggan awal**.
-Lebih dari 50 karyawan atau ~10 cabang → "Hubungi kami". Jangan bikin tingkat keempat.
 
 ### Alasan pembagiannya
 
