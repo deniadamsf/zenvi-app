@@ -33,9 +33,9 @@ jadi harus diambil sebelum Tahap 4.
 | Cabang | 1 | 1 | 5 |
 | Produk | 50 | tak terbatas | tak terbatas |
 | Riwayat transaksi | 30 hari | penuh | penuh |
-| **Harga/bulan** | **Rp 0** | **Rp 99.000** | **Rp 249.000** |
-| Harga/tahun | — | Rp 990.000 | Rp 2.490.000 |
-| Cabang tambahan | — | — | Rp 59.000/cabang/bulan |
+| **Harga/bulan** | **Rp 0** | **Rp 59.000** | **Rp 149.000** |
+| Harga/tahun | — | Rp 590.000 | Rp 1.490.000 |
+| Cabang tambahan | — | — | Rp 39.000/cabang/bulan |
 
 **GRATIS** — POS + varian + diskon, tunai/QRIS/transfer, struk thermal + label,
 mode offline + sync, shift + laci kas, **stok & bahan baku + resep/HPP + opname +
@@ -50,6 +50,16 @@ reservasi, KDS, laporan laba rugi penuh, export Excel/PDF + dashboard analitik.
 cabang, perbandingan performa antar cabang, transfer stok antar cabang.
 
 **Trial Premium 14 hari otomatis** untuk setiap toko baru.
+
+> **Catatan harga.** Rp 59rb dipilih untuk menekan hambatan masuk di pasar UMKM.
+> Konsekuensinya: (a) menurunkan harga adalah pintu satu arah — menaikkannya nanti
+> jauh lebih sulit, apalagi karena sudah ada komitmen grandfather permanen;
+> (b) biaya transaksi gateway yang berbentuk flat (VA ~Rp 4.400) memakan ~7,5% dari
+> Rp 59rb, jauh lebih terasa daripada di harga tinggi — jadi **dorong paket tahunan**
+> dan utamakan QRIS yang biayanya persentase kecil, bukan VA.
+> Alternatif yang menjaga pintu tetap terbuka tanpa mengubah kode sama sekali:
+> pasang Rp 99rb sebagai harga normal dan Rp 59rb sebagai **harga perkenalan yang
+> dikunci selamanya untuk pelanggan awal**.
 Lebih dari 50 karyawan atau ~10 cabang → "Hubungi kami". Jangan bikin tingkat keempat.
 
 ### Alasan pembagiannya
