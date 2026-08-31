@@ -50,8 +50,10 @@ class NotificationService {
       FirebaseMessaging.onBackgroundMessage(firebaseMessagingBackgroundHandler);
 
       // 2. Initialize Local Notifications Plugin
+      // Ikon kecil notifikasi WAJIB siluet putih berlatar transparan; ikon
+      // peluncur yang berwarna akan tampil sebagai kotak putih polos.
       const AndroidInitializationSettings androidSettings =
-          AndroidInitializationSettings('@mipmap/ic_launcher');
+          AndroidInitializationSettings('@drawable/ic_notification');
       const InitializationSettings initSettings =
           InitializationSettings(android: androidSettings);
 
@@ -174,7 +176,8 @@ class NotificationService {
       showWhen: true,
       enableVibration: true,
       playSound: true,
-      icon: '@mipmap/ic_launcher',
+      icon: '@drawable/ic_notification',
+      // largeIcon boleh berwarna penuh - hanya ikon kecil yang diratakan Android.
       largeIcon: DrawableResourceAndroidBitmap('@mipmap/ic_launcher'),
       color: Color(0xFF00796B),
     );
