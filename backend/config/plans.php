@@ -24,8 +24,13 @@ return [
     | Masa tenggang setelah `plan_expires_at` terlewat. Selama masa ini paket
     | masih berlaku penuh - memutus akses tepat di detik kedaluwarsa membuat
     | toko yang pembayarannya sedang diproses Google berhenti berjualan.
+    |
+    | HARUS >= masa tenggang di Play Console (disetel 7 hari). Kalau lebih
+    | pendek, pelanggan yang pembayarannya gagal masih dianggap berlangganan
+    | oleh Google tapi sudah diturunkan oleh server - mereka kehilangan akses
+    | padahal Google masih mencoba menagih ulang.
     */
-    'grace_days' => 3,
+    'grace_days' => 7,
 
     /*
     | Seluruh fitur yang bisa dikunci. Fitur yang tidak terdaftar di sini
