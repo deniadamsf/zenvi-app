@@ -38,6 +38,152 @@ class StockManagementController extends Controller
         return null;
     }
 
+    /**
+     * Memindahkan stok bahan baku dari satu cabang ke cabang lain.
+     *
+     * Berbeda dari restock dan wastage, transfer bersifat NETRAL bagi total stok
+     * perusahaan - yang berpindah hanya lokasinya. Karena itu `ingredients.stock_qty`
+     * (angka global) sengaja tidak disentuh sama sekali; hanya baris per-cabang
+     * yang berubah. Menyentuhnya akan membuat total perusahaan bergeser padahal
+     * tidak ada bahan yang masuk atau keluar.
+     *
+     * Dua baris riwayat ditulis, bukan satu: cabang asal perlu melihat catatan
+     * keluar dan cabang tujuan perlu melihat catatan masuk. Kalau hanya satu,
+     * riwayat salah satu cabang akan bolong dan stoknya seolah berubah sendiri.
+     */
+    public function transfer(Request $request)
+    {
+        $this->checkStockAccess($request);
+
+        $request->validate([
+            'ingredient_id'  => 'required|exists:ingredients,id',
+            'from_branch_id' => 'required|exists:branches,id',
+            'to_branch_id'   => 'required|exists:branches,id|different:from_branch_id',
+            'qty'            => 'required|numeric|min:0.01',
+            'notes'          => 'nullable|string|max:255',
+        ], [
+            'to_branch_id.different' => 'Cabang tujuan harus berbeda dari cabang asal.',
+        ]);
+
+        $user = $request->user();
+        $companyId = $user->company_id;
+
+        $branches = Branch::where('company_id', $companyId)
+            ->whereIn('id', [$request->from_branch_id, $request->to_branch_id])
+            ->get()
+            ->keyBy('id');
+
+        if ($branches->count() < 2) {
+            return response()->json([
+                'message' => 'Cabang asal atau tujuan tidak ditemukan di toko Anda.',
+            ], 422);
+        }
+
+        $lowStockAlert = null;
+
+        DB::beginTransaction();
+        try {
+            $ingredient = Ingredient::where('company_id', $companyId)
+                ->findOrFail($request->ingredient_id);
+
+            // Baris asal dikunci selama pemeriksaan-lalu-pengurangan. Tanpa kunci,
+            // dua transfer bersamaan bisa sama-sama lolos pemeriksaan "stok cukup"
+            // lalu menghasilkan stok minus.
+            $from = BranchIngredient::where('branch_id', $request->from_branch_id)
+                ->where('ingredient_id', $ingredient->id)
+                ->lockForUpdate()
+                ->first();
+
+            if (!$from || $from->stock_qty < $request->qty) {
+                DB::rollBack();
+                return response()->json([
+                    'message' => 'Stok di cabang asal tidak mencukupi. Tersedia: '
+                        . (($from->stock_qty ?? 0) + 0) . ' ' . $ingredient->unit,
+                ], 422);
+            }
+
+            $to = BranchIngredient::firstOrCreate(
+                ['branch_id' => $request->to_branch_id, 'ingredient_id' => $ingredient->id],
+                ['stock_qty' => 0, 'min_stock' => $ingredient->min_stock ?? 5]
+            );
+
+            $from->decrement('stock_qty', $request->qty);
+            $to->increment('stock_qty', $request->qty);
+
+            $fromName = $branches[$request->from_branch_id]->name;
+            $toName   = $branches[$request->to_branch_id]->name;
+            $note     = $request->notes ?: 'Transfer stok antar cabang';
+
+            IngredientHistory::create([
+                'company_id'    => $companyId,
+                'branch_id'     => $request->from_branch_id,
+                'ingredient_id' => $ingredient->id,
+                'user_id'       => $user->id,
+                'type'          => 'transfer_out',
+                'qty_change'    => -1 * $request->qty,
+                'notes'         => $note . " - keluar ke {$toName}",
+            ]);
+
+            IngredientHistory::create([
+                'company_id'    => $companyId,
+                'branch_id'     => $request->to_branch_id,
+                'ingredient_id' => $ingredient->id,
+                'user_id'       => $user->id,
+                'type'          => 'transfer_in',
+                'qty_change'    => $request->qty,
+                'notes'         => $note . " - masuk dari {$fromName}",
+            ]);
+
+            $freshFrom = $from->fresh();
+            if ($freshFrom->stock_qty <= ($freshFrom->min_stock ?? 5)) {
+                $lowStockAlert = [
+                    'name'  => $ingredient->name,
+                    'qty'   => $freshFrom->stock_qty,
+                    'unit'  => $ingredient->unit,
+                    'id'    => $ingredient->id,
+                    'branch'=> $fromName,
+                ];
+            }
+
+            DB::commit();
+        } catch (\Throwable $e) {
+            DB::rollBack();
+            return response()->json([
+                'message' => 'Transfer gagal: ' . $e->getMessage(),
+            ], 500);
+        }
+
+        // Notifikasi dikirim SETELAH respons diterima klien, sama seperti pada
+        // sinkronisasi order: panggilan HTTPS ke Google tidak boleh menahan
+        // orang yang sedang menunggu konfirmasi transfernya.
+        if ($lowStockAlert) {
+            app()->terminating(function () use ($companyId, $lowStockAlert) {
+                try {
+                    FirebaseNotificationService::sendToCompany(
+                        $companyId,
+                        'Peringatan Stok Rendah!',
+                        "Bahan '{$lowStockAlert['name']}' di {$lowStockAlert['branch']} tersisa "
+                            . "{$lowStockAlert['qty']} {$lowStockAlert['unit']} setelah transfer.",
+                        'stock',
+                        ['ingredient_id' => $lowStockAlert['id'], 'type' => 'low_stock', 'route' => '/stock']
+                    );
+                } catch (\Throwable $e) {
+                    \Log::warning('Low stock notification after transfer failed: ' . $e->getMessage());
+                }
+            });
+        }
+
+        return response()->json([
+            'message' => 'Stok berhasil dipindahkan.',
+            'data' => [
+                'ingredient_id' => $request->ingredient_id,
+                'qty'           => (float) $request->qty,
+                'from_branch'   => $branches[$request->from_branch_id]->name,
+                'to_branch'     => $branches[$request->to_branch_id]->name,
+            ],
+        ]);
+    }
+
     public function restock(Request $request)
     {
         $this->checkStockAccess($request);

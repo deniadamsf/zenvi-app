@@ -1180,5 +1180,18 @@
     "export_as_pdf_desc": "Rapi untuk dicetak atau dikirim ke akuntan",
     "export_as_excel": "Excel (CSV)",
     "export_as_excel_desc": "Bisa diolah ulang di Excel atau Google Sheets",
-    "export_failed": "Gagal membuat berkas export"
+    "export_failed": "Gagal membuat berkas export",
+    "stock_transfer_title": "Transfer Stok",
+    "stock_transfer_desc": "Pindahkan bahan baku antar cabang",
+    "transfer_from_branch": "Dari Cabang",
+    "transfer_to_branch": "Ke Cabang",
+    "transfer_ingredient": "Bahan Baku",
+    "transfer_qty": "Jumlah",
+    "transfer_notes": "Catatan (opsional)",
+    "transfer_submit": "Pindahkan Stok",
+    "transfer_success": "Stok berhasil dipindahkan",
+    "transfer_pick_all": "Lengkapi bahan, cabang asal, dan cabang tujuan",
+    "transfer_same_branch": "Cabang tujuan harus berbeda dari cabang asal",
+    "transfer_need_branches": "Transfer stok membutuhkan minimal dua cabang",
+    "transfer_available": "Tersedia"
 }

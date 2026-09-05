@@ -7,6 +7,7 @@ import '../../providers/auth_provider.dart';
 import '../../providers/branch_provider.dart';
 import 'stock_history_screen.dart';
 import '../../widgets/zenvi_header.dart';
+import 'stock_transfer_screen.dart';
 
 class StockManagementScreen extends StatefulWidget {
   const StockManagementScreen({super.key});
@@ -319,6 +320,24 @@ class _StockManagementScreenState extends State<StockManagementScreen> {
               title: 'manajemen_stok_14'.tr(context: context),
               showBackButton: true,
               actions: [
+                // Transfer antar cabang: fitur paket Bisnis. Ditampilkan untuk
+                // semua paket - server yang menolak, dan ApiClient mengubah
+                // penolakan itu jadi tawaran upgrade. Menyembunyikannya berarti
+                // pemilik satu toko tidak pernah tahu fiturnya ada.
+                IconButton(
+                  icon: Icon(Icons.swap_horiz_rounded, color: theme.colorScheme.primary, size: 22),
+                  tooltip: 'stock_transfer_title'.tr(context: context),
+                  onPressed: () async {
+                    final changed = await Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (_) => const StockTransferScreen()),
+                    );
+                    if (changed == true && context.mounted) {
+                      Provider.of<IngredientProvider>(context, listen: false)
+                          .fetchIngredients(branchId: _selectedBranchId);
+                    }
+                  },
+                ),
                 IconButton(
                   icon: Icon(Icons.history, color: theme.colorScheme.primary, size: 22),
                   tooltip: 'stock_history_tooltip'.tr(context: context),

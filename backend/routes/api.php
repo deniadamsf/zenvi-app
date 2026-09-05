@@ -103,6 +103,8 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/stock/restock', [StockManagementController::class, 'restock']);
     Route::post('/stock/wastage', [StockManagementController::class, 'wastage']);
     Route::post('/stock/opname', [StockManagementController::class, 'opname']);
+    Route::post('/stock/transfer', [StockManagementController::class, 'transfer'])
+        ->middleware('feature:stock_transfer');
 
     // Expense & Financial APIs
     Route::apiResource('expenses', ExpenseController::class)->only(['index', 'store']);

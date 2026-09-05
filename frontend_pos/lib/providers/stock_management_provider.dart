@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 import '../config/api_config.dart';
+import '../services/api_client.dart';
 
 class StockHistoryModel {
   final int id;
@@ -195,6 +196,57 @@ class StockManagementProvider extends ChangeNotifier {
     } catch (e) {
       _lastErrorMessage = 'Koneksi error: $e';
       debugPrint('Error wastage: $e');
+      return false;
+    } finally {
+      _setLoading(false);
+    }
+  }
+
+  /// Memindahkan stok bahan dari satu cabang ke cabang lain (paket Bisnis).
+  ///
+  /// Server yang memutuskan boleh atau tidak; balasan 403 bertipe ditangkap
+  /// ApiClient.inspect() dan diubah jadi tawaran upgrade, bukan pesan error.
+  Future<bool> transfer({
+    required int ingredientId,
+    required int fromBranchId,
+    required int toBranchId,
+    required double qty,
+    String notes = '',
+  }) async {
+    _setLoading(true);
+    _lastErrorMessage = '';
+    try {
+      final response = await http.post(
+        Uri.parse('$_apiUrl/transfer'),
+        headers: await _getHeaders(),
+        body: jsonEncode({
+          'ingredient_id': ingredientId,
+          'from_branch_id': fromBranchId,
+          'to_branch_id': toBranchId,
+          'qty': qty,
+          'notes': notes,
+        }),
+      );
+
+      if (ApiClient.inspect(response)) {
+        _lastErrorMessage = '';
+        return false;
+      }
+
+      if (response.statusCode == 200 || response.statusCode == 201) {
+        await fetchHistory(branchId: _selectedBranchId);
+        return true;
+      }
+
+      try {
+        _lastErrorMessage = jsonDecode(response.body)['message'] ?? 'Transfer gagal';
+      } catch (_) {
+        _lastErrorMessage = 'Transfer gagal (${response.statusCode})';
+      }
+      return false;
+    } catch (e) {
+      _lastErrorMessage = 'Koneksi error: $e';
+      debugPrint('Error transfer: $e');
       return false;
     } finally {
       _setLoading(false);

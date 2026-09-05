@@ -1180,5 +1180,18 @@
     "export_as_pdf_desc": "Ready to print or send to your accountant",
     "export_as_excel": "Excel (CSV)",
     "export_as_excel_desc": "Can be reworked in Excel or Google Sheets",
-    "export_failed": "Failed to create export file"
+    "export_failed": "Failed to create export file",
+    "stock_transfer_title": "Stock Transfer",
+    "stock_transfer_desc": "Move ingredients between branches",
+    "transfer_from_branch": "From Branch",
+    "transfer_to_branch": "To Branch",
+    "transfer_ingredient": "Ingredient",
+    "transfer_qty": "Quantity",
+    "transfer_notes": "Notes (optional)",
+    "transfer_submit": "Transfer Stock",
+    "transfer_success": "Stock transferred successfully",
+    "transfer_pick_all": "Please fill in ingredient, source branch, and destination branch",
+    "transfer_same_branch": "Destination branch must differ from source branch",
+    "transfer_need_branches": "Stock transfer requires at least two branches",
+    "transfer_available": "Available"
 }
