@@ -4,6 +4,7 @@ import 'package:provider/provider.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 
 import '../../providers/auth_provider.dart';
+import '../../widgets/premium_gate.dart';
 import '../../widgets/zenvi_header.dart';
 
 
@@ -239,12 +240,23 @@ class _EmployeeSettingsScreenState extends State<EmployeeSettingsScreen> {
                             ],
                           ),
                           const SizedBox(height: 16),
-                          SwitchListTile(
-                            title: Text('foto_absen_opsional_390'.tr(context: context)),
+                          ListTile(
+                            title: Row(
+                              children: [
+                                Flexible(child: Text('foto_absen_opsional_390'.tr(context: context))),
+                                if (!authProvider.hasFeature('attendance_selfie')) ...[
+                                  const SizedBox(width: 6),
+                                  const PremiumBadge(compact: true),
+                                ],
+                              ],
+                            ),
                             subtitle: Text('karyawan_wajib_foto_saat_391'.tr(context: context)),
-                            value: _parseBool(company?['require_attendance']),
-                            onChanged: (val) => authProvider.updateCompanySetting(requireAttendance: val),
-                            activeThumbColor: theme.colorScheme.primary,
+                            trailing: PremiumSwitch(
+                              locked: !authProvider.hasFeature('attendance_selfie'),
+                              feature: 'attendance_selfie',
+                              value: _parseBool(company?['require_attendance']),
+                              onChanged: (val) => authProvider.updateCompanySetting(requireAttendance: val),
+                            ),
                             contentPadding: EdgeInsets.zero,
                           ),
                           SwitchListTile(
@@ -306,12 +318,23 @@ class _EmployeeSettingsScreenState extends State<EmployeeSettingsScreen> {
                             activeThumbColor: theme.colorScheme.primary,
                             contentPadding: EdgeInsets.zero,
                           ),
-                          SwitchListTile(
-                            title: Text('kds_kitchen_display_system_399'.tr(context: context)),
+                          ListTile(
+                            title: Row(
+                              children: [
+                                Flexible(child: Text('kds_kitchen_display_system_399'.tr(context: context))),
+                                if (!authProvider.hasFeature('kds')) ...[
+                                  const SizedBox(width: 6),
+                                  const PremiumBadge(compact: true),
+                                ],
+                              ],
+                            ),
                             subtitle: Text('tampilkan_layar_pesanan_untuk_400'.tr(context: context)),
-                            value: _parseBool(company?['is_kds_enabled']),
-                            onChanged: (val) => authProvider.updateCompanySetting(isKdsEnabled: val),
-                            activeThumbColor: theme.colorScheme.primary,
+                            trailing: PremiumSwitch(
+                              locked: !authProvider.hasFeature('kds'),
+                              feature: 'kds',
+                              value: _parseBool(company?['is_kds_enabled']),
+                              onChanged: (val) => authProvider.updateCompanySetting(isKdsEnabled: val),
+                            ),
                             contentPadding: EdgeInsets.zero,
                           ),
                         ],
