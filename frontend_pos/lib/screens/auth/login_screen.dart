@@ -5,6 +5,7 @@ import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import '../../providers/theme_provider.dart';
 import '../../providers/auth_provider.dart';
+import '../../theme/app_colors.dart';
 import '../dashboard/owner_dashboard_screen.dart';
 import '../dashboard/employee_dashboard_screen.dart';
 import 'role_selection_screen.dart';
@@ -80,7 +81,7 @@ class _LoginScreenState extends State<LoginScreen> with SingleTickerProviderStat
           '${'login_failed_msg'.tr()}: $error',
           style: const TextStyle(color: Colors.white, fontSize: 13),
         ),
-        backgroundColor: Colors.red.shade700,
+        backgroundColor: AppColors.dangerFill,
         duration: const Duration(seconds: 5),
         behavior: SnackBarBehavior.floating,
       ),

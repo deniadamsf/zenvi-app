@@ -122,7 +122,7 @@ class _CompanySetupScreenState extends State<CompanySetupScreen> {
                         subtitle: Text('tampilkan_layar_khusus_dapur_6'.tr(context: context), style: const TextStyle(fontSize: 12)),
                         value: _isKdsEnabled,
                         activeThumbColor: theme.colorScheme.primary,
-                        secondary: Icon(Icons.kitchen_rounded, color: _isKdsEnabled ? theme.colorScheme.primary : Colors.grey, size: 22),
+                        secondary: Icon(Icons.kitchen_rounded, color: _isKdsEnabled ? theme.colorScheme.primary : theme.colorScheme.onSurfaceVariant, size: 22),
                         onChanged: (val) {
                           setState(() {
                             _isKdsEnabled = val;

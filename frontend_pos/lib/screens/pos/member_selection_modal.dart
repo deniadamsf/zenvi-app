@@ -5,6 +5,7 @@ import 'package:flutter_animate/flutter_animate.dart';
 import '../../providers/member_provider.dart';
 import '../../providers/auth_provider.dart';
 import '../../models/member_model.dart';
+import '../../theme/app_colors.dart';
 
 class MemberSelectionModal extends StatefulWidget {
   final MemberModel? currentMember;
@@ -87,10 +88,10 @@ class _MemberSelectionModalState extends State<MemberSelectionModal> {
                         Container(
                           padding: EdgeInsets.all(8),
                           decoration: BoxDecoration(
-                            color: Colors.amber.withValues(alpha: 0.15),
+                            color: AppColors.warningFill.withValues(alpha: 0.15),
                             borderRadius: BorderRadius.circular(10),
                           ),
-                          child: Icon(Icons.person_add_rounded, color: Colors.amber, size: 20),
+                          child: Icon(Icons.person_add_rounded, color: AppColors.warningText, size: 20),
                         ),
                         SizedBox(width: 12),
                         Text('daftar_member_baru_kasir_262'.tr(context: context), style: theme.textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold)),
@@ -148,7 +149,7 @@ class _MemberSelectionModalState extends State<MemberSelectionModal> {
                                   ScaffoldMessenger.of(modalCtx).showSnackBar(
                                     SnackBar(
                                       content: Text('nama_dan_no_telepon_185'.tr(context: context)),
-                                      backgroundColor: Colors.redAccent,
+                                      backgroundColor: AppColors.dangerFill,
                                       behavior: SnackBarBehavior.floating,
                                     ),
                                   );
@@ -178,7 +179,7 @@ class _MemberSelectionModalState extends State<MemberSelectionModal> {
                                   ScaffoldMessenger.of(modalCtx).showSnackBar(
                                     SnackBar(
                                       content: Text(error),
-                                      backgroundColor: Colors.redAccent,
+                                      backgroundColor: AppColors.dangerFill,
                                       behavior: SnackBarBehavior.floating,
                                     ),
                                   );
@@ -235,10 +236,10 @@ class _MemberSelectionModalState extends State<MemberSelectionModal> {
                 Container(
                   padding: const EdgeInsets.all(10),
                   decoration: BoxDecoration(
-                    color: Colors.amber.withValues(alpha: 0.15),
+                    color: AppColors.warningFill.withValues(alpha: 0.15),
                     borderRadius: BorderRadius.circular(12),
                   ),
-                  child: const Icon(Icons.card_membership_rounded, color: Colors.amber, size: 22),
+                  child: const Icon(Icons.card_membership_rounded, color: AppColors.warningFill, size: 22),
                 ),
                 const SizedBox(width: 12),
                 Expanded(
@@ -265,7 +266,7 @@ class _MemberSelectionModalState extends State<MemberSelectionModal> {
                     onPressed: () => Navigator.pop(context, null),
                     icon: const Icon(Icons.person_off_rounded, size: 18),
                     label: Text('hapus_88'.tr(context: context), style: TextStyle(fontSize: 12)),
-                    style: TextButton.styleFrom(foregroundColor: Colors.redAccent),
+                    style: TextButton.styleFrom(foregroundColor: AppColors.dangerText),
                   ),
                 ],
               ],
@@ -388,10 +389,10 @@ class _MemberCard extends StatelessWidget {
               // Avatar
               CircleAvatar(
                 radius: 22,
-                backgroundColor: Colors.amber.withValues(alpha: 0.2),
+                backgroundColor: AppColors.warningFill.withValues(alpha: 0.2),
                 child: Text(
                   member.name.isNotEmpty ? member.name[0].toUpperCase() : '?',
-                  style: const TextStyle(fontWeight: FontWeight.bold, color: Colors.amber, fontSize: 18),
+                  style: const TextStyle(fontWeight: FontWeight.bold, color: AppColors.warningText, fontSize: 18),
                 ),
               ),
               const SizedBox(width: 14),
@@ -431,7 +432,7 @@ class _MemberCard extends StatelessWidget {
                         Text(member.phone, style: TextStyle(fontSize: 12, color: theme.colorScheme.onSurfaceVariant)),
                         if (context.watch<AuthProvider>().isPointsEnabled) ...[
                           const Spacer(),
-                          const Icon(Icons.star_rounded, size: 14, color: Colors.amber),
+                          const Icon(Icons.star_rounded, size: 14, color: AppColors.warningText),
                           const SizedBox(width: 2),
                           Text('member_points_count'.tr(context: context, args: [member.points.toString()]), style: const TextStyle(fontSize: 11, fontWeight: FontWeight.w500)),
                         ],
@@ -441,7 +442,7 @@ class _MemberCard extends StatelessWidget {
                       const SizedBox(height: 2),
                       Text(
                         'member_discount_percent_label'.tr(context: context, args: [member.customDiscountPercent.toStringAsFixed(0)]),
-                        style: TextStyle(fontSize: 11, color: Colors.green.shade700, fontWeight: FontWeight.w500),
+                        style: TextStyle(fontSize: 11, color: AppColors.successText, fontWeight: FontWeight.w500),
                       ),
                     ],
                   ],

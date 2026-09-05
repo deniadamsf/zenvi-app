@@ -14,6 +14,7 @@ import '../../providers/auth_provider.dart';
 import '../../providers/ingredient_provider.dart';
 import '../permission/employee_permission_screen.dart';
 import '../../widgets/zenvi_header.dart';
+import '../../theme/app_colors.dart';
 
 class ShiftScreen extends StatefulWidget {
   const ShiftScreen({super.key});
@@ -296,7 +297,7 @@ class _ShiftScreenState extends State<ShiftScreen> {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
               content: Text(kDebugMode ? 'debug_mode_lokasi_bypass_32'.tr(context: context) : 'lokasi_valid_anda_berada_41'.tr(context: context)),
-              backgroundColor: Colors.green,
+              backgroundColor: AppColors.successFill,
             ),
           );
         } else {
@@ -309,7 +310,7 @@ class _ShiftScreenState extends State<ShiftScreen> {
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(e.toString().replaceAll('Exception: ', '')), backgroundColor: Colors.red),
+          SnackBar(content: Text(e.toString().replaceAll('Exception: ', '')), backgroundColor: AppColors.dangerFill),
         );
       }
     } finally {
@@ -415,7 +416,7 @@ class _ShiftScreenState extends State<ShiftScreen> {
                   Expanded(child: Text('wajah_terdeteksi_terzoom_crop_433'.tr(context: context))),
                 ],
               ),
-              backgroundColor: Colors.green,
+              backgroundColor: AppColors.successFill,
               duration: const Duration(seconds: 2),
             ),
           );
@@ -444,7 +445,7 @@ class _ShiftScreenState extends State<ShiftScreen> {
                   Expanded(child: Text('wajah_kurang_jelas_foto_434'.tr(context: context))),
                 ],
               ),
-              backgroundColor: Colors.orange,
+              backgroundColor: AppColors.warningFill,
               duration: Duration(seconds: 3),
             ),
           );
@@ -479,7 +480,7 @@ class _ShiftScreenState extends State<ShiftScreen> {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text('failed_process_photo'.tr(context: context, args: [e.toString()])),
-            backgroundColor: Colors.red,
+            backgroundColor: AppColors.dangerFill,
           ),
         );
       }
@@ -539,7 +540,7 @@ class _ShiftScreenState extends State<ShiftScreen> {
 
       if (success && mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Shift berhasil dibuka!'.tr()), backgroundColor: Colors.green),
+          SnackBar(content: Text('Shift berhasil dibuka!'.tr()), backgroundColor: AppColors.successFill),
         );
         _openingBalanceController.clear();
         setState(() {
@@ -553,7 +554,7 @@ class _ShiftScreenState extends State<ShiftScreen> {
           _checkLocation();
         } else {
           ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text(errorMsg), backgroundColor: Colors.red),
+            SnackBar(content: Text(errorMsg), backgroundColor: AppColors.dangerFill),
           );
         }
       }
@@ -605,7 +606,7 @@ class _ShiftScreenState extends State<ShiftScreen> {
           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
           title: Row(
             children: [
-              const Icon(Icons.inventory_2_outlined, color: Colors.blue),
+              const Icon(Icons.inventory_2_outlined, color: AppColors.infoFill),
               const SizedBox(width: 10),
               Expanded(child: Text('input_stok_akhir_dapur_438'.tr(context: context), style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold))),
             ],
@@ -632,7 +633,7 @@ class _ShiftScreenState extends State<ShiftScreen> {
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Text(item.name, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14)),
-                              Text('unit_label_prefix'.tr(context: context, args: [item.unit]), style: TextStyle(fontSize: 12, color: Colors.grey[600])),
+                              Text('unit_label_prefix'.tr(context: context, args: [item.unit]), style: TextStyle(fontSize: 12, color: Theme.of(context).colorScheme.onSurfaceVariant)),
                             ],
                           ),
                         ),
@@ -732,14 +733,14 @@ class _ShiftScreenState extends State<ShiftScreen> {
 
       if (success && mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Shift ditutup. Data kas & stok tersinkronisasi.'.tr()), backgroundColor: Colors.green),
+          SnackBar(content: Text('Shift ditutup. Data kas & stok tersinkronisasi.'.tr()), backgroundColor: AppColors.successFill),
         );
         _closingBalanceController.clear();
       }
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(e.toString()), backgroundColor: Colors.red),
+          SnackBar(content: Text(e.toString()), backgroundColor: AppColors.dangerFill),
         );
       }
     }
@@ -770,7 +771,7 @@ class _ShiftScreenState extends State<ShiftScreen> {
               subtitleWidget: Text(
                 isShiftOpen ? 'Sedang Bertugas' : 'Mulai Shift Anda',
                 style: TextStyle(
-                  color: isShiftOpen ? Colors.green : theme.colorScheme.onSurfaceVariant,
+                  color: isShiftOpen ? AppColors.successText : theme.colorScheme.onSurfaceVariant,
                   fontSize: 12.5,
                   fontWeight: FontWeight.w600,
                 ),
@@ -780,13 +781,13 @@ class _ShiftScreenState extends State<ShiftScreen> {
                   width: 38,
                   height: 38,
                   decoration: BoxDecoration(
-                    color: (isShiftOpen ? Colors.green : theme.colorScheme.primary).withValues(alpha: 0.1),
+                    color: (isShiftOpen ? AppColors.successFill : theme.colorScheme.primary).withValues(alpha: 0.1),
                     shape: BoxShape.circle,
                   ),
                   alignment: Alignment.center,
                   child: Icon(
                     isShiftOpen ? Icons.check_circle_rounded : Icons.access_time_filled_rounded,
-                    color: isShiftOpen ? Colors.green : theme.colorScheme.primary,
+                    color: isShiftOpen ? AppColors.successText : theme.colorScheme.primary,
                     size: 20,
                   ),
                 ),
@@ -986,10 +987,10 @@ class _ShiftScreenState extends State<ShiftScreen> {
                               Container(
                                 decoration: BoxDecoration(
                                   borderRadius: BorderRadius.circular(20),
-                                  border: Border.all(color: Colors.green.shade400, width: 2),
+                                  border: Border.all(color: AppColors.successFill, width: 2),
                                   boxShadow: [
                                     BoxShadow(
-                                      color: Colors.green.withValues(alpha: 0.15),
+                                      color: AppColors.successFill.withValues(alpha: 0.15),
                                       blurRadius: 10,
                                       offset: const Offset(0, 4),
                                     ),
@@ -1006,7 +1007,7 @@ class _ShiftScreenState extends State<ShiftScreen> {
                                 child: Container(
                                   padding: const EdgeInsets.all(4),
                                   decoration: const BoxDecoration(
-                                    color: Colors.green,
+                                    color: AppColors.successFill,
                                     shape: BoxShape.circle,
                                   ),
                                   child: const Icon(Icons.check, color: Colors.white, size: 14),
@@ -1122,7 +1123,7 @@ class _ShiftScreenState extends State<ShiftScreen> {
             offset: const Offset(0, 10),
           )
         ],
-        border: Border.all(color: Colors.green.withValues(alpha: 0.3), width: 1.5),
+        border: Border.all(color: AppColors.successFill.withValues(alpha: 0.3), width: 1.5),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -1136,10 +1137,10 @@ class _ShiftScreenState extends State<ShiftScreen> {
                   Container(
                     padding: const EdgeInsets.all(8),
                     decoration: BoxDecoration(
-                      color: Colors.green.withValues(alpha: 0.12),
+                      color: AppColors.successFill.withValues(alpha: 0.12),
                       shape: BoxShape.circle,
                     ),
-                    child: const Icon(Icons.check_circle_rounded, size: 28, color: Colors.green),
+                    child: const Icon(Icons.check_circle_rounded, size: 28, color: AppColors.successFill),
                   ),
                   const SizedBox(width: 10),
                   Column(
@@ -1204,16 +1205,16 @@ class _ShiftScreenState extends State<ShiftScreen> {
                     '💵 Penjualan Tunai (Cash)', 
                     currencyFormatter.format(shift.cashRevenue ?? 0), 
                     theme,
-                    valueColor: Colors.green[700],
+                    valueColor: AppColors.successText,
                   ),
                   const SizedBox(height: 6),
 
                   // Penjualan QRIS
                   _buildShiftSummaryRow(
-                    '📱 Penjualan QRIS (Non-Tunai)', 
-                    currencyFormatter.format(shift.qrisRevenue ?? 0), 
+                    '📱 Penjualan QRIS (Non-Tunai)',
+                    currencyFormatter.format(shift.qrisRevenue ?? 0),
                     theme,
-                    valueColor: Colors.blue[700],
+                    valueColor: AppColors.infoText,
                   ),
                   const SizedBox(height: 6),
 
@@ -1333,11 +1334,11 @@ class _ShiftScreenState extends State<ShiftScreen> {
                   padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
                   decoration: BoxDecoration(
                     color: diff == 0
-                        ? Colors.green.withValues(alpha: 0.1)
-                        : (diff > 0 ? Colors.orange.withValues(alpha: 0.1) : Colors.red.withValues(alpha: 0.1)),
+                        ? AppColors.successFill.withValues(alpha: 0.1)
+                        : (diff > 0 ? AppColors.warningFill.withValues(alpha: 0.1) : AppColors.dangerFill.withValues(alpha: 0.1)),
                     borderRadius: BorderRadius.circular(14),
                     border: Border.all(
-                      color: diff == 0 ? Colors.green.withValues(alpha: 0.35) : (diff > 0 ? Colors.orange.withValues(alpha: 0.35) : Colors.red.withValues(alpha: 0.35)),
+                      color: diff == 0 ? AppColors.successFill.withValues(alpha: 0.35) : (diff > 0 ? AppColors.warningFill.withValues(alpha: 0.35) : AppColors.dangerFill.withValues(alpha: 0.35)),
                     ),
                   ),
                   child: Row(
@@ -1348,7 +1349,7 @@ class _ShiftScreenState extends State<ShiftScreen> {
                         style: TextStyle(
                           fontWeight: FontWeight.bold,
                           fontSize: 12,
-                          color: diff == 0 ? Colors.green[800] : (diff > 0 ? Colors.orange[800] : Colors.red[800]),
+                          color: diff == 0 ? AppColors.successText : (diff > 0 ? AppColors.warningText : AppColors.dangerText),
                         ),
                       ),
                       Text(
@@ -1356,7 +1357,7 @@ class _ShiftScreenState extends State<ShiftScreen> {
                         style: TextStyle(
                           fontWeight: FontWeight.w900,
                           fontSize: 13,
-                          color: diff == 0 ? Colors.green[800] : (diff > 0 ? Colors.orange[800] : Colors.red[800]),
+                          color: diff == 0 ? AppColors.successText : (diff > 0 ? AppColors.warningText : AppColors.dangerText),
                         ),
                       ),
                     ],
@@ -1390,7 +1391,7 @@ class _ShiftScreenState extends State<ShiftScreen> {
                   const SizedBox(height: 8),
                   _buildShiftSummaryRow('Waktu Mulai Bertugas', DateFormat('dd MMM yyyy, HH:mm').format(shift.startTime), theme),
                   const SizedBox(height: 8),
-                  _buildShiftSummaryRow('Status Kehadiran', '✅ Hadir & Aktif Bertugas', theme, valueColor: Colors.green[700]),
+                  _buildShiftSummaryRow('Status Kehadiran', '✅ Hadir & Aktif Bertugas', theme, valueColor: AppColors.successText),
                 ],
               ),
             ),

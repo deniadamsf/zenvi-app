@@ -5,6 +5,7 @@ import '../../providers/stock_management_provider.dart';
 import '../../providers/auth_provider.dart';
 import '../../providers/branch_provider.dart';
 import '../../widgets/zenvi_header.dart';
+import '../../theme/app_colors.dart';
 
 class StockHistoryScreen extends StatefulWidget {
   const StockHistoryScreen({super.key});
@@ -106,10 +107,10 @@ class _StockHistoryScreenState extends State<StockHistoryScreen> {
                           
                           return Card(
                             margin: const EdgeInsets.only(bottom: 12),
-                            color: isSuspicious ? Colors.red.shade50 : null,
+                            color: isSuspicious ? AppColors.dangerSoft : null,
                             shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(12),
-                              side: isSuspicious ? BorderSide(color: Colors.red.shade300, width: 2) : BorderSide.none,
+                              side: isSuspicious ? BorderSide(color: AppColors.dangerFill, width: 2) : BorderSide.none,
                             ),
                             child: Padding(
                               padding: const EdgeInsets.all(16.0),
@@ -125,21 +126,21 @@ class _StockHistoryScreenState extends State<StockHistoryScreen> {
                                           style: TextStyle(
                                             fontWeight: FontWeight.bold,
                                             fontSize: 16,
-                                            color: isSuspicious ? Colors.red.shade900 : null,
+                                            color: isSuspicious ? AppColors.dangerText : null,
                                           ),
                                         ),
                                       ),
                                       Container(
                                         padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                                         decoration: BoxDecoration(
-                                          color: item.qtyChange > 0 ? Colors.green.shade100 : Colors.red.shade100,
+                                          color: item.qtyChange > 0 ? AppColors.successSoft : AppColors.dangerSoft,
                                           borderRadius: BorderRadius.circular(8),
                                         ),
                                         child: Text(
                                           '${item.qtyChange > 0 ? '+' : ''}${item.qtyChange} ${item.ingredientUnit}',
                                           style: TextStyle(
                                             fontWeight: FontWeight.bold,
-                                            color: item.qtyChange > 0 ? Colors.green.shade800 : Colors.red.shade800,
+                                            color: item.qtyChange > 0 ? AppColors.successText : AppColors.dangerText,
                                           ),
                                         ),
                                       ),
@@ -154,9 +155,9 @@ class _StockHistoryScreenState extends State<StockHistoryScreen> {
                                       Row(
                                         mainAxisSize: MainAxisSize.min,
                                         children: [
-                                          Icon(Icons.person, size: 14, color: Colors.grey.shade600),
+                                          Icon(Icons.person, size: 14, color: theme.colorScheme.onSurfaceVariant),
                                           const SizedBox(width: 4),
-                                          Text(item.userName, style: TextStyle(color: Colors.grey.shade700, fontSize: 12)),
+                                          Text(item.userName, style: TextStyle(color: theme.colorScheme.onSurfaceVariant, fontSize: 12)),
                                         ],
                                       ),
                                       if (item.branchName != null)
@@ -178,11 +179,11 @@ class _StockHistoryScreenState extends State<StockHistoryScreen> {
                                       Row(
                                         mainAxisSize: MainAxisSize.min,
                                         children: [
-                                          Icon(Icons.access_time, size: 14, color: Colors.grey.shade600),
+                                          Icon(Icons.access_time, size: 14, color: theme.colorScheme.onSurfaceVariant),
                                           const SizedBox(width: 4),
                                           Text(
                                             DateFormat('dd MMM yyyy, HH:mm').format(item.createdAt.toLocal()),
-                                            style: TextStyle(color: Colors.grey.shade700, fontSize: 12),
+                                            style: TextStyle(color: theme.colorScheme.onSurfaceVariant, fontSize: 12),
                                           ),
                                         ],
                                       ),
@@ -201,11 +202,11 @@ class _StockHistoryScreenState extends State<StockHistoryScreen> {
                                     const SizedBox(height: 8),
                                     Row(
                                       children: [
-                                        const Icon(Icons.warning_rounded, color: Colors.red, size: 16),
+                                        const Icon(Icons.warning_rounded, color: AppColors.dangerText, size: 16),
                                         const SizedBox(width: 4),
                                         Text(
                                           'exceeds_tolerance_limit'.tr(context: context),
-                                          style: TextStyle(color: Colors.red.shade900, fontWeight: FontWeight.bold, fontSize: 12),
+                                          style: TextStyle(color: AppColors.dangerText, fontWeight: FontWeight.bold, fontSize: 12),
                                         ),
                                       ],
                                     ),

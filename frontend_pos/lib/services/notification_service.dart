@@ -8,6 +8,7 @@ import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 import '../config/api_config.dart';
+import '../theme/app_colors.dart';
 
 @pragma('vm:entry-point')
 Future<void> firebaseMessagingBackgroundHandler(RemoteMessage message) async {
@@ -179,7 +180,7 @@ class NotificationService {
       icon: '@drawable/ic_notification',
       // largeIcon boleh berwarna penuh - hanya ikon kecil yang diratakan Android.
       largeIcon: DrawableResourceAndroidBitmap('@mipmap/ic_launcher'),
-      color: Color(0xFF00796B),
+      color: AppColors.brandDeep,
     );
 
     const NotificationDetails platformDetails =

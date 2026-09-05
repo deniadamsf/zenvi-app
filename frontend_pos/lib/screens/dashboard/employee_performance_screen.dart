@@ -5,6 +5,7 @@ import 'package:flutter_animate/flutter_animate.dart';
 import '../../providers/employee_performance_provider.dart';
 import '../../models/employee_performance_model.dart';
 import '../../widgets/zenvi_header.dart';
+import '../../theme/app_colors.dart';
 
 class EmployeePerformanceScreen extends StatefulWidget {
   const EmployeePerformanceScreen({super.key});
@@ -839,7 +840,7 @@ class _EmployeePerformanceScreenState extends State<EmployeePerformanceScreen> {
                                   ? 'no_closed_shift_yet'.tr(context: context) 
                                   : 'accuracy_accurate'.tr(context: context, args: [emp.accuracyPercentage.toString()]),
                               emp.totalCashVariance == 0 ? Icons.check_circle_rounded : Icons.warning_amber_rounded,
-                              valueColor: emp.totalCashVariance == 0 ? Colors.green : (emp.totalCashVariance < 0 ? Colors.red : Colors.orange),
+                              valueColor: emp.totalCashVariance == 0 ? AppColors.successText : (emp.totalCashVariance < 0 ? AppColors.dangerText : AppColors.warningText),
                             ),
                           ),
                           const SizedBox(width: 8),
@@ -851,7 +852,7 @@ class _EmployeePerformanceScreenState extends State<EmployeePerformanceScreen> {
                                   ? 'punctuality_zero_late'.tr(context: context, args: ['${emp.punctualityPercentage}%']) 
                                   : 'punctuality_late_count'.tr(context: context, args: ['${emp.punctualityPercentage}%', emp.lateShiftsCount.toString()]),
                               emp.lateShiftsCount == 0 ? Icons.alarm_on_rounded : Icons.timer_off_rounded,
-                              valueColor: emp.lateShiftsCount == 0 ? Colors.teal : Colors.orange,
+                              valueColor: emp.lateShiftsCount == 0 ? theme.colorScheme.primary : AppColors.warningText,
                             ),
                           ),
                         ],
@@ -977,9 +978,9 @@ class _EmployeePerformanceScreenState extends State<EmployeePerformanceScreen> {
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
                 decoration: BoxDecoration(
-                  color: (emp.lateShiftsCount == 0 ? Colors.teal : Colors.orange).withValues(alpha: 0.08),
+                  color: (emp.lateShiftsCount == 0 ? theme.colorScheme.primary : AppColors.warningFill).withValues(alpha: 0.08),
                   borderRadius: BorderRadius.circular(12),
-                  border: Border.all(color: (emp.lateShiftsCount == 0 ? Colors.teal : Colors.orange).withValues(alpha: 0.2)),
+                  border: Border.all(color: (emp.lateShiftsCount == 0 ? theme.colorScheme.primary : AppColors.warningFill).withValues(alpha: 0.2)),
                 ),
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -988,7 +989,7 @@ class _EmployeePerformanceScreenState extends State<EmployeePerformanceScreen> {
                       child: Row(
                         children: [
                           Icon(emp.lateShiftsCount == 0 ? Icons.verified_rounded : Icons.info_outline_rounded,
-                            size: 16, color: emp.lateShiftsCount == 0 ? Colors.teal : Colors.orange),
+                            size: 16, color: emp.lateShiftsCount == 0 ? theme.colorScheme.primary : AppColors.warningText),
                           const SizedBox(width: 8),
                           Expanded(
                             child: Text(
@@ -998,7 +999,7 @@ class _EmployeePerformanceScreenState extends State<EmployeePerformanceScreen> {
                               style: TextStyle(
                                 fontSize: 11.5,
                                 fontWeight: FontWeight.w600,
-                                color: emp.lateShiftsCount == 0 ? Colors.teal : Colors.orange,
+                                color: emp.lateShiftsCount == 0 ? theme.colorScheme.primary : AppColors.warningText,
                               ),
                               overflow: TextOverflow.ellipsis,
                             ),
@@ -1011,7 +1012,7 @@ class _EmployeePerformanceScreenState extends State<EmployeePerformanceScreen> {
                       style: TextStyle(
                         fontSize: 13,
                         fontWeight: FontWeight.bold,
-                        color: emp.lateShiftsCount == 0 ? Colors.teal : Colors.orange,
+                        color: emp.lateShiftsCount == 0 ? theme.colorScheme.primary : AppColors.warningText,
                       ),
                     ),
                   ],
@@ -1022,20 +1023,20 @@ class _EmployeePerformanceScreenState extends State<EmployeePerformanceScreen> {
                 Container(
                   padding: const EdgeInsets.all(12),
                   decoration: BoxDecoration(
-                    color: Colors.blue.withValues(alpha: 0.06),
+                    color: AppColors.infoFill.withValues(alpha: 0.06),
                     borderRadius: BorderRadius.circular(12),
-                    border: Border.all(color: Colors.blue.withValues(alpha: 0.15)),
+                    border: Border.all(color: AppColors.infoFill.withValues(alpha: 0.15)),
                   ),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Row(
                         children: [
-                          const Icon(Icons.event_available_rounded, size: 15, color: Colors.blue),
+                          const Icon(Icons.event_available_rounded, size: 15, color: AppColors.infoText),
                           const SizedBox(width: 6),
                           Text(
                             'approved_leaves_history'.tr(context: context, args: [emp.approvedLeaves.length.toString()]),
-                            style: const TextStyle(fontSize: 11.5, fontWeight: FontWeight.bold, color: Colors.blue),
+                            style: const TextStyle(fontSize: 11.5, fontWeight: FontWeight.bold, color: AppColors.infoText),
                           ),
                         ],
                       ),
@@ -1093,14 +1094,14 @@ class _EmployeePerformanceScreenState extends State<EmployeePerformanceScreen> {
                           : '-';
                       
                       String varianceText = 'exact_balance_zero'.tr(context: context);
-                      Color varianceColor = Colors.green;
+                      Color varianceColor = AppColors.successText;
                       if (s.cashVariance != null && s.cashVariance != 0) {
                         if (s.cashVariance! > 0) {
                           varianceText = '+${_formatCurrency(s.cashVariance!)}';
-                          varianceColor = Colors.orange;
+                          varianceColor = AppColors.warningText;
                         } else {
                           varianceText = '-${_formatCurrency(s.cashVariance!.abs())}';
-                          varianceColor = Colors.red;
+                          varianceColor = AppColors.dangerText;
                         }
                       }
 
@@ -1121,13 +1122,13 @@ class _EmployeePerformanceScreenState extends State<EmployeePerformanceScreen> {
                                         Container(
                                           padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 1),
                                           decoration: BoxDecoration(
-                                            color: Colors.blue.withValues(alpha: 0.12),
+                                            color: AppColors.infoFill.withValues(alpha: 0.12),
                                             borderRadius: BorderRadius.circular(4),
                                           ),
                                           child: Text(
                                             '${'excused_late_label'.tr(context: context)}${s.excuseReason != null ? ': ${s.excuseReason}' : ''}',
                                             style: const TextStyle(
-                                              color: Colors.blue,
+                                              color: AppColors.infoText,
                                               fontSize: 9.5,
                                               fontWeight: FontWeight.bold,
                                             ),
@@ -1137,13 +1138,13 @@ class _EmployeePerformanceScreenState extends State<EmployeePerformanceScreen> {
                                         Container(
                                           padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 1),
                                           decoration: BoxDecoration(
-                                            color: (s.isLate ? Colors.orange : Colors.teal).withValues(alpha: 0.12),
+                                            color: (s.isLate ? AppColors.warningFill : theme.colorScheme.primary).withValues(alpha: 0.12),
                                             borderRadius: BorderRadius.circular(4),
                                           ),
                                           child: Text(
                                             s.isLate ? 'late_minutes_badge'.tr(context: context, args: [s.lateMinutes.toString()]) : 'on_time_badge'.tr(context: context),
                                             style: TextStyle(
-                                              color: s.isLate ? Colors.orange : Colors.teal,
+                                              color: s.isLate ? AppColors.warningText : theme.colorScheme.primary,
                                               fontSize: 9.5,
                                               fontWeight: FontWeight.bold,
                                             ),

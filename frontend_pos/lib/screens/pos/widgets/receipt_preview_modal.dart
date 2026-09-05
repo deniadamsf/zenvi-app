@@ -11,6 +11,7 @@ import '../../../models/member_model.dart';
 import '../../../providers/auth_provider.dart';
 import '../printer_dialog.dart';
 import 'receipt_widget.dart';
+import '../../../theme/app_colors.dart';
 
 class ReceiptPreviewModal extends StatefulWidget {
   final OrderModel? order;
@@ -245,7 +246,7 @@ class _ReceiptPreviewModalState extends State<ReceiptPreviewModal> {
             height: 4,
             margin: const EdgeInsets.only(top: 12, bottom: 12),
             decoration: BoxDecoration(
-              color: Colors.grey.withValues(alpha: 0.3),
+              color: theme.colorScheme.onSurfaceVariant.withValues(alpha: 0.3),
               borderRadius: BorderRadius.circular(2),
             ),
           ),
@@ -258,10 +259,10 @@ class _ReceiptPreviewModalState extends State<ReceiptPreviewModal> {
                 Container(
                   padding: const EdgeInsets.all(8),
                   decoration: BoxDecoration(
-                    color: Colors.green.withValues(alpha: 0.12),
+                    color: AppColors.successFill.withValues(alpha: 0.12),
                     shape: BoxShape.circle,
                   ),
-                  child: const Icon(Icons.check_circle, color: Colors.green, size: 24),
+                  child: const Icon(Icons.check_circle, color: AppColors.successFill, size: 24),
                 ),
                 const SizedBox(width: 12),
                 Expanded(

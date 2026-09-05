@@ -14,6 +14,7 @@ import '../stock/stock_management_screen.dart';
 import '../permission/owner_permission_management_screen.dart';
 import '../permission/employee_permission_screen.dart';
 import '../reservation/reservation_list_screen.dart';
+import '../../theme/app_colors.dart';
 
 class NotificationCenterScreen extends StatefulWidget {
   const NotificationCenterScreen({super.key});
@@ -130,6 +131,7 @@ class _NotificationCenterScreenState extends State<NotificationCenterScreen> {
   }
 
   Widget _buildFilterChips(NotificationProvider provider) {
+    final theme = Theme.of(context);
     final filters = [
       {'key': 'all', 'label': 'semua_5'.tr(context: context), 'icon': Icons.notifications_none},
       {'key': 'shift', 'label': 'shift_5'.tr(context: context), 'icon': Icons.access_time_rounded},
@@ -154,23 +156,23 @@ class _NotificationCenterScreenState extends State<NotificationCenterScreen> {
                 avatar: Icon(
                   f['icon'] as IconData,
                   size: 16,
-                  color: isSelected ? Colors.white : const Color(0xFF64748B),
+                  color: isSelected ? Colors.white : theme.colorScheme.onSurfaceVariant,
                 ),
                 label: Text(
                   f['label'] as String,
                   style: GoogleFonts.plusJakartaSans(
                     fontSize: 13,
                     fontWeight: isSelected ? FontWeight.w600 : FontWeight.w500,
-                    color: isSelected ? Colors.white : const Color(0xFF475569),
+                    color: isSelected ? Colors.white : theme.colorScheme.onSurfaceVariant,
                   ),
                 ),
                 selected: isSelected,
-                selectedColor: const Color(0xFF0D9488),
-                backgroundColor: const Color(0xFFF1F5F9),
+                selectedColor: theme.colorScheme.primary,
+                backgroundColor: theme.colorScheme.surfaceContainerHighest,
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(20),
                   side: BorderSide(
-                    color: isSelected ? const Color(0xFF0D9488) : Colors.transparent,
+                    color: isSelected ? theme.colorScheme.primary : Colors.transparent,
                   ),
                 ),
                 onSelected: (selected) {
@@ -201,7 +203,7 @@ class _NotificationCenterScreenState extends State<NotificationCenterScreen> {
         alignment: Alignment.centerRight,
         padding: const EdgeInsets.only(right: 20),
         decoration: BoxDecoration(
-          color: const Color(0xFFEF4444),
+          color: AppColors.dangerFill,
           borderRadius: BorderRadius.circular(16),
         ),
         child: const Icon(Icons.delete_outline, color: Colors.white, size: 24),
@@ -224,8 +226,8 @@ class _NotificationCenterScreenState extends State<NotificationCenterScreen> {
             borderRadius: BorderRadius.circular(24),
             border: Border.all(
               color: notification.isRead
-                  ? const Color(0xFFE2E8F0)
-                  : const Color(0xFF99F6E4),
+                  ? Theme.of(context).colorScheme.outline
+                  : Theme.of(context).colorScheme.primary.withValues(alpha: 0.3),
               width: notification.isRead ? 1 : 1.5,
             ),
             boxShadow: [
@@ -265,7 +267,7 @@ class _NotificationCenterScreenState extends State<NotificationCenterScreen> {
                             style: GoogleFonts.plusJakartaSans(
                               fontWeight: notification.isRead ? FontWeight.w600 : FontWeight.w700,
                               fontSize: 14,
-                              color: const Color(0xFF0F172A),
+                              color: Theme.of(context).colorScheme.onSurface,
                             ),
                           ),
                         ),
@@ -274,8 +276,8 @@ class _NotificationCenterScreenState extends State<NotificationCenterScreen> {
                             width: 8,
                             height: 8,
                             margin: const EdgeInsets.only(left: 6),
-                            decoration: const BoxDecoration(
-                              color: Color(0xFF0D9488),
+                            decoration: BoxDecoration(
+                              color: Theme.of(context).colorScheme.primary,
                               shape: BoxShape.circle,
                             ),
                           ),
@@ -286,7 +288,7 @@ class _NotificationCenterScreenState extends State<NotificationCenterScreen> {
                       notification.body,
                       style: GoogleFonts.plusJakartaSans(
                         fontSize: 13,
-                        color: const Color(0xFF475569),
+                        color: Theme.of(context).colorScheme.onSurfaceVariant,
                         height: 1.4,
                       ),
                     ),
@@ -298,7 +300,7 @@ class _NotificationCenterScreenState extends State<NotificationCenterScreen> {
                           timeStr,
                           style: GoogleFonts.plusJakartaSans(
                             fontSize: 11,
-                            color: const Color(0xFF94A3B8),
+                            color: Theme.of(context).colorScheme.onSurfaceVariant,
                             fontWeight: FontWeight.w500,
                           ),
                         ),
@@ -330,6 +332,7 @@ class _NotificationCenterScreenState extends State<NotificationCenterScreen> {
   }
 
   Widget _buildEmptyState(String filter) {
+    final theme = Theme.of(context);
     return Center(
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
@@ -337,14 +340,14 @@ class _NotificationCenterScreenState extends State<NotificationCenterScreen> {
           Container(
             width: 80,
             height: 80,
-            decoration: const BoxDecoration(
-              color: Color(0xFFF1F5F9),
+            decoration: BoxDecoration(
+              color: theme.colorScheme.surfaceContainerHighest,
               shape: BoxShape.circle,
             ),
-            child: const Icon(
+            child: Icon(
               Icons.notifications_off_outlined,
               size: 40,
-              color: Color(0xFF94A3B8),
+              color: theme.colorScheme.onSurfaceVariant,
             ),
           ),
           const SizedBox(height: 16),
@@ -353,7 +356,7 @@ class _NotificationCenterScreenState extends State<NotificationCenterScreen> {
             style: GoogleFonts.plusJakartaSans(
               fontSize: 16,
               fontWeight: FontWeight.w600,
-              color: const Color(0xFF334155),
+              color: theme.colorScheme.onSurface,
             ),
           ),
           const SizedBox(height: 6),
@@ -363,7 +366,7 @@ class _NotificationCenterScreenState extends State<NotificationCenterScreen> {
                 : 'no_notifications_category'.tr(context: context),
             style: GoogleFonts.plusJakartaSans(
               fontSize: 13,
-              color: const Color(0xFF64748B),
+              color: theme.colorScheme.onSurfaceVariant,
             ),
           ),
         ],
@@ -414,15 +417,15 @@ class _NotificationCenterScreenState extends State<NotificationCenterScreen> {
     if (type == 'shift' || type.startsWith('shift')) {
       return _TypeConfig(Icons.access_time_filled_rounded, const Color(0xFF6366F1));
     } else if (type == 'stock' || type == 'low_stock') {
-      return _TypeConfig(Icons.warning_amber_rounded, const Color(0xFFF59E0B));
+      return _TypeConfig(Icons.warning_amber_rounded, AppColors.warningFill);
     } else if (type == 'leave' || type.startsWith('permission')) {
       return _TypeConfig(Icons.event_note_rounded, const Color(0xFFEC4899));
     } else if (type == 'chat' || type.startsWith('chat')) {
-      return _TypeConfig(Icons.chat_bubble_rounded, const Color(0xFF0D9488));
+      return _TypeConfig(Icons.chat_bubble_rounded, Theme.of(context).colorScheme.primary);
     } else if (type == 'reservation' || type.startsWith('reservation')) {
-      return _TypeConfig(Icons.calendar_month_rounded, const Color(0xFF3B82F6));
+      return _TypeConfig(Icons.calendar_month_rounded, AppColors.infoFill);
     }
-    return _TypeConfig(Icons.notifications_rounded, const Color(0xFF64748B));
+    return _TypeConfig(Icons.notifications_rounded, Theme.of(context).colorScheme.onSurfaceVariant);
   }
 
   String _formatTimestamp(DateTime dt) {

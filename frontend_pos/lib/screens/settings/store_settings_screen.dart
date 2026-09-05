@@ -10,6 +10,7 @@ import 'package:image/image.dart' as img;
 import 'package:qr_flutter/qr_flutter.dart';
 import 'package:path_provider/path_provider.dart';
 import '../../providers/auth_provider.dart';
+import '../../theme/app_colors.dart';
 import '../reservation/reservation_list_screen.dart';
 import '../../widgets/premium_gate.dart';
 import '../../widgets/zenvi_header.dart';
@@ -69,6 +70,8 @@ class _StoreSettingsScreenState extends State<StoreSettingsScreen> {
             Container(
               padding: const EdgeInsets.all(16),
               decoration: BoxDecoration(
+                // Kode QR harus gelap di atas putih supaya tetap terpindai; ini
+                // sengaja tidak mengikuti tema.
                 color: Colors.white,
                 borderRadius: BorderRadius.circular(20),
                 border: Border.all(color: theme.dividerColor.withValues(alpha: 0.1)),
@@ -245,7 +248,7 @@ class _StoreSettingsScreenState extends State<StoreSettingsScreen> {
                           ScaffoldMessenger.of(ctx).showSnackBar(
                             SnackBar(
                               content: Text('gagal_menyimpan_pengaturan'.tr(context: context)),
-                              backgroundColor: Colors.redAccent,
+                              backgroundColor: AppColors.dangerFill,
                             ),
                           );
                         }
@@ -390,10 +393,12 @@ class _StoreSettingsScreenState extends State<StoreSettingsScreen> {
                                 Container(
                                   padding: const EdgeInsets.all(8),
                                   decoration: BoxDecoration(
-                                    color: isPointsEnabled ? Colors.amber.withValues(alpha: 0.2) : Colors.grey.withValues(alpha: 0.1),
+                                    color: isPointsEnabled
+                                        ? AppColors.warningFill.withValues(alpha: 0.2)
+                                        : theme.colorScheme.onSurface.withValues(alpha: 0.1),
                                     borderRadius: BorderRadius.circular(10),
                                   ),
-                                  child: Icon(Icons.stars_rounded, color: isPointsEnabled ? Colors.amber : Colors.grey, size: 20),
+                                  child: Icon(Icons.stars_rounded, color: isPointsEnabled ? AppColors.warningFill : theme.colorScheme.onSurfaceVariant, size: 20),
                                 ),
                                 const SizedBox(width: 12),
                                 Expanded(
@@ -424,7 +429,7 @@ class _StoreSettingsScreenState extends State<StoreSettingsScreen> {
                             // ── Bagian 2A: Cara Mendapat Poin ──
                             _SectionLabel(
                               icon: Icons.add_circle_outline_rounded,
-                              color: Colors.amber.shade700,
+                              color: AppColors.warningText,
                               title: 'membership_earning_title'.tr(context: context),
                               subtitle: 'membership_earning_subtitle'.tr(context: context),
                             ),
@@ -458,7 +463,7 @@ class _StoreSettingsScreenState extends State<StoreSettingsScreen> {
                                     duration: const Duration(milliseconds: 150),
                                     padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                                     decoration: BoxDecoration(
-                                      color: isSelected ? Colors.amber.shade700 : theme.colorScheme.surfaceContainerHighest.withValues(alpha: 0.4),
+                                      color: isSelected ? AppColors.warningText : theme.colorScheme.surfaceContainerHighest.withValues(alpha: 0.4),
                                       borderRadius: BorderRadius.circular(10),
                                     ),
                                     child: Text(
@@ -477,18 +482,18 @@ class _StoreSettingsScreenState extends State<StoreSettingsScreen> {
                             Container(
                               padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
                               decoration: BoxDecoration(
-                                color: Colors.amber.withValues(alpha: 0.08),
+                                color: AppColors.warningFill.withValues(alpha: 0.08),
                                 borderRadius: BorderRadius.circular(12),
-                                border: Border.all(color: Colors.amber.withValues(alpha: 0.25)),
+                                border: Border.all(color: AppColors.warningFill.withValues(alpha: 0.25)),
                               ),
                               child: Row(
                                 children: [
-                                  const Icon(Icons.lightbulb_outline_rounded, size: 16, color: Colors.amber),
+                                  const Icon(Icons.lightbulb_outline_rounded, size: 16, color: AppColors.warningText),
                                   const SizedBox(width: 8),
                                   Expanded(
                                     child: Text(
                                       'membership_earning_example'.tr(context: context, args: [examplePoints.toString()]),
-                                      style: TextStyle(fontSize: 11, fontWeight: FontWeight.w600, color: Colors.amber.shade900),
+                                      style: TextStyle(fontSize: 11, fontWeight: FontWeight.w600, color: AppColors.warningText),
                                     ),
                                   ),
                                 ],
@@ -502,7 +507,7 @@ class _StoreSettingsScreenState extends State<StoreSettingsScreen> {
                             // ── Bagian 2B: Cara Memakai Poin ──
                             _SectionLabel(
                               icon: Icons.redeem_rounded,
-                              color: const Color(0xFF059669),
+                              color: AppColors.successText,
                               title: 'membership_redeem_title'.tr(context: context),
                               subtitle: 'membership_redeem_subtitle'.tr(context: context),
                             ),
@@ -536,7 +541,7 @@ class _StoreSettingsScreenState extends State<StoreSettingsScreen> {
                                     duration: const Duration(milliseconds: 150),
                                     padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                                     decoration: BoxDecoration(
-                                      color: isSelected ? const Color(0xFF059669) : theme.colorScheme.surfaceContainerHighest.withValues(alpha: 0.4),
+                                      color: isSelected ? AppColors.successText : theme.colorScheme.surfaceContainerHighest.withValues(alpha: 0.4),
                                       borderRadius: BorderRadius.circular(10),
                                     ),
                                     child: Text(
@@ -555,18 +560,18 @@ class _StoreSettingsScreenState extends State<StoreSettingsScreen> {
                             Container(
                               padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
                               decoration: BoxDecoration(
-                                color: const Color(0xFF059669).withValues(alpha: 0.08),
+                                color: AppColors.successFill.withValues(alpha: 0.08),
                                 borderRadius: BorderRadius.circular(12),
-                                border: Border.all(color: const Color(0xFF059669).withValues(alpha: 0.25)),
+                                border: Border.all(color: AppColors.successFill.withValues(alpha: 0.25)),
                               ),
                               child: Row(
                                 children: [
-                                  const Icon(Icons.check_circle_outline_rounded, size: 16, color: Color(0xFF059669)),
+                                  const Icon(Icons.check_circle_outline_rounded, size: 16, color: AppColors.successText),
                                   const SizedBox(width: 8),
                                   Expanded(
                                     child: Text(
                                       'membership_redeem_example'.tr(context: context, args: [NumberFormat('#,###', 'id_ID').format(exampleRedeemDiscount)]),
-                                      style: const TextStyle(fontSize: 11, fontWeight: FontWeight.w600, color: Color(0xFF065F46)),
+                                      style: const TextStyle(fontSize: 11, fontWeight: FontWeight.w600, color: AppColors.successText),
                                     ),
                                   ),
                                 ],
@@ -627,7 +632,7 @@ class _StoreSettingsScreenState extends State<StoreSettingsScreen> {
                                       ScaffoldMessenger.of(ctx).showSnackBar(
                                         SnackBar(
                                           content: Text('gagal_menyimpan_pengaturan'.tr(context: context)),
-                                          backgroundColor: Colors.redAccent,
+                                          backgroundColor: AppColors.dangerFill,
                                         ),
                                       );
                                     }
@@ -789,10 +794,10 @@ class _StoreSettingsScreenState extends State<StoreSettingsScreen> {
                     Container(
                       padding: const EdgeInsets.all(10),
                       decoration: BoxDecoration(
-                        color: const Color(0xFF059669).withValues(alpha: 0.15),
+                        color: AppColors.successFill.withValues(alpha: 0.15),
                         borderRadius: BorderRadius.circular(12),
                       ),
-                      child: const Icon(Icons.restaurant_menu_rounded, color: Color(0xFF059669), size: 22),
+                      child: const Icon(Icons.restaurant_menu_rounded, color: AppColors.successText, size: 22),
                     ),
                     const SizedBox(width: 14),
                     Expanded(
@@ -930,10 +935,10 @@ class _StoreSettingsScreenState extends State<StoreSettingsScreen> {
                             Container(
                               padding: const EdgeInsets.all(10),
                               decoration: BoxDecoration(
-                                color: Colors.amber.withValues(alpha: 0.15),
+                                color: AppColors.warningFill.withValues(alpha: 0.15),
                                 borderRadius: BorderRadius.circular(12),
                               ),
-                              child: const Icon(Icons.card_membership_rounded, color: Colors.amber, size: 22),
+                              child: const Icon(Icons.card_membership_rounded, color: AppColors.warningText, size: 22),
                             ),
                             const SizedBox(width: 14),
                             Expanded(
@@ -952,12 +957,12 @@ class _StoreSettingsScreenState extends State<StoreSettingsScreen> {
                                       Container(
                                         padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
                                         decoration: BoxDecoration(
-                                          color: Colors.amber.withValues(alpha: 0.18),
+                                          color: AppColors.warningFill.withValues(alpha: 0.18),
                                           borderRadius: BorderRadius.circular(6),
                                         ),
                                         child: Text(
                                           'loyalty_badge'.tr(context: context),
-                                          style: TextStyle(color: Colors.amber.shade900, fontSize: 9, fontWeight: FontWeight.bold),
+                                          style: const TextStyle(color: AppColors.warningText, fontSize: 9, fontWeight: FontWeight.bold),
                                         ),
                                       ),
                                       if (membershipLocked) const PremiumBadge(compact: true),
@@ -1003,7 +1008,7 @@ class _StoreSettingsScreenState extends State<StoreSettingsScreen> {
                               Icon(
                                 isPointsEnabled ? Icons.stars_rounded : Icons.star_border_rounded,
                                 size: 18,
-                                color: isPointsEnabled ? Colors.amber : theme.colorScheme.onSurfaceVariant,
+                                color: isPointsEnabled ? AppColors.warningText : theme.colorScheme.onSurfaceVariant,
                               ),
                               const SizedBox(width: 8),
                               Expanded(

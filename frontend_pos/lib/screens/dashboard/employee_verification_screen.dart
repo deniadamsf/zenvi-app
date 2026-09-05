@@ -6,6 +6,7 @@ import 'package:provider/provider.dart';
 
 import '../../providers/auth_provider.dart';
 import '../../widgets/zenvi_header.dart';
+import '../../theme/app_colors.dart';
 
 class EmployeeVerificationScreen extends StatefulWidget {
   const EmployeeVerificationScreen({super.key});
@@ -337,7 +338,7 @@ class _EmployeeVerificationScreenState extends State<EmployeeVerificationScreen>
                       height: 52,
                       child: ElevatedButton(
                         style: ElevatedButton.styleFrom(
-                          backgroundColor: isApproving ? Colors.green : theme.colorScheme.primary,
+                          backgroundColor: isApproving ? AppColors.successFill : theme.colorScheme.primary,
                           foregroundColor: Colors.white,
                           elevation: 2,
                           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
@@ -368,7 +369,7 @@ class _EmployeeVerificationScreenState extends State<EmployeeVerificationScreen>
                                 ScaffoldMessenger.of(context).showSnackBar(
                                   SnackBar(
                                     content: Text('Karyawan ${employee['name']} berhasil disetujui sebagai $jobTitle.'),
-                                    backgroundColor: Colors.green,
+                                    backgroundColor: AppColors.successFill,
                                   ),
                                 );
                                 _fetchEmployees();
@@ -376,7 +377,7 @@ class _EmployeeVerificationScreenState extends State<EmployeeVerificationScreen>
                                 ScaffoldMessenger.of(context).showSnackBar(
                                   SnackBar(
                                     content: Text('gagal_menyetujui_karyawan_82'.tr(context: context)),
-                                    backgroundColor: Colors.red,
+                                    backgroundColor: AppColors.dangerFill,
                                   ),
                                 );
                               }
@@ -392,7 +393,7 @@ class _EmployeeVerificationScreenState extends State<EmployeeVerificationScreen>
                                 ScaffoldMessenger.of(context).showSnackBar(
                                   SnackBar(
                                     content: Text('Hak akses ${employee['name']} berhasil diperbarui.'),
-                                    backgroundColor: Colors.green,
+                                    backgroundColor: AppColors.successFill,
                                   ),
                                 );
                                 _fetchEmployees();
@@ -400,7 +401,7 @@ class _EmployeeVerificationScreenState extends State<EmployeeVerificationScreen>
                                 ScaffoldMessenger.of(context).showSnackBar(
                                   SnackBar(
                                     content: Text('gagal_memperbarui_hak_akses_83'.tr(context: context)),
-                                    backgroundColor: Colors.red,
+                                    backgroundColor: AppColors.dangerFill,
                                   ),
                                 );
                               }
@@ -501,7 +502,7 @@ class _EmployeeVerificationScreenState extends State<EmployeeVerificationScreen>
         actions: [
           TextButton(onPressed: () => Navigator.pop(ctx, false), child: Text('batal_5'.tr(context: context))),
           ElevatedButton(
-            style: ElevatedButton.styleFrom(backgroundColor: Colors.red, foregroundColor: Colors.white),
+            style: ElevatedButton.styleFrom(backgroundColor: AppColors.dangerFill, foregroundColor: Colors.white),
             onPressed: () => Navigator.pop(ctx, true), 
             child: Text('tolak_85'.tr(context: context))
           ),
@@ -515,14 +516,14 @@ class _EmployeeVerificationScreenState extends State<EmployeeVerificationScreen>
     if (success) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('registration_rejected_msg'.tr(context: context, args: [employee['name']])), backgroundColor: Colors.green),
+          SnackBar(content: Text('registration_rejected_msg'.tr(context: context, args: [employee['name']])), backgroundColor: AppColors.successFill),
         );
         _fetchEmployees();
       }
     } else {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('gagal_menolak_pendaftaran_86'.tr(context: context)), backgroundColor: Colors.red),
+          SnackBar(content: Text('gagal_menolak_pendaftaran_86'.tr(context: context)), backgroundColor: AppColors.dangerFill),
         );
       }
     }
@@ -541,7 +542,7 @@ class _EmployeeVerificationScreenState extends State<EmployeeVerificationScreen>
         actions: [
           TextButton(onPressed: () => Navigator.pop(ctx, false), child: Text('batal_5'.tr(context: context))),
           ElevatedButton(
-            style: ElevatedButton.styleFrom(backgroundColor: Colors.red, foregroundColor: Colors.white),
+            style: ElevatedButton.styleFrom(backgroundColor: AppColors.dangerFill, foregroundColor: Colors.white),
             onPressed: () => Navigator.pop(ctx, true), 
             child: Text('hapus_88'.tr(context: context))
           ),
@@ -555,14 +556,14 @@ class _EmployeeVerificationScreenState extends State<EmployeeVerificationScreen>
     if (success) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('employee_deleted_msg'.tr(context: context, args: [employee['name']])), backgroundColor: Colors.green),
+          SnackBar(content: Text('employee_deleted_msg'.tr(context: context, args: [employee['name']])), backgroundColor: AppColors.successFill),
         );
         _fetchEmployees();
       }
     } else {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('gagal_menghapus_karyawan_89'.tr(context: context)), backgroundColor: Colors.red),
+          SnackBar(content: Text('gagal_menghapus_karyawan_89'.tr(context: context)), backgroundColor: AppColors.dangerFill),
         );
       }
     }
@@ -706,10 +707,10 @@ class _EmployeeVerificationScreenState extends State<EmployeeVerificationScreen>
                     const SizedBox(width: 4),
                     IconButton(
                       onPressed: () => _removeEmployee(index),
-                      icon: const Icon(Icons.delete_outline, color: Colors.red, size: 20),
+                      icon: const Icon(Icons.delete_outline, color: AppColors.dangerText, size: 20),
                       tooltip: 'delete_employee_tooltip'.tr(context: context),
                       style: IconButton.styleFrom(
-                        backgroundColor: Colors.red.withValues(alpha: 0.1),
+                        backgroundColor: AppColors.dangerFill.withValues(alpha: 0.1),
                       ),
                     ),
                   ],
@@ -722,8 +723,8 @@ class _EmployeeVerificationScreenState extends State<EmployeeVerificationScreen>
                       child: OutlinedButton(
                         onPressed: () => _rejectEmployee(index),
                         style: OutlinedButton.styleFrom(
-                          foregroundColor: Colors.red,
-                          side: const BorderSide(color: Colors.red),
+                          foregroundColor: AppColors.dangerText,
+                          side: const BorderSide(color: AppColors.dangerFill),
                           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                           padding: const EdgeInsets.symmetric(vertical: 10),
                         ),
@@ -737,7 +738,7 @@ class _EmployeeVerificationScreenState extends State<EmployeeVerificationScreen>
                         icon: const Icon(Icons.check_circle_outline, size: 18),
                         label: Text('setujui_90'.tr(context: context)),
                         style: ElevatedButton.styleFrom(
-                          backgroundColor: Colors.green,
+                          backgroundColor: AppColors.successFill,
                           foregroundColor: Colors.white,
                           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                           padding: const EdgeInsets.symmetric(vertical: 10),
@@ -835,7 +836,7 @@ class _EmployeeVerificationScreenState extends State<EmployeeVerificationScreen>
                               children: [
                                 Text(
                                   'your_store_code'.tr(context: context),
-                                  style: const TextStyle(fontSize: 11, fontWeight: FontWeight.w600, color: Colors.grey),
+                                  style: TextStyle(fontSize: 11, fontWeight: FontWeight.w600, color: theme.colorScheme.onSurfaceVariant),
                                 ),
                                 const SizedBox(height: 2),
                                 Text(

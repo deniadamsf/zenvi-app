@@ -7,6 +7,7 @@ import '../../providers/branch_provider.dart';
 import '../../models/order_model.dart';
 import '../pos/widgets/receipt_widget.dart';
 import '../../widgets/zenvi_header.dart';
+import '../../theme/app_colors.dart';
 
 class OwnerTransactionLogScreen extends StatefulWidget {
   const OwnerTransactionLogScreen({super.key});
@@ -70,7 +71,7 @@ class _OwnerTransactionLogScreenState extends State<OwnerTransactionLogScreen> {
         ),
         child: Column(
           children: [
-            Container(width: 40, height: 4, decoration: BoxDecoration(color: Colors.grey[300], borderRadius: BorderRadius.circular(2))),
+            Container(width: 40, height: 4, decoration: BoxDecoration(color: Theme.of(context).dividerColor, borderRadius: BorderRadius.circular(2))),
             const SizedBox(height: 24),
             Text('transaction_detail_number'.tr(context: context, args: [order.id.toString()]), style: Theme.of(context).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold)),
             if (order.priceMismatch && order.priceMismatchNote != null) ...[
@@ -79,19 +80,19 @@ class _OwnerTransactionLogScreenState extends State<OwnerTransactionLogScreen> {
                 width: double.infinity,
                 padding: const EdgeInsets.all(12),
                 decoration: BoxDecoration(
-                  color: Colors.orange.withValues(alpha: 0.1),
+                  color: AppColors.warningFill.withValues(alpha: 0.1),
                   borderRadius: BorderRadius.circular(12),
-                  border: Border.all(color: Colors.orange.withValues(alpha: 0.3)),
+                  border: Border.all(color: AppColors.warningFill.withValues(alpha: 0.3)),
                 ),
                 child: Row(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    const Icon(Icons.error_outline, size: 18, color: Colors.orange),
+                    const Icon(Icons.error_outline, size: 18, color: AppColors.warningText),
                     const SizedBox(width: 8),
                     Expanded(
                       child: Text(
                         order.priceMismatchNote!,
-                        style: const TextStyle(color: Colors.orange, fontSize: 12, fontWeight: FontWeight.w600),
+                        style: const TextStyle(color: AppColors.warningText, fontSize: 12, fontWeight: FontWeight.w600),
                       ),
                     ),
                   ],
@@ -225,12 +226,12 @@ class _OwnerTransactionLogScreenState extends State<OwnerTransactionLogScreen> {
                                 width: 48,
                                 height: 48,
                                 decoration: BoxDecoration(
-                                  color: isVoided ? Colors.red.withValues(alpha: 0.1) : theme.colorScheme.primary.withValues(alpha: 0.1),
+                                  color: isVoided ? AppColors.dangerFill.withValues(alpha: 0.1) : theme.colorScheme.primary.withValues(alpha: 0.1),
                                   shape: BoxShape.circle,
                                 ),
                                 child: Icon(
                                   isVoided ? Icons.cancel : Icons.receipt_long,
-                                  color: isVoided ? Colors.red : theme.colorScheme.primary,
+                                  color: isVoided ? AppColors.dangerFill : theme.colorScheme.primary,
                                 ),
                               ),
                               const SizedBox(width: 16),
@@ -269,27 +270,27 @@ class _OwnerTransactionLogScreenState extends State<OwnerTransactionLogScreen> {
                                       margin: const EdgeInsets.only(top: 4),
                                       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
                                       decoration: BoxDecoration(
-                                        color: Colors.red.withValues(alpha: 0.1),
+                                        color: AppColors.dangerFill.withValues(alpha: 0.1),
                                         borderRadius: BorderRadius.circular(4),
                                       ),
-                                      child: Text('void_167'.tr(context: context), style: TextStyle(color: Colors.red, fontSize: 10, fontWeight: FontWeight.bold)),
+                                      child: Text('void_167'.tr(context: context), style: TextStyle(color: AppColors.dangerText, fontSize: 10, fontWeight: FontWeight.bold)),
                                     )
                                   else if (order.priceMismatch)
                                     Container(
                                       margin: const EdgeInsets.only(top: 4),
                                       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
                                       decoration: BoxDecoration(
-                                        color: Colors.orange.withValues(alpha: 0.12),
+                                        color: AppColors.warningFill.withValues(alpha: 0.12),
                                         borderRadius: BorderRadius.circular(4),
                                       ),
                                       child: Row(
                                         mainAxisSize: MainAxisSize.min,
                                         children: [
-                                          const Icon(Icons.error_outline, size: 11, color: Colors.orange),
+                                          const Icon(Icons.error_outline, size: 11, color: AppColors.warningText),
                                           const SizedBox(width: 3),
                                           Text(
                                             'order_needs_review_badge'.tr(context: context),
-                                            style: const TextStyle(color: Colors.orange, fontSize: 10, fontWeight: FontWeight.bold),
+                                            style: const TextStyle(color: AppColors.warningText, fontSize: 10, fontWeight: FontWeight.bold),
                                           ),
                                         ],
                                       ),

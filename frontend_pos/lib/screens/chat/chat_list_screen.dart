@@ -4,6 +4,7 @@ import 'package:provider/provider.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import '../../providers/chat_provider.dart';
 import '../../providers/auth_provider.dart';
+import '../../theme/app_colors.dart';
 import 'chat_room_screen.dart';
 import '../../widgets/zenvi_header.dart';
 
@@ -216,7 +217,7 @@ class _ChatListScreenState extends State<ChatListScreen> {
                           width: 14,
                           height: 14,
                           decoration: BoxDecoration(
-                            color: const Color(0xFF10B981), // Modern green
+                            color: AppColors.successFill,
                             shape: BoxShape.circle,
                             border: Border.all(color: theme.colorScheme.surface, width: 2.5),
                           ),

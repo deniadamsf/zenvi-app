@@ -47,6 +47,8 @@ abstract final class AppColors {
   static const Color darkSurface = Color(0xFF0F172A);
   static const Color darkSurfaceAlt = Color(0xFF1E293B);
   static const Color darkBorder = Color(0xFF1E293B);
+  // Batas yang perlu lebih tegas dari kartu, mis. tombol bergaris.
+  static const Color darkBorderStrong = Color(0xFF334155);
   // Sebelumnya divider mode gelap bernilai sama persis dengan warna kartu
   // (#0F172A), jadi setiap garis pemisah di dalam kartu tidak pernah terlihat.
   static const Color darkDivider = Color(0xFF243044);
@@ -78,6 +80,8 @@ abstract final class AppColors {
   static const Color infoFill = Color(0xFF3B82F6);
   static const Color infoText = Color(0xFF1D4ED8);
   static const Color infoSoft = Color(0xFFEFF6FF);
+  // Varian terang untuk teks/ikon info di atas permukaan gelap.
+  static const Color infoBright = Color(0xFF60A5FA);
 
   static const Color neutralFill = Color(0xFF94A3B8);
   static const Color neutralText = Color(0xFF475569);
@@ -99,6 +103,17 @@ abstract final class AppColors {
     Color(0xFF0F766E),
     Color(0xFF115E59),
   ];
+
+  /// Deret grafik laba rugi. Warnanya membawa MAKNA, bukan sekadar kategori:
+  /// hijau untuk laba dan merah untuk beban adalah konvensi yang dibaca orang
+  /// jauh lebih cepat daripada label mana pun.
+  ///
+  /// Omzet sengaja indigo, BUKAN teal merek. Kalau omzet memakai teal dan laba
+  /// memakai hijau, satu grafik berisi dua warna yang nyaris sama - dan pada
+  /// layar ponsel di bawah lampu toko keduanya tidak terbedakan.
+  static const Color chartRevenue = Color(0xFF6366F1);
+  static const Color chartProfit = successFill;
+  static const Color chartExpense = dangerFill;
 
   /// Warna deret grafik, sudah dijauhkan rona satu sama lain supaya masih
   /// terbedakan pada layar kecil dan pada penglihatan warna yang terbatas.

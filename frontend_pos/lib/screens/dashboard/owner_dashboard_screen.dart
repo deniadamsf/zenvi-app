@@ -30,6 +30,7 @@ import '../notifications/notification_center_screen.dart';
 import '../../widgets/zenvi_header.dart';
 import '../../services/export_service.dart';
 import '../../widgets/premium_gate.dart';
+import '../../theme/app_colors.dart';
 
 class _NavItemData {
   final IconData icon;
@@ -335,10 +336,10 @@ class _DashboardOverviewState extends State<_DashboardOverview> {
                         Container(
                           padding: const EdgeInsets.all(10),
                           decoration: BoxDecoration(
-                            color: const Color(0xFFEF4444).withValues(alpha: 0.12),
+                            color: AppColors.dangerFill.withValues(alpha: 0.12),
                             shape: BoxShape.circle,
                           ),
-                          child: const Icon(Icons.money_off_rounded, color: Color(0xFFEF4444), size: 22),
+                          child: const Icon(Icons.money_off_rounded, color: AppColors.dangerFill, size: 22),
                         ),
                         const SizedBox(width: 14),
                         Expanded(
@@ -505,14 +506,14 @@ class _DashboardOverviewState extends State<_DashboardOverview> {
                                   ScaffoldMessenger.of(context).showSnackBar(
                                     SnackBar(
                                       content: Text('pengeluaran_berhasil_dicatat_data_130'.tr(context: context)),
-                                      backgroundColor: Colors.green,
+                                      backgroundColor: AppColors.successFill,
                                     ),
                                   );
                                 }
                               }
                             },
                             style: ElevatedButton.styleFrom(
-                              backgroundColor: const Color(0xFFEF4444),
+                              backgroundColor: AppColors.dangerFill,
                               foregroundColor: Colors.white,
                               padding: const EdgeInsets.symmetric(vertical: 14),
                               shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
@@ -1051,7 +1052,7 @@ class _DashboardOverviewState extends State<_DashboardOverview> {
                 Container(
                   padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4.5),
                   decoration: BoxDecoration(
-                    color: const Color(0xFF10B981).withValues(alpha: 0.12),
+                    color: AppColors.successFill.withValues(alpha: 0.12),
                     borderRadius: BorderRadius.circular(10),
                   ),
                   child: Row(
@@ -1061,7 +1062,7 @@ class _DashboardOverviewState extends State<_DashboardOverview> {
                         width: 6,
                         height: 6,
                         decoration: const BoxDecoration(
-                          color: Color(0xFF10B981),
+                          color: AppColors.successFill,
                           shape: BoxShape.circle,
                         ),
                       ),
@@ -1073,7 +1074,7 @@ class _DashboardOverviewState extends State<_DashboardOverview> {
                         style: const TextStyle(
                           fontSize: 10,
                           fontWeight: FontWeight.w800,
-                          color: Color(0xFF10B981),
+                          color: AppColors.successText,
                         ),
                       ),
                     ],
@@ -1966,9 +1967,9 @@ class _DashboardOverviewState extends State<_DashboardOverview> {
                 spacing: 8,
                 runSpacing: 4,
                 children: [
-                  _buildChartLegend(color: theme.colorScheme.primary, label: 'revenue_label'.tr(context: context)),
-                  _buildChartLegend(color: const Color(0xFF10B981), label: 'profit_label'.tr(context: context)),
-                  _buildChartLegend(color: const Color(0xFFF43F5E), label: 'expense_label'.tr(context: context)),
+                  _buildChartLegend(color: AppColors.chartRevenue, label: 'revenue_label'.tr(context: context)),
+                  _buildChartLegend(color: AppColors.chartProfit, label: 'profit_label'.tr(context: context)),
+                  _buildChartLegend(color: AppColors.chartExpense, label: 'expense_label'.tr(context: context)),
                 ],
               ),
             ],
@@ -2212,7 +2213,7 @@ class _DashboardOverviewState extends State<_DashboardOverview> {
                                 if (cogs > 0)
                                   Text(
                                     '+Rp ${NumberFormat.decimalPattern('id').format(profit)} (${margin.toStringAsFixed(0)}%)',
-                                    style: const TextStyle(fontSize: 10.5, fontWeight: FontWeight.bold, color: Colors.teal),
+                                    style: const TextStyle(fontSize: 10.5, fontWeight: FontWeight.bold, color: AppColors.successText),
                                   ),
                               ],
                             ),
@@ -2368,12 +2369,12 @@ class _DashboardOverviewState extends State<_DashboardOverview> {
         minY: minY,
         maxY: maxY,
         lineBarsData: [
-          // Omzet Line (Teal Primary)
+          // Omzet Line (Chart Series 0)
           LineChartBarData(
             spots: omzetSpots,
             isCurved: chartData.length > 1,
             curveSmoothness: 0.35,
-            color: theme.colorScheme.primary,
+            color: AppColors.chartRevenue,
             barWidth: 3,
             isStrokeCapRound: true,
             dotData: FlDotData(show: chartData.length <= 1 || !hasNonZero),
@@ -2381,30 +2382,30 @@ class _DashboardOverviewState extends State<_DashboardOverview> {
               show: true,
               gradient: LinearGradient(
                 colors: [
-                  theme.colorScheme.primary.withValues(alpha: 0.25),
-                  theme.colorScheme.primary.withValues(alpha: 0.0),
+                  AppColors.chartRevenue.withValues(alpha: 0.25),
+                  AppColors.chartRevenue.withValues(alpha: 0.0),
                 ],
                 begin: Alignment.topCenter,
                 end: Alignment.bottomCenter,
               ),
             ),
           ),
-          // Laba Bersih Line (Emerald Green)
+          // Laba Bersih Line (Chart Series 1)
           LineChartBarData(
             spots: profitSpots,
             isCurved: chartData.length > 1,
             curveSmoothness: 0.35,
-            color: const Color(0xFF10B981),
+            color: AppColors.chartProfit,
             barWidth: 2.5,
             isStrokeCapRound: true,
             dotData: FlDotData(show: chartData.length <= 1 || !hasNonZero),
           ),
-          // Expense Line (Rose Red)
+          // Expense Line (Chart Series 2)
           LineChartBarData(
             spots: expenseSpots,
             isCurved: chartData.length > 1,
             curveSmoothness: 0.35,
-            color: const Color(0xFFF43F5E),
+            color: AppColors.chartExpense,
             barWidth: 2,
             dashArray: [4, 4],
             dotData: FlDotData(show: chartData.length <= 1 || !hasNonZero),
@@ -2416,7 +2417,7 @@ class _DashboardOverviewState extends State<_DashboardOverview> {
             getTooltipItems: (touchedSpots) {
               return touchedSpots.map((spot) {
                 final label = spot.barIndex == 0 ? 'Omzet' : spot.barIndex == 1 ? 'Laba' : 'Beban';
-                final color = spot.barIndex == 0 ? theme.colorScheme.primary : spot.barIndex == 1 ? const Color(0xFF10B981) : const Color(0xFFF43F5E);
+                final color = spot.barIndex == 0 ? AppColors.chartRevenue : spot.barIndex == 1 ? AppColors.chartProfit : AppColors.chartExpense;
                 return LineTooltipItem(
                   '$label: Rp ${NumberFormat.decimalPattern('id').format(spot.y)}',
                   TextStyle(color: color, fontWeight: FontWeight.w800, fontSize: 11),
@@ -2647,17 +2648,17 @@ class _DashboardOverviewState extends State<_DashboardOverview> {
                                 Container(
                                   padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
                                   decoration: BoxDecoration(
-                                    color: const Color(0xFF10B981).withValues(alpha: 0.15),
+                                    color: AppColors.successFill.withValues(alpha: 0.15),
                                     borderRadius: BorderRadius.circular(6),
                                   ),
                                   child: Row(
                                     mainAxisSize: MainAxisSize.min,
                                     children: [
-                                      Container(width: 5, height: 5, decoration: const BoxDecoration(color: Color(0xFF10B981), shape: BoxShape.circle)),
+                                      Container(width: 5, height: 5, decoration: const BoxDecoration(color: AppColors.successFill, shape: BoxShape.circle)),
                                       const SizedBox(width: 4),
                                       Text(
                                         'active_cashiers_count_label'.tr(context: context, args: [activeShifts.toString()]),
-                                        style: const TextStyle(fontSize: 10, fontWeight: FontWeight.w700, color: Color(0xFF10B981)),
+                                        style: const TextStyle(fontSize: 10, fontWeight: FontWeight.w700, color: AppColors.successText),
                                       ),
                                     ],
                                   ),
@@ -2791,13 +2792,13 @@ class _DashboardOverviewState extends State<_DashboardOverview> {
                         Container(
                           padding: const EdgeInsets.all(9),
                           decoration: BoxDecoration(
-                            color: isClosed ? Colors.grey.withValues(alpha: 0.15) : const Color(0xFF10B981).withValues(alpha: 0.15),
+                            color: isClosed ? theme.colorScheme.onSurface.withValues(alpha: 0.15) : AppColors.successFill.withValues(alpha: 0.15),
                             shape: BoxShape.circle,
                           ),
                           child: Icon(
                             isClosed ? Icons.lock_clock_rounded : Icons.point_of_sale_rounded,
                             size: 18,
-                            color: isClosed ? Colors.grey.shade700 : const Color(0xFF10B981),
+                            color: isClosed ? theme.colorScheme.onSurfaceVariant : AppColors.successText,
                           ),
                         ),
                         const SizedBox(width: 12),
@@ -2836,7 +2837,7 @@ class _DashboardOverviewState extends State<_DashboardOverview> {
                                   Container(
                                     padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
                                     decoration: BoxDecoration(
-                                      color: isClosed ? Colors.grey.withValues(alpha: 0.15) : const Color(0xFF10B981).withValues(alpha: 0.15),
+                                      color: isClosed ? theme.colorScheme.onSurface.withValues(alpha: 0.15) : AppColors.successFill.withValues(alpha: 0.15),
                                       borderRadius: BorderRadius.circular(6),
                                     ),
                                     child: Text(
@@ -2844,7 +2845,7 @@ class _DashboardOverviewState extends State<_DashboardOverview> {
                                       style: TextStyle(
                                         fontSize: 9.5,
                                         fontWeight: FontWeight.w700,
-                                        color: isClosed ? Colors.grey.shade700 : const Color(0xFF10B981),
+                                        color: isClosed ? theme.colorScheme.onSurfaceVariant : AppColors.successText,
                                       ),
                                     ),
                                   ),

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../theme/app_colors.dart';
 
 enum ZenviLogoVariant {
   solid,     // Latar belakang kotak hijau, segitiga putih
@@ -14,7 +15,7 @@ class ZenviLogo extends StatelessWidget {
   const ZenviLogo({
     super.key,
     this.size = 100.0,
-    this.primaryColor = const Color(0xFF0D7C83), // Zenvi Teal
+    this.primaryColor = AppColors.brand,
     this.variant = ZenviLogoVariant.solid,
   });
 
@@ -196,7 +197,7 @@ class ZenviNotificationIcon extends StatelessWidget {
                 child: Container(
                   padding: const EdgeInsets.all(3),
                   decoration: const BoxDecoration(
-                    color: Colors.redAccent,
+                    color: AppColors.dangerText,
                     shape: BoxShape.circle,
                   ),
                   constraints: const BoxConstraints(

@@ -5,6 +5,7 @@ import '../../providers/expense_provider.dart';
 import '../../providers/ingredient_provider.dart';
 import '../../providers/auth_provider.dart';
 import '../../widgets/zenvi_header.dart';
+import '../../theme/app_colors.dart';
 
 class ExpenseScreen extends StatefulWidget {
   const ExpenseScreen({super.key});
@@ -54,8 +55,8 @@ class _ExpenseScreenState extends State<ExpenseScreen> {
                 children: [
                   Center(
                     child: Container(
-                      width: 40, height: 4, 
-                      decoration: BoxDecoration(color: Colors.grey[300], borderRadius: BorderRadius.circular(2))
+                      width: 40, height: 4,
+                      decoration: BoxDecoration(color: theme.dividerColor, borderRadius: BorderRadius.circular(2))
                     )
                   ),
                   const SizedBox(height: 24),
@@ -325,7 +326,7 @@ class _ExpenseScreenState extends State<ExpenseScreen> {
                           const SizedBox(width: 16),
                           Text(
                             '- Rp ${exp.amount.toStringAsFixed(0)}',
-                            style: const TextStyle(color: Colors.red, fontWeight: FontWeight.bold, fontSize: 15),
+                            style: const TextStyle(color: AppColors.dangerText, fontWeight: FontWeight.bold, fontSize: 15),
                           ),
                         ],
                       ),

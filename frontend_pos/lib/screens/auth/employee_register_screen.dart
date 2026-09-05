@@ -4,6 +4,7 @@ import 'package:provider/provider.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import '../../providers/auth_provider.dart';
 import '../../providers/theme_provider.dart';
+import '../../theme/app_colors.dart';
 import 'pending_approval_screen.dart';
 
 class EmployeeRegisterScreen extends StatefulWidget {
@@ -83,7 +84,7 @@ class _EmployeeRegisterScreenState extends State<EmployeeRegisterScreen> {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text('harap_pilih_cabang_tempat_9'.tr(context: context)),
-          backgroundColor: Colors.red,
+          backgroundColor: AppColors.dangerFill,
         ),
       );
       return;
@@ -101,7 +102,7 @@ class _EmployeeRegisterScreenState extends State<EmployeeRegisterScreen> {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text('permohonan_berhasil_dikirim_menunggu_10'.tr(context: context)),
-          backgroundColor: Colors.green,
+          backgroundColor: AppColors.successFill,
         ),
       );
       Navigator.pushAndRemoveUntil(
@@ -113,7 +114,7 @@ class _EmployeeRegisterScreenState extends State<EmployeeRegisterScreen> {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text('gagal_mengirim_permohonan_silakan_11'.tr(context: context)),
-          backgroundColor: Colors.red,
+          backgroundColor: AppColors.dangerFill,
         ),
       );
     }
@@ -149,9 +150,9 @@ class _EmployeeRegisterScreenState extends State<EmployeeRegisterScreen> {
                     height: 64,
                     decoration: BoxDecoration(
                       shape: BoxShape.circle,
-                      color: Colors.teal.withValues(alpha: 0.12),
+                      color: theme.colorScheme.primary.withValues(alpha: 0.12),
                     ),
-                    child: const Icon(Icons.qr_code_scanner_rounded, size: 32, color: Colors.teal),
+                    child: Icon(Icons.qr_code_scanner_rounded, size: 32, color: theme.colorScheme.primary),
                   ).animate().scale(duration: 400.ms, curve: Curves.easeOutBack),
                   const SizedBox(height: 16),
 
@@ -165,7 +166,7 @@ class _EmployeeRegisterScreenState extends State<EmployeeRegisterScreen> {
                   Text(
                     'enter_store_code_desc'.tr(context: context),
                     style: theme.textTheme.bodyMedium?.copyWith(
-                      color: isDark ? Colors.grey[400] : Colors.grey[600],
+                      color: theme.colorScheme.onSurfaceVariant,
                       fontSize: 13,
                       height: 1.35,
                     ),
@@ -191,7 +192,7 @@ class _EmployeeRegisterScreenState extends State<EmployeeRegisterScreen> {
                               contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
                               border: OutlineInputBorder(borderRadius: BorderRadius.circular(14)),
                               filled: true,
-                              fillColor: isDark ? const Color(0xFF1E222D) : Colors.white,
+                              fillColor: isDark ? AppColors.darkSurfaceAlt : Colors.white,
                             ),
                             onFieldSubmitted: (_) => _searchCompany(),
                           ),
@@ -202,7 +203,7 @@ class _EmployeeRegisterScreenState extends State<EmployeeRegisterScreen> {
                           child: ElevatedButton(
                             onPressed: _isSearching ? null : _searchCompany,
                             style: ElevatedButton.styleFrom(
-                              backgroundColor: Colors.teal,
+                              backgroundColor: theme.colorScheme.primary,
                               foregroundColor: Colors.white,
                               shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
                               padding: const EdgeInsets.symmetric(horizontal: 18),
@@ -222,18 +223,18 @@ class _EmployeeRegisterScreenState extends State<EmployeeRegisterScreen> {
                     Container(
                       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
                       decoration: BoxDecoration(
-                        color: Colors.redAccent.withValues(alpha: 0.12),
+                        color: AppColors.dangerFill.withValues(alpha: 0.12),
                         borderRadius: BorderRadius.circular(12),
-                        border: Border.all(color: Colors.redAccent.withValues(alpha: 0.3)),
+                        border: Border.all(color: AppColors.dangerFill.withValues(alpha: 0.3)),
                       ),
                       child: Row(
                         children: [
-                          const Icon(Icons.error_outline_rounded, color: Colors.redAccent, size: 18),
+                          const Icon(Icons.error_outline_rounded, color: AppColors.dangerText, size: 18),
                           const SizedBox(width: 8),
                           Expanded(
                             child: Text(
                               _errorMessage!,
-                              style: const TextStyle(color: Colors.redAccent, fontSize: 12.5),
+                              style: const TextStyle(color: AppColors.dangerText, fontSize: 12.5),
                             ),
                           ),
                         ],
@@ -247,12 +248,12 @@ class _EmployeeRegisterScreenState extends State<EmployeeRegisterScreen> {
                     Container(
                       padding: const EdgeInsets.all(16),
                       decoration: BoxDecoration(
-                        color: isDark ? const Color(0xFF1E222D) : Colors.white,
+                        color: isDark ? AppColors.darkSurfaceAlt : Colors.white,
                         borderRadius: BorderRadius.circular(18),
-                        border: Border.all(color: Colors.teal.withValues(alpha: 0.4), width: 1.5),
+                        border: Border.all(color: theme.colorScheme.primary.withValues(alpha: 0.4), width: 1.5),
                         boxShadow: [
                           BoxShadow(
-                            color: Colors.teal.withValues(alpha: 0.08),
+                            color: theme.colorScheme.primary.withValues(alpha: 0.08),
                             blurRadius: 16,
                             offset: const Offset(0, 4),
                           ),
@@ -267,10 +268,10 @@ class _EmployeeRegisterScreenState extends State<EmployeeRegisterScreen> {
                                 width: 44,
                                 height: 44,
                                 decoration: BoxDecoration(
-                                  color: Colors.teal.withValues(alpha: 0.12),
+                                  color: theme.colorScheme.primary.withValues(alpha: 0.12),
                                   borderRadius: BorderRadius.circular(12),
                                 ),
-                                child: const Icon(Icons.storefront_rounded, color: Colors.teal, size: 24),
+                                child: Icon(Icons.storefront_rounded, color: theme.colorScheme.primary, size: 24),
                               ),
                               const SizedBox(width: 12),
                               Expanded(
@@ -288,22 +289,22 @@ class _EmployeeRegisterScreenState extends State<EmployeeRegisterScreen> {
                                     Container(
                                       padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
                                       decoration: BoxDecoration(
-                                        color: Colors.teal.withValues(alpha: 0.15),
+                                        color: theme.colorScheme.primary.withValues(alpha: 0.15),
                                         borderRadius: BorderRadius.circular(6),
                                       ),
                                       child: Text(
                                         'Kode: ${_foundCompany!['code'] ?? _codeController.text.toUpperCase()}',
-                                        style: const TextStyle(
+                                        style: TextStyle(
                                           fontSize: 10.5,
                                           fontWeight: FontWeight.bold,
-                                          color: Colors.teal,
+                                          color: theme.colorScheme.primary,
                                         ),
                                       ),
                                     ),
                                   ],
                                 ),
                               ),
-                              const Icon(Icons.check_circle_rounded, color: Colors.teal, size: 24),
+                              Icon(Icons.check_circle_rounded, color: theme.colorScheme.primary, size: 24),
                             ],
                           ),
                           const Divider(height: 24),
@@ -319,12 +320,12 @@ class _EmployeeRegisterScreenState extends State<EmployeeRegisterScreen> {
                             Container(
                               padding: const EdgeInsets.all(12),
                               decoration: BoxDecoration(
-                                color: isDark ? Colors.grey[850] : Colors.grey[100],
+                                color: theme.colorScheme.surfaceContainerHighest,
                                 borderRadius: BorderRadius.circular(12),
                               ),
                               child: Row(
                                 children: [
-                                  const Icon(Icons.location_on_outlined, size: 16, color: Colors.grey),
+                                  Icon(Icons.location_on_outlined, size: 16, color: theme.colorScheme.onSurfaceVariant),
                                   const SizedBox(width: 8),
                                   Text('cabang_utama_default_15'.tr(context: context), style: const TextStyle(fontWeight: FontWeight.w500, fontSize: 13)),
                                 ],
@@ -333,7 +334,7 @@ class _EmployeeRegisterScreenState extends State<EmployeeRegisterScreen> {
                           else
                             DropdownButtonFormField<int>(
                               decoration: InputDecoration(
-                                prefixIcon: const Icon(Icons.location_on_rounded, color: Colors.teal, size: 20),
+                                prefixIcon: Icon(Icons.location_on_rounded, color: theme.colorScheme.primary, size: 20),
                                 border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
                                 contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
                               ),
@@ -362,7 +363,7 @@ class _EmployeeRegisterScreenState extends State<EmployeeRegisterScreen> {
                             child: ElevatedButton.icon(
                               onPressed: authProvider.isLoading ? null : _submitJoin,
                               style: ElevatedButton.styleFrom(
-                                backgroundColor: Colors.teal,
+                                backgroundColor: theme.colorScheme.primary,
                                 foregroundColor: Colors.white,
                                 elevation: 0,
                                 shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),

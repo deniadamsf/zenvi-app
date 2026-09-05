@@ -7,6 +7,7 @@ import 'package:geolocator/geolocator.dart';
 import '../../providers/auth_provider.dart';
 import '../../providers/branch_provider.dart';
 import '../../models/branch_model.dart';
+import '../../theme/app_colors.dart';
 import '../../widgets/zenvi_header.dart';
 
 class BranchFormScreen extends StatefulWidget {
@@ -123,7 +124,7 @@ class _BranchFormScreenState extends State<BranchFormScreen> {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text(widget.branch == null ? 'Cabang berhasil ditambahkan' : 'Cabang berhasil diperbarui'),
-          backgroundColor: Colors.green,
+          backgroundColor: AppColors.successText,
         ),
       );
       Navigator.pop(context);
@@ -131,7 +132,7 @@ class _BranchFormScreenState extends State<BranchFormScreen> {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text(provider.error ?? 'Gagal menyimpan cabang. Silakan periksa koneksi.'),
-          backgroundColor: Colors.red,
+          backgroundColor: AppColors.dangerText,
         ),
       );
     }

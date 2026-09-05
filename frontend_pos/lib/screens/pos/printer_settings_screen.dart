@@ -5,6 +5,7 @@ import '../../providers/printer_provider.dart';
 import '../../providers/auth_provider.dart';
 import '../../services/label_printer_service.dart';
 import '../../widgets/zenvi_header.dart';
+import '../../theme/app_colors.dart';
 
 class PrinterSettingsScreen extends StatefulWidget {
   const PrinterSettingsScreen({super.key});
@@ -45,14 +46,14 @@ class _PrinterSettingsScreenState extends State<PrinterSettingsScreen> {
         children: [
           Container(
             padding: const EdgeInsets.all(16),
-            color: printerProvider.isConnected ? Colors.green.shade50 : Colors.red.shade50,
+            color: printerProvider.isConnected ? AppColors.successSoft : AppColors.dangerSoft,
             child: Column(
               children: [
                 Row(
                   children: [
                     Icon(
                       printerProvider.isConnected ? Icons.bluetooth_connected : Icons.bluetooth_disabled,
-                      color: printerProvider.isConnected ? Colors.green : Colors.red,
+                      color: printerProvider.isConnected ? AppColors.successFill : AppColors.dangerFill,
                     ),
                     const SizedBox(width: 16),
                     Expanded(
@@ -63,7 +64,7 @@ class _PrinterSettingsScreenState extends State<PrinterSettingsScreen> {
                             printerProvider.isConnected ? 'terhubung_9'.tr(context: context) : 'terputus_8'.tr(context: context),
                             style: TextStyle(
                               fontWeight: FontWeight.bold,
-                              color: printerProvider.isConnected ? Colors.green.shade800 : Colors.red.shade800,
+                              color: printerProvider.isConnected ? AppColors.successText : AppColors.dangerText,
                             ),
                           ),
                           if (printerProvider.selectedDevice != null)
@@ -82,7 +83,7 @@ class _PrinterSettingsScreenState extends State<PrinterSettingsScreen> {
                                 content: Text(success
                                     ? 'test_print_success'.tr(context: context)
                                     : 'test_print_failed'.tr(context: context)),
-                                backgroundColor: success ? Colors.green : Colors.red,
+                                backgroundColor: success ? AppColors.successFill : AppColors.dangerFill,
                               ),
                             );
                           }
@@ -93,7 +94,7 @@ class _PrinterSettingsScreenState extends State<PrinterSettingsScreen> {
                       ),
                       TextButton(
                         onPressed: () => printerProvider.disconnect(),
-                        child: Text('putuskan_304'.tr(context: context), style: const TextStyle(color: Colors.red)),
+                        child: Text('putuskan_304'.tr(context: context), style: const TextStyle(color: AppColors.dangerText)),
                       ),
                     ],
                   ],
@@ -195,7 +196,7 @@ class _PrinterSettingsScreenState extends State<PrinterSettingsScreen> {
                                   scaffoldMessenger.showSnackBar(
                                     SnackBar(
                                       content: Text(success ? successText : failureText),
-                                      backgroundColor: success ? Colors.green : Colors.red,
+                                      backgroundColor: success ? AppColors.successFill : AppColors.dangerFill,
                                     ),
                                   );
                                 }
@@ -236,12 +237,12 @@ class _PrinterSettingsScreenState extends State<PrinterSettingsScreen> {
                           return ListTile(
                             leading: Icon(
                               Icons.print,
-                              color: isSelected ? theme.colorScheme.primary : Colors.grey,
+                              color: isSelected ? theme.colorScheme.primary : theme.colorScheme.onSurfaceVariant,
                             ),
                             title: Text(device.name ?? 'unknown_device_14'.tr(context: context)),
                             subtitle: Text(device.address ?? ''),
                             trailing: isSelected
-                                ? const Icon(Icons.check_circle, color: Colors.green)
+                                ? const Icon(Icons.check_circle, color: AppColors.successFill)
                                 : ElevatedButton(
                                     onPressed: () async {
                                       final scaffoldMessenger = ScaffoldMessenger.of(context);

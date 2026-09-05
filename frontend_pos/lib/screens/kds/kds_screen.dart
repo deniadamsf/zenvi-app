@@ -9,6 +9,7 @@ import '../../providers/auth_provider.dart';
 import '../../providers/branch_provider.dart';
 import '../../config/api_config.dart';
 import '../../widgets/zenvi_header.dart';
+import '../../theme/app_colors.dart';
 
 class KdsScreen extends StatefulWidget {
   const KdsScreen({super.key});
@@ -453,7 +454,7 @@ class _KdsScreenState extends State<KdsScreen> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            const Icon(Icons.error_outline_rounded, size: 64, color: Colors.redAccent),
+            const Icon(Icons.error_outline_rounded, size: 64, color: AppColors.dangerFill),
             const SizedBox(height: 16),
             Text(_errorMessage!, style: theme.textTheme.titleMedium),
             const SizedBox(height: 16),
@@ -516,16 +517,20 @@ class _KdsScreenState extends State<KdsScreen> {
     final servicedBy = order['serviced_by'] != null ? order['serviced_by']['name'] : null;
     final branchName = order['shift']?['branch']?['name'];
 
-    Color statusColor;
+    Color statusFillColor;
+    Color statusTextColor;
     String statusBadgeText;
     if (orderStatus == 'ready') {
-      statusColor = Colors.green;
+      statusFillColor = AppColors.successFill;
+      statusTextColor = AppColors.successText;
       statusBadgeText = 'item_status_ready'.tr(context: context);
     } else if (orderStatus == 'preparing') {
-      statusColor = Colors.blue;
+      statusFillColor = AppColors.infoFill;
+      statusTextColor = AppColors.infoText;
       statusBadgeText = 'item_status_preparing'.tr(context: context);
     } else {
-      statusColor = Colors.orange;
+      statusFillColor = AppColors.warningFill;
+      statusTextColor = AppColors.warningText;
       statusBadgeText = 'item_status_pending'.tr(context: context);
     }
 
@@ -540,10 +545,10 @@ class _KdsScreenState extends State<KdsScreen> {
           decoration: BoxDecoration(
             color: theme.colorScheme.surface.withValues(alpha: 0.9),
             borderRadius: BorderRadius.circular(20),
-            border: Border.all(color: statusColor.withValues(alpha: 0.35), width: 1.5),
+            border: Border.all(color: statusFillColor.withValues(alpha: 0.35), width: 1.5),
             boxShadow: [
               BoxShadow(
-                color: statusColor.withValues(alpha: 0.08),
+                color: statusFillColor.withValues(alpha: 0.08),
                 blurRadius: 12,
                 offset: const Offset(0, 4),
               )
@@ -556,8 +561,8 @@ class _KdsScreenState extends State<KdsScreen> {
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
                 decoration: BoxDecoration(
-                  color: statusColor.withValues(alpha: 0.1),
-                  border: Border(bottom: BorderSide(color: statusColor.withValues(alpha: 0.2))),
+                  color: statusFillColor.withValues(alpha: 0.1),
+                  border: Border(bottom: BorderSide(color: statusFillColor.withValues(alpha: 0.2))),
                 ),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -579,17 +584,17 @@ class _KdsScreenState extends State<KdsScreen> {
                         Container(
                           padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                           decoration: BoxDecoration(
-                            color: statusColor.withValues(alpha: 0.2),
+                            color: statusFillColor.withValues(alpha: 0.2),
                             borderRadius: BorderRadius.circular(8),
                           ),
                           child: Row(
                             mainAxisSize: MainAxisSize.min,
                             children: [
-                              Icon(Icons.access_time_rounded, size: 13, color: statusColor),
+                              Icon(Icons.access_time_rounded, size: 13, color: statusTextColor),
                               const SizedBox(width: 4),
                               Text(
                                 timeStr,
-                                style: TextStyle(fontWeight: FontWeight.bold, color: statusColor, fontSize: 13),
+                                style: TextStyle(fontWeight: FontWeight.bold, color: statusTextColor, fontSize: 13),
                               ),
                             ],
                           ),
@@ -602,7 +607,7 @@ class _KdsScreenState extends State<KdsScreen> {
                         Container(
                           padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
                           decoration: BoxDecoration(
-                            color: statusColor.withValues(alpha: 0.15),
+                            color: statusFillColor.withValues(alpha: 0.15),
                             borderRadius: BorderRadius.circular(6),
                           ),
                           child: Text(
@@ -610,7 +615,7 @@ class _KdsScreenState extends State<KdsScreen> {
                             style: TextStyle(
                               fontSize: 11,
                               fontWeight: FontWeight.bold,
-                              color: statusColor,
+                              color: statusTextColor,
                             ),
                           ),
                         ),
@@ -743,8 +748,8 @@ class _KdsScreenState extends State<KdsScreen> {
                         Expanded(
                           child: OutlinedButton.icon(
                             style: OutlinedButton.styleFrom(
-                              foregroundColor: Colors.blue.shade700,
-                              side: BorderSide(color: Colors.blue.withValues(alpha: 0.4)),
+                              foregroundColor: AppColors.infoText,
+                              side: BorderSide(color: AppColors.infoFill.withValues(alpha: 0.4)),
                               padding: const EdgeInsets.symmetric(vertical: 10),
                               shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
                             ),
@@ -761,7 +766,7 @@ class _KdsScreenState extends State<KdsScreen> {
                       Expanded(
                         child: ElevatedButton.icon(
                           style: ElevatedButton.styleFrom(
-                            backgroundColor: allItemsReady ? Colors.green.shade600 : theme.colorScheme.primary,
+                            backgroundColor: allItemsReady ? AppColors.successFill : theme.colorScheme.primary,
                             foregroundColor: Colors.white,
                             padding: const EdgeInsets.symmetric(vertical: 10),
                             shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
@@ -790,20 +795,24 @@ class _KdsScreenState extends State<KdsScreen> {
     required ThemeData theme,
     required String status,
   }) {
-    Color color;
+    Color fillColor;
+    Color textColor;
     String text;
     IconData icon;
 
     if (status == 'ready') {
-      color = Colors.green;
+      fillColor = AppColors.successFill;
+      textColor = AppColors.successText;
       text = 'item_status_ready'.tr(context: context);
       icon = Icons.check_circle_rounded;
     } else if (status == 'preparing') {
-      color = Colors.blue;
+      fillColor = AppColors.infoFill;
+      textColor = AppColors.infoText;
       text = 'item_status_preparing'.tr(context: context);
       icon = Icons.hourglass_top_rounded;
     } else {
-      color = Colors.orange;
+      fillColor = AppColors.warningFill;
+      textColor = AppColors.warningText;
       text = 'item_status_pending'.tr(context: context);
       icon = Icons.access_time_rounded;
     }
@@ -811,21 +820,21 @@ class _KdsScreenState extends State<KdsScreen> {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 5),
       decoration: BoxDecoration(
-        color: color.withValues(alpha: 0.12),
+        color: fillColor.withValues(alpha: 0.12),
         borderRadius: BorderRadius.circular(8),
-        border: Border.all(color: color.withValues(alpha: 0.3)),
+        border: Border.all(color: fillColor.withValues(alpha: 0.3)),
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Icon(icon, size: 13, color: color),
+          Icon(icon, size: 13, color: textColor),
           const SizedBox(width: 4),
           Text(
             text,
             style: TextStyle(
               fontSize: 11.5,
               fontWeight: FontWeight.bold,
-              color: color,
+              color: textColor,
             ),
           ),
         ],
@@ -846,18 +855,18 @@ class _KdsScreenState extends State<KdsScreen> {
         child: Container(
           padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
           decoration: BoxDecoration(
-            color: Colors.orange.withValues(alpha: 0.12),
-            border: Border.all(color: Colors.orange.withValues(alpha: 0.4)),
+            color: AppColors.warningFill.withValues(alpha: 0.12),
+            border: Border.all(color: AppColors.warningFill.withValues(alpha: 0.4)),
             borderRadius: BorderRadius.circular(8),
           ),
           child: Row(
             mainAxisSize: MainAxisSize.min,
             children: [
-              const Icon(Icons.play_circle_outline_rounded, size: 14, color: Colors.orange),
+              const Icon(Icons.play_circle_outline_rounded, size: 14, color: AppColors.warningText),
               const SizedBox(width: 4),
               Text(
                 'action_start_item'.tr(context: context),
-                style: const TextStyle(fontSize: 11, fontWeight: FontWeight.bold, color: Colors.orange),
+                style: const TextStyle(fontSize: 11, fontWeight: FontWeight.bold, color: AppColors.warningText),
               ),
             ],
           ),
@@ -870,18 +879,18 @@ class _KdsScreenState extends State<KdsScreen> {
         child: Container(
           padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
           decoration: BoxDecoration(
-            color: Colors.blue.withValues(alpha: 0.15),
-            border: Border.all(color: Colors.blue.withValues(alpha: 0.4)),
+            color: AppColors.infoFill.withValues(alpha: 0.15),
+            border: Border.all(color: AppColors.infoFill.withValues(alpha: 0.4)),
             borderRadius: BorderRadius.circular(8),
           ),
           child: Row(
             mainAxisSize: MainAxisSize.min,
             children: [
-              const Icon(Icons.check_circle_outline_rounded, size: 14, color: Colors.blue),
+              const Icon(Icons.check_circle_outline_rounded, size: 14, color: AppColors.infoText),
               const SizedBox(width: 4),
               Text(
                 'action_complete_item'.tr(context: context),
-                style: const TextStyle(fontSize: 11, fontWeight: FontWeight.bold, color: Colors.blue),
+                style: const TextStyle(fontSize: 11, fontWeight: FontWeight.bold, color: AppColors.infoText),
               ),
             ],
           ),
@@ -900,7 +909,7 @@ class _KdsScreenState extends State<KdsScreen> {
             value: 'revert',
             child: Row(
               children: [
-                const Icon(Icons.undo_rounded, size: 16, color: Colors.orange),
+                const Icon(Icons.undo_rounded, size: 16, color: AppColors.warningText),
                 const SizedBox(width: 8),
                 Text('action_revert_item'.tr(context: context)),
               ],
@@ -910,17 +919,17 @@ class _KdsScreenState extends State<KdsScreen> {
         child: Container(
           padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
           decoration: BoxDecoration(
-            color: Colors.green.withValues(alpha: 0.12),
+            color: AppColors.successFill.withValues(alpha: 0.12),
             borderRadius: BorderRadius.circular(8),
           ),
           child: Row(
             mainAxisSize: MainAxisSize.min,
             children: [
-              const Icon(Icons.check_rounded, size: 14, color: Colors.green),
+              const Icon(Icons.check_rounded, size: 14, color: AppColors.successText),
               const SizedBox(width: 4),
               Text(
                 'item_status_ready'.tr(context: context),
-                style: const TextStyle(fontSize: 11, fontWeight: FontWeight.bold, color: Colors.green),
+                style: const TextStyle(fontSize: 11, fontWeight: FontWeight.bold, color: AppColors.successText),
               ),
             ],
           ),

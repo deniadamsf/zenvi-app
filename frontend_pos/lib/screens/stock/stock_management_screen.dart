@@ -8,6 +8,7 @@ import '../../providers/branch_provider.dart';
 import 'stock_history_screen.dart';
 import '../../widgets/zenvi_header.dart';
 import 'stock_transfer_screen.dart';
+import '../../theme/app_colors.dart';
 
 class StockManagementScreen extends StatefulWidget {
   const StockManagementScreen({super.key});
@@ -273,7 +274,7 @@ class _StockManagementScreenState extends State<StockManagementScreen> {
                         ScaffoldMessenger.of(context).showSnackBar(
                           SnackBar(
                             content: Text(err),
-                            backgroundColor: Colors.red.shade700,
+                            backgroundColor: AppColors.dangerFill,
                           ),
                         );
                       }
@@ -459,13 +460,13 @@ class _StockManagementScreenState extends State<StockManagementScreen> {
                     margin: const EdgeInsets.all(16),
                     padding: const EdgeInsets.all(16),
                     decoration: BoxDecoration(
-                      color: Colors.red.shade50,
-                      border: Border.all(color: Colors.red.shade300),
+                      color: AppColors.dangerSoft,
+                      border: Border.all(color: AppColors.dangerFill),
                       borderRadius: BorderRadius.circular(12),
                     ),
                     child: Row(
                       children: [
-                        const Icon(Icons.warning_amber_rounded, color: Colors.red, size: 40),
+                        const Icon(Icons.warning_amber_rounded, color: AppColors.dangerFill, size: 40),
                         const SizedBox(width: 16),
                         Expanded(
                           child: Column(
@@ -473,12 +474,12 @@ class _StockManagementScreenState extends State<StockManagementScreen> {
                             children: [
                               Text(
                                 'fraud_warning_title'.tr(context: context),
-                                style: const TextStyle(color: Colors.red, fontWeight: FontWeight.bold, fontSize: 16),
+                                style: const TextStyle(color: AppColors.dangerText, fontWeight: FontWeight.bold, fontSize: 16),
                               ),
                               const SizedBox(height: 4),
                               Text(
                                 'fraud_warning_desc'.tr(context: context, args: [fraudItems.length.toString()]),
-                                style: TextStyle(color: Colors.red.shade900, fontSize: 12),
+                                style: TextStyle(color: AppColors.dangerText, fontSize: 12),
                               ),
                             ],
                           ),
@@ -498,10 +499,10 @@ class _StockManagementScreenState extends State<StockManagementScreen> {
                       return Container(
                         margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                         decoration: BoxDecoration(
-                          color: isMinus ? Colors.red.withValues(alpha: 0.05) : theme.colorScheme.surface.withValues(alpha: 0.9),
+                          color: isMinus ? AppColors.dangerFill.withValues(alpha: 0.05) : theme.colorScheme.surface.withValues(alpha: 0.9),
                           borderRadius: BorderRadius.circular(24),
                           border: Border.all(
-                            color: isMinus ? Colors.red.withValues(alpha: 0.3) : theme.colorScheme.outline.withValues(alpha: 0.1),
+                            color: isMinus ? AppColors.dangerFill.withValues(alpha: 0.3) : theme.colorScheme.outline.withValues(alpha: 0.1),
                           ),
                           boxShadow: [
                             BoxShadow(
@@ -517,12 +518,12 @@ class _StockManagementScreenState extends State<StockManagementScreen> {
                             leading: Container(
                               padding: const EdgeInsets.all(10),
                               decoration: BoxDecoration(
-                                color: isMinus ? Colors.red.withValues(alpha: 0.1) : theme.colorScheme.primary.withValues(alpha: 0.1),
+                                color: isMinus ? AppColors.dangerFill.withValues(alpha: 0.1) : theme.colorScheme.primary.withValues(alpha: 0.1),
                                 borderRadius: BorderRadius.circular(12),
                               ),
-                              child: Icon(Icons.inventory_2_rounded, color: isMinus ? Colors.red : theme.colorScheme.primary),
+                              child: Icon(Icons.inventory_2_rounded, color: isMinus ? AppColors.dangerFill : theme.colorScheme.primary),
                             ),
-                            title: Text(item.name, style: theme.textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold, color: isMinus ? Colors.red.shade900 : null)),
+                            title: Text(item.name, style: theme.textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold, color: isMinus ? AppColors.dangerText : null)),
                             subtitle: Wrap(
                               spacing: 8,
                               runSpacing: 4,
@@ -532,14 +533,14 @@ class _StockManagementScreenState extends State<StockManagementScreen> {
                                   padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                                   margin: const EdgeInsets.only(top: 4),
                                   decoration: BoxDecoration(
-                                    color: isMinus ? Colors.red.withValues(alpha: 0.1) : theme.colorScheme.secondaryContainer.withValues(alpha: 0.5),
+                                    color: isMinus ? AppColors.dangerFill.withValues(alpha: 0.1) : theme.colorScheme.secondaryContainer.withValues(alpha: 0.5),
                                     borderRadius: BorderRadius.circular(8),
                                   ),
                                   child: Text(
                                     '${NumberFormat.decimalPattern('id').format(item.stockQty)} ${item.unit}',
                                     style: TextStyle(
                                       fontSize: 12,
-                                      color: isMinus ? Colors.red : theme.colorScheme.onSecondaryContainer,
+                                      color: isMinus ? AppColors.dangerText : theme.colorScheme.onSecondaryContainer,
                                       fontWeight: FontWeight.bold,
                                     ),
                                   ),
@@ -579,7 +580,7 @@ class _StockManagementScreenState extends State<StockManagementScreen> {
                                       context: context,
                                       label: 'restock_464'.tr(context: context),
                                       icon: Icons.add_shopping_cart_rounded,
-                                      color: const Color(0xFF10B981),
+                                      color: AppColors.successFill,
                                       onTap: () => _showActionDialog('restock', item.id, item.name),
                                     ),
                                     const SizedBox(width: 8),
@@ -595,7 +596,7 @@ class _StockManagementScreenState extends State<StockManagementScreen> {
                                       context: context,
                                       label: 'wastage_466'.tr(context: context),
                                       icon: Icons.delete_outline_rounded,
-                                      color: const Color(0xFFF43F5E),
+                                      color: AppColors.dangerFill,
                                       onTap: () => _showActionDialog('wastage', item.id, item.name),
                                     ),
                                   ],

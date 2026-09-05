@@ -288,7 +288,7 @@ class _POSScreenState extends State<POSScreen> {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Text('reservation_loaded_msg'.tr(context: context, args: [res.customerName])),
-        backgroundColor: Colors.teal.shade700,
+        backgroundColor: Theme.of(context).colorScheme.primary,
       ),
     );
   }
@@ -680,7 +680,7 @@ class _POSScreenState extends State<POSScreen> {
                     child: Container(
                       padding: const EdgeInsets.all(4),
                       decoration: BoxDecoration(
-                        color: Colors.teal.shade600,
+                        color: theme.colorScheme.primary,
                         shape: BoxShape.circle,
                       ),
                       constraints: const BoxConstraints(minWidth: 16, minHeight: 16),
@@ -1294,16 +1294,16 @@ class _POSScreenState extends State<POSScreen> {
             child: Container(
               padding: const EdgeInsets.all(12),
               decoration: BoxDecoration(
-                color: Colors.teal.withValues(alpha: 0.08),
+                color: theme.colorScheme.primary.withValues(alpha: 0.08),
                 borderRadius: BorderRadius.circular(14),
-                border: Border.all(color: Colors.teal.withValues(alpha: 0.3)),
+                border: Border.all(color: theme.colorScheme.primary.withValues(alpha: 0.3)),
               ),
               child: Row(
                 children: [
                   Container(
                     padding: const EdgeInsets.all(6),
-                    decoration: const BoxDecoration(
-                      color: Colors.teal,
+                    decoration: BoxDecoration(
+                      color: theme.colorScheme.primary,
                       shape: BoxShape.circle,
                     ),
                     child: const Icon(Icons.event_available_rounded, size: 14, color: Colors.white),
@@ -1321,7 +1321,7 @@ class _POSScreenState extends State<POSScreen> {
                               cart.selectedReservation!.reservationTime,
                             ],
                           ),
-                          style: const TextStyle(fontWeight: FontWeight.w800, fontSize: 13, color: Colors.teal),
+                          style: TextStyle(fontWeight: FontWeight.w800, fontSize: 13, color: theme.colorScheme.primary),
                           overflow: TextOverflow.ellipsis,
                         ),
                         const SizedBox(height: 2),

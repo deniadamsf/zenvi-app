@@ -9,6 +9,7 @@ import '../../providers/ingredient_provider.dart';
 import '../../providers/auth_provider.dart';
 import '../../models/product_model.dart';
 import '../../widgets/zenvi_header.dart';
+import '../../theme/app_colors.dart';
 
 class AddProductScreen extends StatefulWidget {
   final ProductModel? product;
@@ -366,7 +367,7 @@ class _AddProductScreenState extends State<AddProductScreen> {
                         physics: const BouncingScrollPhysics(),
                         child: Row(
                           children: [
-                            Text('saran_46'.tr(context: context), style: TextStyle(fontSize: 12, color: Colors.grey)),
+                            Text('saran_46'.tr(context: context), style: TextStyle(fontSize: 12, color: theme.colorScheme.onSurfaceVariant)),
                             ...existingCategories.map((cat) => Padding(
                               padding: const EdgeInsets.only(right: 6.0),
                               child: ActionChip(
@@ -455,7 +456,7 @@ class _AddProductScreenState extends State<AddProductScreen> {
                           borderRadius: BorderRadius.circular(16),
                           border: Border.all(color: theme.dividerColor.withValues(alpha: 0.1)),
                         ),
-                        child: Text('tidak_ada_varian_ditambahkan_50'.tr(context: context), style: TextStyle(color: Colors.grey, fontStyle: FontStyle.italic)),
+                        child: Text('tidak_ada_varian_ditambahkan_50'.tr(context: context), style: TextStyle(color: theme.colorScheme.onSurfaceVariant, fontStyle: FontStyle.italic)),
                       ),
                     if (_variants.isNotEmpty)
                       Container(
@@ -495,7 +496,7 @@ class _AddProductScreenState extends State<AddProductScreen> {
                                     ),
                                   ),
                                   IconButton(
-                                    icon: const Icon(Icons.remove_circle_outline, color: Colors.red),
+                                    icon: const Icon(Icons.remove_circle_outline, color: AppColors.dangerText),
                                     onPressed: () => _removeVariantRow(index),
                                   ),
                                 ],
@@ -535,7 +536,7 @@ class _AddProductScreenState extends State<AddProductScreen> {
                           borderRadius: BorderRadius.circular(16),
                           border: Border.all(color: theme.dividerColor.withValues(alpha: 0.1)),
                         ),
-                        child: Text('belum_ada_bahan_baku_53'.tr(context: context), style: TextStyle(color: Colors.grey, fontStyle: FontStyle.italic)),
+                        child: Text('belum_ada_bahan_baku_53'.tr(context: context), style: TextStyle(color: theme.colorScheme.onSurfaceVariant, fontStyle: FontStyle.italic)),
                       )
                     else
                       Container(
@@ -586,7 +587,7 @@ class _AddProductScreenState extends State<AddProductScreen> {
                                     ),
                                   ),
                                   IconButton(
-                                    icon: const Icon(Icons.remove_circle_outline, color: Colors.red),
+                                    icon: const Icon(Icons.remove_circle_outline, color: AppColors.dangerText),
                                     onPressed: () => _removeIngredientRow(index),
                                   ),
                                 ],

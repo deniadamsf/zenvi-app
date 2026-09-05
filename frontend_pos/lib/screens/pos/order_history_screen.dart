@@ -14,6 +14,7 @@ import 'widgets/receipt_widget.dart';
 import 'printer_dialog.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import '../../widgets/zenvi_header.dart';
+import '../../theme/app_colors.dart';
 
 class OrderHistoryScreen extends StatefulWidget {
   const OrderHistoryScreen({super.key});
@@ -130,7 +131,7 @@ class _OrderHistoryScreenState extends State<OrderHistoryScreen> {
         ),
         child: Column(
           children: [
-            Container(width: 40, height: 4, decoration: BoxDecoration(color: Colors.grey[300], borderRadius: BorderRadius.circular(2))),
+            Container(width: 40, height: 4, decoration: BoxDecoration(color: Theme.of(context).colorScheme.onSurfaceVariant.withValues(alpha: 0.3), borderRadius: BorderRadius.circular(2))),
             const SizedBox(height: 24),
             Text('detail_transaksi_269'.tr(context: context), style: Theme.of(context).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold)),
             const SizedBox(height: 16),
@@ -150,11 +151,11 @@ class _OrderHistoryScreenState extends State<OrderHistoryScreen> {
                 if (!isOffline && order.status != 'voided') ...[
                   Expanded(
                     child: OutlinedButton.icon(
-                      icon: const Icon(Icons.cancel_outlined, color: Colors.red, size: 18),
-                      label: Text('void_270'.tr(context: context), style: TextStyle(color: Colors.red)),
+                      icon: const Icon(Icons.cancel_outlined, color: AppColors.dangerText, size: 18),
+                      label: Text('void_270'.tr(context: context), style: const TextStyle(color: AppColors.dangerText)),
                       style: OutlinedButton.styleFrom(
                         padding: const EdgeInsets.symmetric(vertical: 14),
-                        side: const BorderSide(color: Colors.red),
+                        side: const BorderSide(color: AppColors.dangerText),
                         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
                       ),
                       onPressed: () => _handleVoidOrder(ctx, order, isOffline, offlineId),
@@ -165,11 +166,11 @@ class _OrderHistoryScreenState extends State<OrderHistoryScreen> {
                 if (isOffline) ...[
                   Expanded(
                     child: OutlinedButton.icon(
-                      icon: const Icon(Icons.delete_outline, color: Colors.red, size: 18),
-                      label: Text('hapus_88'.tr(context: context), style: TextStyle(color: Colors.red)),
+                      icon: const Icon(Icons.delete_outline, color: AppColors.dangerText, size: 18),
+                      label: Text('hapus_88'.tr(context: context), style: const TextStyle(color: AppColors.dangerText)),
                       style: OutlinedButton.styleFrom(
                         padding: const EdgeInsets.symmetric(vertical: 14),
-                        side: const BorderSide(color: Colors.red),
+                        side: const BorderSide(color: AppColors.dangerText),
                         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
                       ),
                       onPressed: () => _handleVoidOrder(ctx, order, isOffline, offlineId),
@@ -245,7 +246,7 @@ class _OrderHistoryScreenState extends State<OrderHistoryScreen> {
           TextButton(onPressed: () => Navigator.pop(c, false), child: Text('batal_5'.tr(context: context))),
           TextButton(
             onPressed: () => Navigator.pop(c, true),
-            child: Text('ya_void_275'.tr(context: context), style: TextStyle(color: Colors.red, fontWeight: FontWeight.bold)),
+            child: Text('ya_void_275'.tr(context: context), style: const TextStyle(color: AppColors.dangerText, fontWeight: FontWeight.bold)),
           ),
         ],
       ),
@@ -306,7 +307,7 @@ class _OrderHistoryScreenState extends State<OrderHistoryScreen> {
                       padding: const EdgeInsets.symmetric(horizontal: 32),
                       child: Text(
                         provider.errorMessage!,
-                        style: TextStyle(color: Colors.orange[700], fontSize: 12),
+                        style: TextStyle(color: AppColors.warningText, fontSize: 12),
                         textAlign: TextAlign.center,
                       ),
                     ),
@@ -343,15 +344,15 @@ class _OrderHistoryScreenState extends State<OrderHistoryScreen> {
                 Container(
                   width: double.infinity,
                   padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                  color: Colors.orange.withValues(alpha: 0.15),
+                  color: AppColors.warningFill.withValues(alpha: 0.15),
                   child: Row(
                     children: [
-                      const Icon(Icons.wifi_off, color: Colors.orange, size: 18),
+                      const Icon(Icons.wifi_off, color: AppColors.warningText, size: 18),
                       const SizedBox(width: 8),
                       Expanded(
                         child: Text(
                           provider.errorMessage!,
-                          style: TextStyle(color: Colors.orange[800], fontSize: 12),
+                          style: TextStyle(color: AppColors.warningText, fontSize: 12),
                         ),
                       ),
                       TextButton(
@@ -462,12 +463,12 @@ class _OrderHistoryScreenState extends State<OrderHistoryScreen> {
               width: 48,
               height: 48,
               decoration: BoxDecoration(
-                color: isVoided ? Colors.red.withValues(alpha: 0.1) : (isOffline ? Colors.orange.withValues(alpha: 0.1) : theme.colorScheme.primary.withValues(alpha: 0.1)),
+                color: isVoided ? AppColors.dangerFill.withValues(alpha: 0.1) : (isOffline ? AppColors.warningFill.withValues(alpha: 0.1) : theme.colorScheme.primary.withValues(alpha: 0.1)),
                 shape: BoxShape.circle,
               ),
               child: Icon(
                 isVoided ? Icons.cancel : (isOffline ? Icons.cloud_off : Icons.receipt_long),
-                color: isVoided ? Colors.red : (isOffline ? Colors.orange : theme.colorScheme.primary),
+                color: isVoided ? AppColors.dangerFill : (isOffline ? AppColors.warningFill : theme.colorScheme.primary),
               ),
             ),
             const SizedBox(width: 16),
@@ -498,14 +499,14 @@ class _OrderHistoryScreenState extends State<OrderHistoryScreen> {
                   style: TextStyle(
                     fontWeight: FontWeight.bold, 
                     fontSize: 16,
-                    color: isVoided ? Colors.red : theme.colorScheme.primary,
+                    color: isVoided ? AppColors.dangerText : theme.colorScheme.primary,
                     decoration: isVoided ? TextDecoration.lineThrough : null,
                   ),
                 ),
                 if (isVoided)
-                  Text('void_167'.tr(context: context), style: TextStyle(color: Colors.red, fontWeight: FontWeight.bold, fontSize: 12))
+                  Text('void_167'.tr(context: context), style: const TextStyle(color: AppColors.dangerText, fontWeight: FontWeight.bold, fontSize: 12))
                 else if (isOffline)
-                  Text('belum_sync_281'.tr(context: context), style: TextStyle(color: Colors.orange, fontSize: 12)),
+                  Text('belum_sync_281'.tr(context: context), style: const TextStyle(color: AppColors.warningText, fontSize: 12)),
               ],
             )
           ],

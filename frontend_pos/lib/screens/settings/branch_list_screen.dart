@@ -4,6 +4,7 @@ import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 import '../../providers/auth_provider.dart';
 import '../../providers/branch_provider.dart';
+import '../../theme/app_colors.dart';
 import 'branch_form_screen.dart';
 import '../../widgets/zenvi_header.dart';
 
@@ -66,7 +67,7 @@ class _BranchListScreenState extends State<BranchListScreen> {
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            Text('nama_toko_utama_374'.tr(context: context), style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w600, color: Colors.grey)),
+                            Text('nama_toko_utama_374'.tr(context: context), style: TextStyle(fontSize: 12, fontWeight: FontWeight.w600, color: theme.colorScheme.onSurfaceVariant)),
                             const SizedBox(height: 4),
                             Consumer<AuthProvider>(
                               builder: (context, auth, _) {
@@ -244,7 +245,7 @@ class _BranchListScreenState extends State<BranchListScreen> {
                               children: [
                                 Text(
                                   'store_code_for_employees'.tr(context: context),
-                                  style: const TextStyle(fontSize: 11, fontWeight: FontWeight.w600, color: Colors.grey),
+                                  style: TextStyle(fontSize: 11, fontWeight: FontWeight.w600, color: theme.colorScheme.onSurfaceVariant),
                                 ),
                                 const SizedBox(height: 2),
                                 Text(
@@ -352,7 +353,7 @@ class _BranchListScreenState extends State<BranchListScreen> {
                                     TextButton(onPressed: () => Navigator.pop(ctx, false), child: Text('batal_5'.tr(context: context))),
                                     ElevatedButton(
                                       onPressed: () => Navigator.pop(ctx, true), 
-                                      style: ElevatedButton.styleFrom(backgroundColor: Colors.red, foregroundColor: Colors.white),
+                                      style: ElevatedButton.styleFrom(backgroundColor: AppColors.dangerText, foregroundColor: Colors.white),
                                       child: Text('hapus_88'.tr(context: context)),
                                     ),
                                   ],
@@ -380,9 +381,9 @@ class _BranchListScreenState extends State<BranchListScreen> {
                               value: 'delete',
                               child: Row(
                                 children: [
-                                  const Icon(Icons.delete_outline, color: Colors.red, size: 20),
+                                  const Icon(Icons.delete_outline, color: AppColors.dangerText, size: 20),
                                   const SizedBox(width: 12),
-                                  Text('hapus_88'.tr(context: context), style: const TextStyle(color: Colors.red)),
+                                  Text('hapus_88'.tr(context: context), style: const TextStyle(color: AppColors.dangerText)),
                                 ],
                               ),
                             ),

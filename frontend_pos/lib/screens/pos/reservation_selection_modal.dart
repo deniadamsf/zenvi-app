@@ -4,6 +4,7 @@ import 'package:easy_localization/easy_localization.dart';
 import '../../models/reservation_model.dart';
 import '../../providers/reservation_provider.dart';
 import '../../providers/auth_provider.dart';
+import '../../theme/app_colors.dart';
 
 class ReservationSelectionModal extends StatefulWidget {
   const ReservationSelectionModal({super.key});
@@ -218,7 +219,8 @@ class _ReservationSelectionModalState extends State<ReservationSelectionModal> {
   Widget _buildReservationCard(BuildContext context, ThemeData theme, ReservationModel item) {
     final isConfirmed = item.status == 'confirmed';
     final isPending = item.status == 'pending';
-    Color statusColor = isConfirmed ? Colors.green : (isPending ? Colors.orange : Colors.grey);
+    Color statusFillColor = isConfirmed ? AppColors.successFill : (isPending ? AppColors.warningFill : theme.colorScheme.onSurfaceVariant);
+    Color statusTextColor = isConfirmed ? AppColors.successText : (isPending ? AppColors.warningText : theme.colorScheme.onSurfaceVariant);
     String statusText = isConfirmed ? 'Dikonfirmasi' : (isPending ? 'Menunggu' : item.status.toUpperCase());
 
     return Container(
@@ -227,7 +229,7 @@ class _ReservationSelectionModalState extends State<ReservationSelectionModal> {
         color: theme.colorScheme.surface,
         borderRadius: BorderRadius.circular(16),
         border: Border.all(
-          color: isConfirmed ? Colors.green.withValues(alpha: 0.3) : theme.colorScheme.outline.withValues(alpha: 0.15),
+          color: isConfirmed ? AppColors.successFill.withValues(alpha: 0.3) : theme.colorScheme.outline.withValues(alpha: 0.15),
           width: isConfirmed ? 1.5 : 1,
         ),
         boxShadow: [
@@ -352,12 +354,12 @@ class _ReservationSelectionModalState extends State<ReservationSelectionModal> {
                 Container(
                   padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                   decoration: BoxDecoration(
-                    color: statusColor.withValues(alpha: 0.15),
+                    color: statusFillColor.withValues(alpha: 0.15),
                     borderRadius: BorderRadius.circular(8),
                   ),
                   child: Text(
                     statusText,
-                    style: TextStyle(fontSize: 11, fontWeight: FontWeight.bold, color: statusColor),
+                    style: TextStyle(fontSize: 11, fontWeight: FontWeight.bold, color: statusTextColor),
                   ),
                 ),
               ],
@@ -386,7 +388,7 @@ class _ReservationSelectionModalState extends State<ReservationSelectionModal> {
               width: double.infinity,
               child: ElevatedButton.icon(
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: isConfirmed ? theme.colorScheme.primary : Colors.teal.shade700,
+                  backgroundColor: theme.colorScheme.primary,
                   foregroundColor: Colors.white,
                   shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                   padding: const EdgeInsets.symmetric(vertical: 10),

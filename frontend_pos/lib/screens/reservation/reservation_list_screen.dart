@@ -11,6 +11,7 @@ import '../../providers/branch_provider.dart';
 import '../../providers/cart_provider.dart';
 import '../../providers/member_provider.dart';
 import '../../widgets/zenvi_header.dart';
+import '../../theme/app_colors.dart';
 
 class ReservationListScreen extends StatefulWidget {
   const ReservationListScreen({super.key});
@@ -123,7 +124,7 @@ class _ReservationListScreenState extends State<ReservationListScreen> {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text('cannot_open_wa'.tr(context: context, args: [res.customerPhone])),
-          backgroundColor: Colors.red,
+          backgroundColor: AppColors.dangerFill,
         ),
       );
     }
@@ -147,13 +148,14 @@ class _ReservationListScreenState extends State<ReservationListScreen> {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text('cannot_make_call'.tr(context: context, args: [phoneNumber])),
-          backgroundColor: Colors.red,
+          backgroundColor: AppColors.dangerFill,
         ),
       );
     }
   }
 
   void _serveInPos(BuildContext context, ReservationModel res) {
+    final theme = Theme.of(context);
     final cart = Provider.of<CartProvider>(context, listen: false);
     cart.setSelectedReservation(res);
 
@@ -183,7 +185,7 @@ class _ReservationListScreenState extends State<ReservationListScreen> {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Text('reservation_loaded_msg'.tr(context: context, args: [res.customerName])),
-        backgroundColor: Colors.teal.shade700,
+        backgroundColor: theme.colorScheme.primary,
       ),
     );
 
@@ -508,27 +510,27 @@ class _ReservationListScreenState extends State<ReservationListScreen> {
 
     switch (res.status) {
       case 'confirmed':
-        statusColor = const Color(0xFF2563EB); // Soft Slate Blue
-        statusBg = isDark ? const Color(0xFF1E3A8A).withValues(alpha: 0.3) : const Color(0xFFEFF6FF);
+        statusColor = AppColors.infoText;
+        statusBg = isDark ? AppColors.infoFill.withValues(alpha: 0.3) : AppColors.infoSoft;
         statusLabel = 'status_confirmed'.tr(context: context);
         statusIcon = Icons.check_circle_rounded;
         break;
       case 'completed':
-        statusColor = const Color(0xFF059669); // Soft Emerald
-        statusBg = isDark ? const Color(0xFF064E3B).withValues(alpha: 0.3) : const Color(0xFFECFDF5);
+        statusColor = AppColors.successText;
+        statusBg = isDark ? AppColors.successFill.withValues(alpha: 0.3) : AppColors.successSoft;
         statusLabel = 'status_completed'.tr(context: context);
         statusIcon = Icons.task_alt_rounded;
         break;
       case 'cancelled':
-        statusColor = const Color(0xFFDC2626); // Soft Rose Red
-        statusBg = isDark ? const Color(0xFF7F1D1D).withValues(alpha: 0.3) : const Color(0xFFFEF2F2);
+        statusColor = AppColors.dangerText;
+        statusBg = isDark ? AppColors.dangerFill.withValues(alpha: 0.3) : AppColors.dangerSoft;
         statusLabel = 'status_cancelled'.tr(context: context);
         statusIcon = Icons.cancel_rounded;
         break;
       case 'pending':
       default:
-        statusColor = const Color(0xFFD97706); // Soft Amber
-        statusBg = isDark ? const Color(0xFF78350F).withValues(alpha: 0.3) : const Color(0xFFFEF3C7);
+        statusColor = AppColors.warningText;
+        statusBg = isDark ? AppColors.warningFill.withValues(alpha: 0.3) : AppColors.warningSoft;
         statusLabel = 'status_pending'.tr(context: context);
         statusIcon = Icons.hourglass_top_rounded;
         break;
@@ -835,8 +837,8 @@ class _ReservationListScreenState extends State<ReservationListScreen> {
                   OutlinedButton(
                     onPressed: () => _confirmChangeStatus(context, res, 'cancelled', resProvider),
                     style: OutlinedButton.styleFrom(
-                      foregroundColor: Colors.red.shade700,
-                      side: BorderSide(color: Colors.red.withValues(alpha: 0.25)),
+                      foregroundColor: AppColors.dangerText,
+                      side: BorderSide(color: AppColors.dangerFill.withValues(alpha: 0.25)),
                       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
                       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                       minimumSize: const Size(0, 36),
@@ -863,7 +865,7 @@ class _ReservationListScreenState extends State<ReservationListScreen> {
                     icon: const Icon(Icons.point_of_sale_rounded, size: 15),
                     label: Text('serve_reservation_btn'.tr(context: context), style: const TextStyle(fontSize: 12.5, fontWeight: FontWeight.bold)),
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.teal.shade700,
+                      backgroundColor: theme.colorScheme.primary,
                       foregroundColor: Colors.white,
                       elevation: 0,
                       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
@@ -875,8 +877,8 @@ class _ReservationListScreenState extends State<ReservationListScreen> {
                   OutlinedButton(
                     onPressed: () => _confirmChangeStatus(context, res, 'cancelled', resProvider),
                     style: OutlinedButton.styleFrom(
-                      foregroundColor: Colors.red.shade700,
-                      side: BorderSide(color: Colors.red.withValues(alpha: 0.25)),
+                      foregroundColor: AppColors.dangerText,
+                      side: BorderSide(color: AppColors.dangerFill.withValues(alpha: 0.25)),
                       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
                       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
                       minimumSize: const Size(0, 36),
@@ -915,7 +917,7 @@ class _ReservationListScreenState extends State<ReservationListScreen> {
                       if (res.status != 'completed')
                         PopupMenuItem(value: 'completed', child: Text('tandai_selesai_339'.tr(context: context))),
                       const PopupMenuDivider(),
-                      PopupMenuItem(value: 'delete', child: Text('hapus_data_340'.tr(context: context), style: const TextStyle(color: Colors.red))),
+                      PopupMenuItem(value: 'delete', child: Text('hapus_data_340'.tr(context: context), style: const TextStyle(color: AppColors.dangerText))),
                     ],
                   ),
                 ],
@@ -954,7 +956,7 @@ class _ReservationListScreenState extends State<ReservationListScreen> {
               Navigator.pop(ctx);
               _changeStatus(res.id, targetStatus, resProvider);
             },
-            style: ElevatedButton.styleFrom(backgroundColor: Colors.redAccent, foregroundColor: Colors.white),
+            style: ElevatedButton.styleFrom(backgroundColor: AppColors.dangerFill, foregroundColor: Colors.white),
             child: Text('ya_batalkan_25'.tr(context: context)),
           ),
         ],
@@ -976,7 +978,7 @@ class _ReservationListScreenState extends State<ReservationListScreen> {
               Navigator.pop(ctx);
               await resProvider.deleteReservation(id);
             },
-            style: ElevatedButton.styleFrom(backgroundColor: Colors.redAccent, foregroundColor: Colors.white),
+            style: ElevatedButton.styleFrom(backgroundColor: AppColors.dangerFill, foregroundColor: Colors.white),
             child: Text('hapus_88'.tr(context: context)),
           ),
         ],

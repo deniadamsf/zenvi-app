@@ -241,7 +241,7 @@ class ThemeProvider extends ChangeNotifier {
       outlinedButtonTheme: OutlinedButtonThemeData(
         style: OutlinedButton.styleFrom(
           foregroundColor: AppColors.darkTextStrong,
-          side: const BorderSide(color: Color(0xFF334155), width: 1.5),
+          side: const BorderSide(color: AppColors.darkBorderStrong, width: 1.5),
           padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
           textStyle: const TextStyle(fontWeight: FontWeight.w600, fontSize: 16),

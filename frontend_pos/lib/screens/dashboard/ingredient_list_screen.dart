@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../providers/ingredient_provider.dart';
 import '../../widgets/zenvi_header.dart';
+import '../../theme/app_colors.dart';
 
 class IngredientListScreen extends StatefulWidget {
   const IngredientListScreen({super.key});
@@ -119,13 +120,13 @@ class _IngredientListScreenState extends State<IngredientListScreen> {
                     margin: const EdgeInsets.all(16),
                     padding: EdgeInsets.all(16),
                     decoration: BoxDecoration(
-                      color: Colors.red.shade50,
-                      border: Border.all(color: Colors.red.shade300),
+                      color: AppColors.dangerSoft,
+                      border: Border.all(color: AppColors.dangerFill),
                       borderRadius: BorderRadius.circular(24),
                     ),
                     child: Row(
                       children: [
-                        Icon(Icons.warning_amber_rounded, color: Colors.red, size: 40),
+                        Icon(Icons.warning_amber_rounded, color: AppColors.dangerFill, size: 40),
                         SizedBox(width: 16),
                         Expanded(
                           child: Column(
@@ -133,12 +134,12 @@ class _IngredientListScreenState extends State<IngredientListScreen> {
                             children: [
                               Text(
                                 'peringatan_indikasi_fraud_26'.tr(context: context),
-                                style: TextStyle(color: Colors.red, fontWeight: FontWeight.bold, fontSize: 16),
+                                style: TextStyle(color: AppColors.dangerText, fontWeight: FontWeight.bold, fontSize: 16),
                               ),
                               const SizedBox(height: 4),
                               Text(
                                 'Terdapat ${fraudItems.length} bahan baku dengan stok minus.',
-                                style: TextStyle(color: Colors.red.shade900, fontSize: 12),
+                                style: TextStyle(color: AppColors.dangerText, fontSize: 12),
                               ),
                             ],
                           ),
@@ -158,10 +159,10 @@ class _IngredientListScreenState extends State<IngredientListScreen> {
                       return Container(
                         margin: const EdgeInsets.only(bottom: 12),
                         decoration: BoxDecoration(
-                          color: isMinus ? Colors.red.shade50 : theme.colorScheme.surface,
+                          color: isMinus ? AppColors.dangerSoft : theme.colorScheme.surface,
                           borderRadius: BorderRadius.circular(24),
                           border: Border.all(
-                            color: isMinus ? Colors.red.shade300 : theme.colorScheme.outline.withValues(alpha: 0.1),
+                            color: isMinus ? AppColors.dangerFill : theme.colorScheme.outline.withValues(alpha: 0.1),
                             width: isMinus ? 1.5 : 1,
                           ),
                           boxShadow: [
@@ -177,24 +178,24 @@ class _IngredientListScreenState extends State<IngredientListScreen> {
                           leading: Container(
                             padding: const EdgeInsets.all(12),
                             decoration: BoxDecoration(
-                              color: isMinus ? Colors.red.withValues(alpha: 0.1) : theme.colorScheme.primary.withValues(alpha: 0.1),
+                              color: isMinus ? AppColors.dangerFill.withValues(alpha: 0.1) : theme.colorScheme.primary.withValues(alpha: 0.1),
                               shape: BoxShape.circle,
                             ),
-                            child: Icon(Icons.kitchen_rounded, color: isMinus ? Colors.red : theme.colorScheme.primary),
+                            child: Icon(Icons.kitchen_rounded, color: isMinus ? AppColors.dangerFill : theme.colorScheme.primary),
                           ),
                           title: Text(
-                            item.name, 
-                            style: TextStyle(fontWeight: FontWeight.bold, color: isMinus ? Colors.red.shade900 : null)
+                            item.name,
+                            style: TextStyle(fontWeight: FontWeight.bold, color: isMinus ? AppColors.dangerText : null)
                           ),
                           subtitle: Text(
                             'Sisa Stok: ${item.stockQty} ${item.unit}',
                             style: TextStyle(
-                              color: isMinus ? Colors.red : theme.colorScheme.onSurfaceVariant,
+                              color: isMinus ? AppColors.dangerText : theme.colorScheme.onSurfaceVariant,
                               fontWeight: isMinus ? FontWeight.bold : FontWeight.normal,
                             ),
                           ),
                           trailing: PopupMenuButton<String>(
-                            icon: const Icon(Icons.more_vert_rounded, color: Colors.grey),
+                            icon: Icon(Icons.more_vert_rounded, color: theme.colorScheme.onSurfaceVariant),
                             shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
                             onSelected: (value) {
                               if (value == 'edit') {
@@ -216,9 +217,9 @@ class _IngredientListScreenState extends State<IngredientListScreen> {
                                 value: 'delete',
                                 child: Row(
                                   children: [
-                                    const Icon(Icons.delete_outline_rounded, color: Colors.red, size: 20),
+                                    const Icon(Icons.delete_outline_rounded, color: AppColors.dangerText, size: 20),
                                     const SizedBox(width: 12),
-                                    Text('hapus_88'.tr(context: context), style: const TextStyle(color: Colors.red)),
+                                    Text('hapus_88'.tr(context: context), style: const TextStyle(color: AppColors.dangerText)),
                                   ],
                                 ),
                               ),

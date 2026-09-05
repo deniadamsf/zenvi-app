@@ -4,6 +4,7 @@ import 'package:provider/provider.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import '../../providers/auth_provider.dart';
 import '../../providers/theme_provider.dart';
+import '../../theme/app_colors.dart';
 import 'company_setup_screen.dart';
 import 'employee_register_screen.dart';
 import 'login_screen.dart';
@@ -41,7 +42,7 @@ class RoleSelectionScreen extends StatelessWidget {
                     ),
                     ElevatedButton(
                       onPressed: () => Navigator.pop(ctx, true),
-                      style: ElevatedButton.styleFrom(backgroundColor: Colors.red, foregroundColor: Colors.white),
+                      style: ElevatedButton.styleFrom(backgroundColor: AppColors.dangerFill, foregroundColor: Colors.white),
                       child: Text('keluar_6'.tr(context: context)),
                     ),
                   ],
@@ -130,7 +131,7 @@ class RoleSelectionScreen extends StatelessWidget {
                         'select_role_desc'.tr(context: context),
                         textAlign: TextAlign.center,
                         style: theme.textTheme.bodyMedium?.copyWith(
-                          color: isDark ? Colors.grey[400] : Colors.grey[600],
+                          color: theme.colorScheme.onSurfaceVariant,
                           fontSize: 13,
                           height: 1.35,
                         ),
@@ -161,7 +162,7 @@ class RoleSelectionScreen extends StatelessWidget {
                         context: context,
                         isDark: isDark,
                         icon: Icons.badge_rounded,
-                        accentColor: Colors.teal,
+                        accentColor: theme.colorScheme.primary,
                         title: 'role_employee_title'.tr(context: context),
                         subtitle: 'role_employee_desc'.tr(context: context),
                         badgeText: 'role_employee_badge'.tr(context: context),
@@ -204,7 +205,7 @@ class RoleSelectionScreen extends StatelessWidget {
         borderRadius: BorderRadius.circular(18),
         child: Ink(
           decoration: BoxDecoration(
-            color: isDark ? const Color(0xFF1E222D) : Colors.white,
+            color: isDark ? AppColors.darkSurfaceAlt : Colors.white,
             borderRadius: BorderRadius.circular(18),
             border: Border.all(
               color: isDark ? Colors.white.withValues(alpha: 0.08) : Colors.grey.withValues(alpha: 0.2),
@@ -255,7 +256,7 @@ class RoleSelectionScreen extends StatelessWidget {
                       Text(
                         subtitle,
                         style: theme.textTheme.bodySmall?.copyWith(
-                          color: isDark ? Colors.grey[400] : Colors.grey[600],
+                          color: theme.colorScheme.onSurfaceVariant,
                           fontSize: 12,
                           height: 1.35,
                         ),
@@ -280,7 +281,7 @@ class RoleSelectionScreen extends StatelessWidget {
                   ),
                 ),
                 const SizedBox(width: 6),
-                Icon(Icons.chevron_right_rounded, color: isDark ? Colors.grey[600] : Colors.grey[400], size: 20),
+                Icon(Icons.chevron_right_rounded, color: theme.colorScheme.onSurfaceVariant, size: 20),
               ],
             ),
           ),

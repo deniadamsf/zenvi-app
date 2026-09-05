@@ -4,6 +4,7 @@ import 'package:provider/provider.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import '../../providers/auth_provider.dart';
 import '../../providers/theme_provider.dart';
+import '../../theme/app_colors.dart';
 import '../dashboard/employee_dashboard_screen.dart';
 import 'role_selection_screen.dart';
 import 'login_screen.dart';
@@ -36,7 +37,7 @@ class _PendingApprovalScreenState extends State<PendingApprovalScreen> {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
               content: Text('permohonan_anda_ditolak_atau_20'.tr(context: context)),
-              backgroundColor: Colors.orange,
+              backgroundColor: AppColors.warningFill,
             ),
           );
         }
@@ -50,7 +51,7 @@ class _PendingApprovalScreenState extends State<PendingApprovalScreen> {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text('Selamat! Akun Anda telah disetujui oleh Owner ${user.company?['name'] ?? ''}.'),
-            backgroundColor: Colors.green,
+            backgroundColor: AppColors.successFill,
           ),
         );
         Navigator.pushAndRemoveUntil(
@@ -63,7 +64,7 @@ class _PendingApprovalScreenState extends State<PendingApprovalScreen> {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
               content: Text('status_masih_menunggu_persetujuan_21'.tr(context: context)),
-              backgroundColor: Colors.blueGrey,
+              backgroundColor: AppColors.neutralText,
             ),
           );
         }
@@ -84,7 +85,7 @@ class _PendingApprovalScreenState extends State<PendingApprovalScreen> {
           ),
           ElevatedButton(
             onPressed: () => Navigator.pop(ctx, true),
-            style: ElevatedButton.styleFrom(backgroundColor: Colors.red, foregroundColor: Colors.white),
+            style: ElevatedButton.styleFrom(backgroundColor: AppColors.dangerFill, foregroundColor: Colors.white),
             child: Text('ya_batalkan_25'.tr(context: context)),
           ),
         ],
@@ -100,7 +101,7 @@ class _PendingApprovalScreenState extends State<PendingApprovalScreen> {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text('pendaftaran_dibatalkan_26'.tr(context: context)),
-            backgroundColor: Colors.grey,
+            backgroundColor: AppColors.neutralText,
           ),
         );
         Navigator.pushAndRemoveUntil(
@@ -112,7 +113,7 @@ class _PendingApprovalScreenState extends State<PendingApprovalScreen> {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text('gagal_membatalkan_permohonan_silakan_27'.tr(context: context)),
-            backgroundColor: Colors.red,
+            backgroundColor: AppColors.dangerFill,
           ),
         );
       }
@@ -169,13 +170,13 @@ class _PendingApprovalScreenState extends State<PendingApprovalScreen> {
                     height: 100,
                     decoration: BoxDecoration(
                       shape: BoxShape.circle,
-                      color: Colors.amber.withValues(alpha: 0.15),
-                      border: Border.all(color: Colors.amber.withValues(alpha: 0.4), width: 3),
+                      color: AppColors.warningFill.withValues(alpha: 0.15),
+                      border: Border.all(color: AppColors.warningFill.withValues(alpha: 0.4), width: 3),
                     ),
                     child: const Icon(
                       Icons.hourglass_top_rounded,
                       size: 52,
-                      color: Colors.amber,
+                      color: AppColors.warningFill,
                     ),
                   ).animate(onPlay: (c) => c.repeat(reverse: true))
                    .scale(begin: const Offset(0.95, 0.95), end: const Offset(1.05, 1.05), duration: 1500.ms),
@@ -196,7 +197,7 @@ class _PendingApprovalScreenState extends State<PendingApprovalScreen> {
                     'permohonan_anda_sedang_ditinjau_101'.tr(context: context),
                     textAlign: TextAlign.center,
                     style: theme.textTheme.bodyMedium?.copyWith(
-                      color: isDark ? Colors.grey[400] : Colors.grey[600],
+                      color: theme.colorScheme.onSurfaceVariant,
                       height: 1.4,
                     ),
                   ).animate().fade(delay: 150.ms).slideY(begin: 0.2, end: 0),
@@ -206,7 +207,7 @@ class _PendingApprovalScreenState extends State<PendingApprovalScreen> {
                   Container(
                     padding: const EdgeInsets.all(20),
                     decoration: BoxDecoration(
-                      color: isDark ? const Color(0xFF1E222D) : Colors.white,
+                      color: isDark ? AppColors.darkSurfaceAlt : Colors.white,
                       borderRadius: BorderRadius.circular(20),
                       border: Border.all(
                         color: isDark ? Colors.white.withValues(alpha: 0.08) : Colors.grey.withValues(alpha: 0.2),
@@ -249,7 +250,7 @@ class _PendingApprovalScreenState extends State<PendingApprovalScreen> {
                           label: 'status_akun_11'.tr(context: context),
                           value: 'menunggu_persetujuan_20'.tr(context: context),
                           isDark: isDark,
-                          statusColor: Colors.amber[700],
+                          statusColor: AppColors.warningText,
                         ),
                       ],
                     ),
@@ -291,8 +292,8 @@ class _PendingApprovalScreenState extends State<PendingApprovalScreen> {
                         style: TextStyle(fontWeight: FontWeight.w600),
                       ),
                       style: OutlinedButton.styleFrom(
-                        foregroundColor: Colors.redAccent,
-                        side: BorderSide(color: Colors.redAccent.withValues(alpha: 0.5)),
+                        foregroundColor: AppColors.dangerText,
+                        side: BorderSide(color: AppColors.dangerFill.withValues(alpha: 0.5)),
                         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
                       ),
                     ),

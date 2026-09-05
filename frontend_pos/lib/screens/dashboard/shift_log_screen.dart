@@ -6,6 +6,7 @@ import '../../providers/auth_provider.dart';
 import '../../providers/shift_provider.dart';
 import '../../models/shift_model.dart';
 import '../../widgets/zenvi_header.dart';
+import '../../theme/app_colors.dart';
 
 class ShiftLogScreen extends StatefulWidget {
   const ShiftLogScreen({super.key});
@@ -128,10 +129,10 @@ class _ShiftLogScreenState extends State<ShiftLogScreen> {
     final bool isAutoClosed = shift.status == 'auto_closed';
 
     final Color statusBg = isActive
-        ? const Color(0xFF10B981).withValues(alpha: 0.12)
+        ? AppColors.successFill.withValues(alpha: 0.12)
         : (isAutoClosed ? theme.colorScheme.surfaceContainerHighest.withValues(alpha: 0.5) : theme.colorScheme.primary.withValues(alpha: 0.10));
     final Color statusColor = isActive
-        ? const Color(0xFF10B981)
+        ? AppColors.successText
         : (isAutoClosed ? theme.colorScheme.onSurfaceVariant : theme.colorScheme.primary);
     final String statusLabel = isActive
         ? 'sedang_aktif_12'.tr(context: context)
@@ -300,17 +301,17 @@ class _ShiftLogScreenState extends State<ShiftLogScreen> {
                             child: Container(
                               padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
                               decoration: BoxDecoration(
-                                color: const Color(0xFFF43F5E).withValues(alpha: 0.10),
+                                color: AppColors.dangerFill.withValues(alpha: 0.10),
                                 borderRadius: BorderRadius.circular(8),
                               ),
                               child: Row(
                                 children: [
-                                  const Icon(Icons.warning_amber_rounded, size: 14, color: Color(0xFFF43F5E)),
+                                  const Icon(Icons.warning_amber_rounded, size: 14, color: AppColors.dangerText),
                                   const SizedBox(width: 6),
                                   Expanded(
                                     child: Text(
                                       'late_by_minutes'.tr(context: context, args: [shift.lateMinutes.toString()]),
-                                      style: GoogleFonts.outfit(fontSize: 11, fontWeight: FontWeight.w700, color: const Color(0xFFF43F5E)),
+                                      style: GoogleFonts.outfit(fontSize: 11, fontWeight: FontWeight.w700, color: AppColors.dangerText),
                                       overflow: TextOverflow.ellipsis,
                                     ),
                                   ),
@@ -326,17 +327,17 @@ class _ShiftLogScreenState extends State<ShiftLogScreen> {
                             child: Container(
                               padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
                               decoration: BoxDecoration(
-                                color: const Color(0xFF10B981).withValues(alpha: 0.10),
+                                color: AppColors.successFill.withValues(alpha: 0.10),
                                 borderRadius: BorderRadius.circular(8),
                               ),
                               child: Row(
                                 children: [
-                                  const Icon(Icons.add_alarm_rounded, size: 14, color: Color(0xFF10B981)),
+                                  const Icon(Icons.add_alarm_rounded, size: 14, color: AppColors.successText),
                                   const SizedBox(width: 6),
                                   Expanded(
                                     child: Text(
                                       'overtime_by_hours'.tr(context: context, args: [shift.overtimeHours!.toStringAsFixed(1)]),
-                                      style: GoogleFonts.outfit(fontSize: 11, fontWeight: FontWeight.w700, color: const Color(0xFF10B981)),
+                                      style: GoogleFonts.outfit(fontSize: 11, fontWeight: FontWeight.w700, color: AppColors.successText),
                                       overflow: TextOverflow.ellipsis,
                                     ),
                                   ),
@@ -405,14 +406,14 @@ class _ShiftLogScreenState extends State<ShiftLogScreen> {
                       final bool isOver = diff > 0;
 
                       final Color diffBg = isMatch
-                          ? const Color(0xFF10B981).withValues(alpha: 0.08)
-                          : (isOver ? theme.colorScheme.primary.withValues(alpha: 0.08) : const Color(0xFFF43F5E).withValues(alpha: 0.08));
+                          ? AppColors.successFill.withValues(alpha: 0.08)
+                          : (isOver ? theme.colorScheme.primary.withValues(alpha: 0.08) : AppColors.dangerFill.withValues(alpha: 0.08));
                       final Color diffColor = isMatch
-                          ? const Color(0xFF10B981)
-                          : (isOver ? theme.colorScheme.primary : const Color(0xFFF43F5E));
+                          ? AppColors.successText
+                          : (isOver ? theme.colorScheme.primary : AppColors.dangerText);
                       final Color diffBorder = isMatch
-                          ? const Color(0xFF10B981).withValues(alpha: 0.25)
-                          : (isOver ? theme.colorScheme.primary.withValues(alpha: 0.25) : const Color(0xFFF43F5E).withValues(alpha: 0.25));
+                          ? AppColors.successFill.withValues(alpha: 0.25)
+                          : (isOver ? theme.colorScheme.primary.withValues(alpha: 0.25) : AppColors.dangerFill.withValues(alpha: 0.25));
 
                       return Container(
                         padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),

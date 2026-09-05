@@ -5,6 +5,7 @@ import '../../providers/printer_provider.dart';
 import '../../providers/auth_provider.dart';
 import '../../services/printer_service.dart';
 import 'printer_settings_screen.dart';
+import '../../theme/app_colors.dart';
 
 class PrinterDialog extends StatefulWidget {
   final double totalAmount;
@@ -226,20 +227,20 @@ class _PrinterDialogState extends State<PrinterDialog> {
     switch (_step) {
       case 0:
         icon = Icons.bluetooth_connected;
-        color = Colors.blueAccent;
+        color = AppColors.infoFill;
         break;
       case 1:
         icon = Icons.print;
-        color = Colors.orange;
+        color = AppColors.warningFill;
         break;
       case 3:
         icon = Icons.error_outline;
-        color = Colors.red;
+        color = AppColors.dangerFill;
         break;
       case 2:
       default:
         icon = Icons.check_circle_outline;
-        color = Colors.green;
+        color = AppColors.successFill;
         break;
     }
 
@@ -296,7 +297,7 @@ class _PrinterDialogState extends State<PrinterDialog> {
     }
     return Text(
       subtitle,
-      style: TextStyle(color: _step == 3 ? Colors.red : theme.colorScheme.onSurfaceVariant, fontSize: 14),
+      style: TextStyle(color: _step == 3 ? AppColors.dangerText : theme.colorScheme.onSurfaceVariant, fontSize: 14),
       textAlign: TextAlign.center,
     );
   }

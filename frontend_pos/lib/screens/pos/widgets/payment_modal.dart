@@ -1,6 +1,7 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import '../../../models/member_model.dart';
+import '../../../theme/app_colors.dart';
 
 class PaymentModal extends StatefulWidget {
   final double totalAmount;
@@ -230,7 +231,7 @@ class _PaymentModalState extends State<PaymentModal> {
                 height: 4,
                 margin: const EdgeInsets.only(bottom: 16),
                 decoration: BoxDecoration(
-                  color: Colors.grey.withValues(alpha: 0.3),
+                  color: theme.colorScheme.onSurfaceVariant.withValues(alpha: 0.3),
                   borderRadius: BorderRadius.circular(2),
                 ),
               ),
@@ -263,11 +264,11 @@ class _PaymentModalState extends State<PaymentModal> {
                 padding: const EdgeInsets.all(14),
                 decoration: BoxDecoration(
                   color: _usePoints
-                      ? Colors.amber.withValues(alpha: 0.08)
+                      ? AppColors.warningFill.withValues(alpha: 0.08)
                       : theme.colorScheme.surfaceContainerHighest.withValues(alpha: 0.3),
                   borderRadius: BorderRadius.circular(18),
                   border: Border.all(
-                    color: _usePoints ? Colors.amber.withValues(alpha: 0.4) : theme.dividerColor.withValues(alpha: 0.1),
+                    color: _usePoints ? AppColors.warningFill.withValues(alpha: 0.4) : theme.dividerColor.withValues(alpha: 0.1),
                     width: _usePoints ? 1.5 : 1,
                   ),
                 ),
@@ -283,10 +284,10 @@ class _PaymentModalState extends State<PaymentModal> {
                               Container(
                                 padding: const EdgeInsets.all(8),
                                 decoration: BoxDecoration(
-                                  color: Colors.amber.withValues(alpha: 0.2),
+                                  color: AppColors.warningFill.withValues(alpha: 0.2),
                                   borderRadius: BorderRadius.circular(10),
                                 ),
-                                child: const Icon(Icons.stars_rounded, color: Colors.amber, size: 22),
+                                child: const Icon(Icons.stars_rounded, color: AppColors.warningFill, size: 22),
                               ),
                               const SizedBox(width: 10),
                               Expanded(
@@ -303,12 +304,12 @@ class _PaymentModalState extends State<PaymentModal> {
                                         Container(
                                           padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
                                           decoration: BoxDecoration(
-                                            color: Colors.amber.withValues(alpha: 0.15),
+                                            color: AppColors.warningFill.withValues(alpha: 0.15),
                                             borderRadius: BorderRadius.circular(6),
                                           ),
                                           child: Text(
                                             '${widget.member!.points} Poin',
-                                            style: const TextStyle(color: Colors.amber, fontSize: 10, fontWeight: FontWeight.bold),
+                                            style: const TextStyle(color: AppColors.warningText, fontSize: 10, fontWeight: FontWeight.bold),
                                           ),
                                         ),
                                       ],
@@ -326,7 +327,7 @@ class _PaymentModalState extends State<PaymentModal> {
                         ),
                         Switch(
                           value: _usePoints,
-                          activeThumbColor: Colors.amber,
+                          activeThumbColor: AppColors.warningFill,
                           onChanged: _toggleUsePoints,
                         ),
                       ],
@@ -345,7 +346,7 @@ class _PaymentModalState extends State<PaymentModal> {
                               decoration: InputDecoration(
                                 labelText: 'Jumlah Poin Ditukar',
                                 suffixText: 'Poin',
-                                prefixIcon: const Icon(Icons.redeem_rounded, size: 18, color: Colors.amber),
+                                prefixIcon: const Icon(Icons.redeem_rounded, size: 18, color: AppColors.warningText),
                                 contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
                                 border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
                                 filled: true,
@@ -365,8 +366,8 @@ class _PaymentModalState extends State<PaymentModal> {
                               _onPointsChanged(autoPts.toString());
                             },
                             style: FilledButton.styleFrom(
-                              backgroundColor: Colors.amber.withValues(alpha: 0.2),
-                              foregroundColor: Colors.amber.shade900,
+                              backgroundColor: AppColors.warningFill.withValues(alpha: 0.2),
+                              foregroundColor: AppColors.warningText,
                               padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
                               shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                             ),
@@ -378,16 +379,16 @@ class _PaymentModalState extends State<PaymentModal> {
                       Container(
                         padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
                         decoration: BoxDecoration(
-                          color: Colors.green.withValues(alpha: 0.1),
+                          color: AppColors.successFill.withValues(alpha: 0.1),
                           borderRadius: BorderRadius.circular(8),
                         ),
                         child: Row(
                           children: [
-                            const Icon(Icons.check_circle_outline_rounded, size: 14, color: Colors.green),
+                            const Icon(Icons.check_circle_outline_rounded, size: 14, color: AppColors.successText),
                             const SizedBox(width: 6),
                             Text(
                               'bill_deduction_amount'.tr(context: context, args: [NumberFormat('#,###', 'id_ID').format(_pointRedeemAmount)]),
-                              style: TextStyle(fontSize: 11, fontWeight: FontWeight.bold, color: Colors.green[800]),
+                              style: TextStyle(fontSize: 11, fontWeight: FontWeight.bold, color: AppColors.successText),
                             ),
                           ],
                         ),
@@ -572,11 +573,11 @@ class _PaymentModalState extends State<PaymentModal> {
                 padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
                 decoration: BoxDecoration(
                   color: isCashValid
-                      ? Colors.green.withValues(alpha: 0.1)
-                      : Colors.red.withValues(alpha: 0.1),
+                      ? AppColors.successFill.withValues(alpha: 0.1)
+                      : AppColors.dangerFill.withValues(alpha: 0.1),
                   borderRadius: BorderRadius.circular(14),
                   border: Border.all(
-                    color: isCashValid ? Colors.green.withValues(alpha: 0.4) : Colors.red.withValues(alpha: 0.4),
+                    color: isCashValid ? AppColors.successFill.withValues(alpha: 0.4) : AppColors.dangerFill.withValues(alpha: 0.4),
                   ),
                 ),
                 child: Row(
@@ -586,7 +587,7 @@ class _PaymentModalState extends State<PaymentModal> {
                       isCashValid ? 'Kembalian:' : 'Uang Kurang:',
                       style: TextStyle(
                         fontWeight: FontWeight.bold,
-                        color: isCashValid ? Colors.green[800] : Colors.red[800],
+                        color: isCashValid ? AppColors.successText : AppColors.dangerText,
                       ),
                     ),
                     Text(
@@ -594,7 +595,7 @@ class _PaymentModalState extends State<PaymentModal> {
                       style: TextStyle(
                         fontSize: 16,
                         fontWeight: FontWeight.w900,
-                        color: isCashValid ? Colors.green[800] : Colors.red[800],
+                        color: isCashValid ? AppColors.successText : AppColors.dangerText,
                       ),
                     ),
                   ],

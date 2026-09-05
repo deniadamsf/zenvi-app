@@ -7,6 +7,7 @@ import '../../models/product_model.dart';
 import 'add_product_screen.dart';
 import '../../widgets/product_image.dart';
 import '../../widgets/zenvi_header.dart';
+import '../../theme/app_colors.dart';
 
 class ProductListScreen extends StatefulWidget {
   const ProductListScreen({super.key});
@@ -178,9 +179,9 @@ class _ProductListScreenState extends State<ProductListScreen> {
                                                   value: 'delete',
                                                   child: Row(
                                                     children: [
-                                                      const Icon(Icons.delete_rounded, color: Colors.red, size: 20),
+                                                      const Icon(Icons.delete_rounded, color: AppColors.dangerText, size: 20),
                                                       const SizedBox(width: 12),
-                                                      Text('hapus_88'.tr(context: context), style: const TextStyle(color: Colors.red)),
+                                                      Text('hapus_88'.tr(context: context), style: const TextStyle(color: AppColors.dangerText)),
                                                     ],
                                                   ),
                                                 ),
@@ -207,13 +208,13 @@ class _ProductListScreenState extends State<ProductListScreen> {
                                             Container(
                                               padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
                                               decoration: BoxDecoration(
-                                                color: product.isActive ? Colors.green.withValues(alpha: 0.1) : theme.colorScheme.error.withValues(alpha: 0.1),
+                                                color: product.isActive ? AppColors.successFill.withValues(alpha: 0.1) : theme.colorScheme.error.withValues(alpha: 0.1),
                                                 borderRadius: BorderRadius.circular(8),
                                               ),
                                               child: Text(
                                                 product.isActive ? 'Tersedia' : 'Habis/Nonaktif',
                                                 style: TextStyle(
-                                                  color: product.isActive ? Colors.green.shade700 : theme.colorScheme.error,
+                                                  color: product.isActive ? AppColors.successText : theme.colorScheme.error,
                                                   fontSize: 12,
                                                   fontWeight: FontWeight.bold,
                                                 ),

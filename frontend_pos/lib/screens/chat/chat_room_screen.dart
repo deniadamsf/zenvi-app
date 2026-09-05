@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../providers/chat_provider.dart';
 import '../../providers/auth_provider.dart';
+import '../../theme/app_colors.dart';
 import '../../widgets/zenvi_header.dart';
 
 class ChatRoomScreen extends StatefulWidget {
@@ -124,7 +125,7 @@ class _ChatRoomScreenState extends State<ChatRoomScreen> {
                     widget.isOnline ? 'Online • ${widget.contactRole}' : 'Offline • ${widget.contactRole}',
                     style: TextStyle(
                       fontSize: 11,
-                      color: widget.isOnline ? Colors.green : theme.colorScheme.onSurfaceVariant,
+                      color: widget.isOnline ? AppColors.successText : theme.colorScheme.onSurfaceVariant,
                     ),
                     overflow: TextOverflow.ellipsis,
                   ),
