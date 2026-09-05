@@ -42,7 +42,6 @@ return [
         'kds'                 => 'Kitchen Display System',
         'full_report'         => 'Laporan laba rugi penuh',
         'export'              => 'Export Excel & PDF',
-        'analytics'           => 'Dashboard analitik',
         'multi_branch'        => 'Multi-cabang',
         'branch_stock'        => 'Stok per cabang',
         'consolidated_report' => 'Laporan konsolidasi lintas cabang',
@@ -82,7 +81,6 @@ return [
                 'kds',
                 'full_report',
                 'export',
-                'analytics',
             ],
             'limits'   => [
                 'products'     => null,
@@ -105,7 +103,6 @@ return [
                 'kds',
                 'full_report',
                 'export',
-                'analytics',
                 'multi_branch',
                 'branch_stock',
                 'consolidated_report',

@@ -937,8 +937,21 @@ class _DashboardOverviewState extends State<_DashboardOverview> {
                   const SizedBox(height: 24),
 
                   // 7. Branch Performance & Today's Cashier Shift Summary
+                  //
+                  // Perbandingan antar cabang adalah fitur paket Bisnis. Sengaja
+                  // ditampilkan bergembok, bukan disembunyikan: pemilik satu toko
+                  // jadi tahu fiturnya ada saat nanti membuka cabang kedua.
+                  //
+                  // Analitik (tren omzet, jam ramai, menu terlaris, metode bayar)
+                  // TIDAK dikunci - pembedanya sudah datang sendiri dari batas
+                  // riwayat 30 hari di paket gratis.
                   if (branches.isNotEmpty) ...[
-                    _buildBranchPerformanceCard(theme, expenseProvider, branches),
+                    PremiumGate(
+                      locked: !authProvider.hasFeature('consolidated_report'),
+                      feature: 'consolidated_report',
+                      requiredPlan: 'business',
+                      child: _buildBranchPerformanceCard(theme, expenseProvider, branches),
+                    ),
                     const SizedBox(height: 24),
                   ],
 

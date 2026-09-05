@@ -463,7 +463,11 @@ class ExpenseController extends Controller
                 'hourly_sales' => $hourlySales,
                 'payment_methods' => $paymentMethods,
                 'top_products' => $topProducts,
-                'branch_performance' => $branchPerformance,
+                // Dipangkas kalau paket tidak mencakupnya: mengirim data yang
+                // tidak berhak ditampilkan hanya memboroskan bandwidth, dan
+                // membuat klien yang dimodifikasi tetap bisa melihatnya.
+                'branch_performance' => Entitlements::for($request->user()->company)
+                    ->hasFeature('consolidated_report') ? $branchPerformance : [],
                 'shift_summaries' => $shiftSummaries,
                 'recent_expenses' => $recentExpenses,
                 'expense_breakdown' => $expenseBreakdown,
