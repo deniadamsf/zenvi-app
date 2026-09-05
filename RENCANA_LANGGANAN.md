@@ -1,27 +1,30 @@
 # Rencana Implementasi Fitur Langganan Zenvi
 
-> Status: **desain final, belum ada kode.** Dokumen ini dibaca oleh Claude/Codex/Gemini
+> Status per 2026-08-31: **Tahap 1, 2, dan 3 SUDAH SELESAI dan live di produksi.**
+> Tahap 4 (penagihan) belum dikerjakan. Dokumen ini dibaca oleh Claude/Codex/Gemini
 > yang bergantian mengerjakan repo ini. Kalau ada keputusan yang berubah, perbarui di sini.
 
 ---
 
-## 0. Dua keputusan yang harus dikunci sebelum baris kode pertama
+## 0. Keputusan yang sudah dikunci
 
-**0.1 Tanggal cutoff grandfathering.** Semua toko yang terdaftar sebelum tanggal ini
-dapat paket berbayar gratis selamanya. Tanpa tanggal yang ditetapkan dan diumumkan,
-batasnya kabur dan pemberian gratis tidak pernah berhenti.
+**0.1 Cutoff grandfathering — SELESAI.** Tanggal cutoff = momen migration dijalankan
+di produksi (2026-08-31). Seluruh toko yang sudah ada ditandai founding member:
+`plan_code = 'business'`, `plan_expires_at = NULL`. Tidak ada tanggal hardcoded, jadi
+tidak ada celah antara tanggal yang ditulis dan waktu deploy sebenarnya.
 
-**0.2 Jalur pembayaran di Android.** Ada `playstore_assets/` di repo — aplikasi ini
-terdistribusi lewat Play Store. Google mewajibkan Play Billing untuk pembelian digital
-di dalam aplikasi; menjual langganan lewat Midtrans di dalam APK berisiko reject atau
-takedown. Dua pilihan:
+**0.2 Jalur pembayaran — SELESAI: Google Play Billing.** Bukan payment gateway, bukan
+transfer manual. Aplikasi terdistribusi lewat Play Store, dan Google mewajibkan Play
+Billing untuk pembelian digital di dalam aplikasi. Ini menghilangkan risiko takedown
+sepenuhnya. Konsekuensinya: potongan Google 15%, harga ditetapkan di Play Console
+(bukan di kode), dan add-on cabang per-unit DIBATALKAN karena Play Billing tidak
+menangani kuantitas variabel dengan baik.
 
-- **Checkout di browser eksternal** (halaman billing Laravel, dibuka dengan
-  `url_launcher` ke browser — bukan WebView in-app). Paling aman, paling cepat.
-- **Play Billing** untuk jalur Android. Lebih patuh, jauh lebih banyak kerjaan.
-
-Keputusan ini menentukan apakah halaman checkout dibuat di Flutter atau di Blade,
-jadi harus diambil sebelum Tahap 4.
+**0.3 Rilis mendahului penagihan — RISIKO YANG DITERIMA.** Gating live di rilis
+1.0.2+4 sementara pembelian belum ada, sehingga toko baru terbatas tanpa cara
+membayar. Aman HANYA selama belum ada pendaftar baru. **Wajib ditinjau ulang sebelum
+aplikasi dipromosikan** — kalau Play Billing masih belum siap saat itu, ubah dulu
+supaya toko baru mendapat paket berbayar.
 
 ---
 
@@ -93,7 +96,7 @@ Lebih dari ~10 cabang → "Hubungi kami". Jangan bikin tingkat keempat.
 
 ## 3. Tahapan
 
-### Tahap 1 — Pondasi entitlement (backend)
+### Tahap 1 — Pondasi entitlement (backend)  ✅ SELESAI
 
 | File | Aksi |
 |---|---|
@@ -147,7 +150,7 @@ Pakai **403 dengan body bertipe**, bukan 402. Secara semantik 402 Payment Requir
 memang lebih tepat, tapi sebagian proxy dan klien HTTP menanganinya dengan aneh;
 403 + field `error` yang eksplisit tidak pernah ambigu.
 
-### Tahap 2 — Penegakan batas
+### Tahap 2 — Penegakan batas  ✅ SELESAI
 
 | Batas | Titik penegakan | Catatan |
 |---|---|---|
@@ -163,7 +166,7 @@ menyetujui" — tepat saat sedang menatap nama orang yang mau dia terima kerja.
 Momen konversi terbaik yang tersedia. Hitung hanya `is_approved = true`;
 owner tidak dihitung.
 
-### Tahap 3 — Gating di Flutter
+### Tahap 3 — Gating di Flutter  ✅ SELESAI
 
 | File | Aksi |
 |---|---|
@@ -186,29 +189,52 @@ membaca dari titik ini, gating UI-nya hampir gratis.
 **Jangan sembunyikan menu premium** — tampilkan dengan gembok. Menu yang
 tersembunyi tidak menjual apa pun.
 
-### Tahap 4 — Penagihan
+### Tahap 4 — Google Play Billing  ← BERIKUTNYA
 
-| Komponen | Catatan |
-|---|---|
-| Tabel `subscriptions` | riwayat siklus: company_id, plan_code, period_start/end, amount, source |
-| Tabel `subscription_payments` | `order_id` **unique** ← ini yang membuat webhook idempoten |
-| Transfer manual | upload bukti → admin approve. **Kerjakan duluan** |
-| Halaman admin (Blade) | lihat company + paket, approve pembayaran, perpanjang manual |
-| `POST /api/billing/checkout` | buat transaksi, kembalikan snap token / invoice URL |
-| `GET /api/billing/status`, `/history` | |
-| `POST /api/webhooks/{gateway}` | route publik, verifikasi signature, idempoten |
-| `app/Console/Commands/CheckSubscriptionExpiry.php` | reminder H-7/H-3/H-1 + flip status |
+Menggantikan seluruh rencana gateway/transfer manual sebelumnya.
 
-**Hanya webhook yang boleh mengubah `plan_status`.** Jangan pernah mengaktifkan
-paket dari sisi klien.
+**Prasyarat non-kode, dikerjakan di Play Console akun `Cellanoma Digital`**
+(aplikasi dipindahkan ke akun ini pada 2026-08-31 — profil pembayaran, produk
+langganan, dan akses API TIDAK ikut berpindah saat transfer, jadi semuanya harus
+disiapkan ulang di akun tujuan):
 
-**Transfer manual dikerjakan lebih dulu.** Registrasi merchant gateway bisa makan
-waktu berminggu-minggu; jalur manual membuat fiturnya bisa dijual duluan.
+1. Payments profile aktif di akun baru
+2. Produk langganan: `zenvi_premium_monthly`, `zenvi_premium_yearly`,
+   `zenvi_business_monthly`, `zenvi_business_yearly`
+3. Offer free trial 14 hari pada base plan Premium
+4. Service account Google Cloud + akses Play Console, aktifkan
+   **Google Play Android Developer API**
+5. JSON key ke server: `storage/app/play-service-account.json`
+6. Akun license tester (IAP tidak bisa diuji dengan APK sideload)
 
-Command expiry dijadwalkan di `app/Console/Kernel.php`. **Cron di Hostinger sudah
-aktif dan terverifikasi** (lihat `storage/framework/scheduler_last_run`), jadi task
-terjadwal aman diandalkan. Reminder memakai `InAppNotification` + FCM yang
-infrastrukturnya sudah ada.
+**Flutter**
+- paket `in_app_purchase` di `pubspec.yaml`
+- `lib/services/billing_service.dart` — query produk, `buyNonConsumable()`,
+  dengarkan `purchaseStream`, `restorePurchases()` saat login/start
+- `plan_screen.dart` menampilkan harga dari Play (`ProductDetails.price`), bukan
+  string hardcoded. Tombol beli saat ini masih dinonaktifkan.
+- kirim `purchaseToken` + `productId` ke backend, `completePurchase()` hanya
+  setelah backend mengonfirmasi
+
+**Backend**
+- `app/Services/PlayBillingService.php`, `BillingController`,
+  `SyncPlaySubscriptions` command, migration `subscription_purchases`
+- `config/services.php` + `play.credentials` (JANGAN `env()` di luar `config/`)
+- `POST /billing/play/verify`, `GET /billing/status`
+- **REUSE BESAR:** `FirebaseNotificationService::getAccessToken()` sudah
+  mengimplementasikan OAuth2 service account Google lengkap — JWT RS256 dirakit
+  manual dengan `openssl_sign`, ditukar di `oauth2.googleapis.com/token`, di-cache
+  3300 detik. Salin polanya, ganti scope jadi
+  `https://www.googleapis.com/auth/androidpublisher`. Tidak perlu paket composer baru.
+- Verifikasi lewat `androidpublisher.purchases.subscriptionsv2.get`, petakan state
+  Play (ACTIVE, IN_GRACE_PERIOD, ON_HOLD, CANCELED, EXPIRED) ke `plan_status` +
+  `plan_expires_at`
+- `subscription_purchases.purchase_token` **unique** → verifikasi idempoten
+- Perpanjangan: **polling harian** `subscriptions:sync-play`, bukan RTDN/Pub-Sub.
+  Cron sudah aktif & terverifikasi (`storage/framework/scheduler_last_run`).
+
+**Aturan mutlak:** `plan_code` hanya boleh berubah setelah backend memverifikasi
+`purchaseToken` ke Google. Jangan pernah percaya klien.
 
 ### Tahap 5 — Fitur premium yang benar-benar baru
 
