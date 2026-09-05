@@ -11,6 +11,7 @@ import 'package:qr_flutter/qr_flutter.dart';
 import 'package:path_provider/path_provider.dart';
 import '../../providers/auth_provider.dart';
 import '../reservation/reservation_list_screen.dart';
+import '../../widgets/premium_gate.dart';
 import '../../widgets/zenvi_header.dart';
 
 class StoreSettingsScreen extends StatefulWidget {
@@ -755,6 +756,13 @@ class _StoreSettingsScreenState extends State<StoreSettingsScreen> {
     final isReservationEnabled = _parseBool(company?['is_reservation_enabled']);
     final portalUrl = _getStorePortalUrl(company);
 
+    // Fitur yang tidak termasuk paket saat ini. Sakelarnya tetap ditampilkan —
+    // menyembunyikannya berarti pemilik toko tidak pernah tahu fiturnya ada.
+    final qrLocked = !authProvider.hasFeature('qr_menu');
+    final reservationLocked = !authProvider.hasFeature('reservation');
+    final membershipLocked = !authProvider.hasFeature('membership');
+    final productImageLocked = !authProvider.hasFeature('product_image');
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -791,7 +799,15 @@ class _StoreSettingsScreenState extends State<StoreSettingsScreen> {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Text('menu_digital_qr_code'.tr(context: context), style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14)),
+                          Wrap(
+                            crossAxisAlignment: WrapCrossAlignment.center,
+                            spacing: 6,
+                            runSpacing: 4,
+                            children: [
+                              Text('menu_digital_qr_code'.tr(context: context), style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14)),
+                              if (qrLocked) const PremiumBadge(compact: true),
+                            ],
+                          ),
                           const SizedBox(height: 2),
                           Text(
                             'pelanggan_bisa_scan_qr'.tr(context: context),
@@ -803,9 +819,10 @@ class _StoreSettingsScreenState extends State<StoreSettingsScreen> {
                   ],
                 ),
               ),
-              Switch(
+              PremiumSwitch(
+                locked: qrLocked,
+                feature: 'qr_menu',
                 value: isQrEnabled,
-                activeThumbColor: theme.colorScheme.primary,
                 onChanged: (val) async {
                   await authProvider.updateCompanySetting(isQrMenuEnabled: val);
                 },
@@ -861,6 +878,7 @@ class _StoreSettingsScreenState extends State<StoreSettingsScreen> {
                                   style: TextStyle(color: theme.colorScheme.primary, fontSize: 9, fontWeight: FontWeight.bold),
                                 ),
                               ),
+                              if (reservationLocked) const PremiumBadge(compact: true),
                             ],
                           ),
                           const SizedBox(height: 2),
@@ -874,9 +892,10 @@ class _StoreSettingsScreenState extends State<StoreSettingsScreen> {
                   ],
                 ),
               ),
-              Switch(
+              PremiumSwitch(
+                locked: reservationLocked,
+                feature: 'reservation',
                 value: isReservationEnabled,
-                activeThumbColor: theme.colorScheme.primary,
                 onChanged: (val) async {
                   await authProvider.updateCompanySetting(isReservationEnabled: val);
                 },
@@ -941,6 +960,7 @@ class _StoreSettingsScreenState extends State<StoreSettingsScreen> {
                                           style: TextStyle(color: Colors.amber.shade900, fontSize: 9, fontWeight: FontWeight.bold),
                                         ),
                                       ),
+                                      if (membershipLocked) const PremiumBadge(compact: true),
                                     ],
                                   ),
                                   const SizedBox(height: 2),
@@ -954,9 +974,10 @@ class _StoreSettingsScreenState extends State<StoreSettingsScreen> {
                           ],
                         ),
                       ),
-                      Switch(
+                      PremiumSwitch(
+                        locked: membershipLocked,
+                        feature: 'membership',
                         value: isMembershipEnabled,
-                        activeThumbColor: theme.colorScheme.primary,
                         onChanged: (val) async {
                           await authProvider.updateCompanySetting(isMembershipEnabled: val);
                         },
@@ -1057,9 +1078,17 @@ class _StoreSettingsScreenState extends State<StoreSettingsScreen> {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Text(
-                            'katalog_foto_produk_title'.tr(context: context),
-                            style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
+                          Wrap(
+                            crossAxisAlignment: WrapCrossAlignment.center,
+                            spacing: 6,
+                            runSpacing: 4,
+                            children: [
+                              Text(
+                                'katalog_foto_produk_title'.tr(context: context),
+                                style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
+                              ),
+                              if (productImageLocked) const PremiumBadge(compact: true),
+                            ],
                           ),
                           const SizedBox(height: 2),
                           Text(
@@ -1072,9 +1101,10 @@ class _StoreSettingsScreenState extends State<StoreSettingsScreen> {
                   ],
                 ),
               ),
-              Switch(
+              PremiumSwitch(
+                locked: productImageLocked,
+                feature: 'product_image',
                 value: authProvider.isProductImageEnabled,
-                activeThumbColor: theme.colorScheme.primary,
                 onChanged: (val) async {
                   await authProvider.updateCompanySetting(isProductImageEnabled: val);
                 },

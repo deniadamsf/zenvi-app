@@ -6,6 +6,7 @@ import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 import '../models/user_model.dart';
 import '../config/api_config.dart';
+import '../services/api_client.dart';
 import '../services/notification_service.dart';
 
 class AuthProvider extends ChangeNotifier {
@@ -483,6 +484,10 @@ class AuthProvider extends ChangeNotifier {
         }
         return true;
       }
+      // Permintaan ini memakai `http` langsung, bukan ApiClient, jadi 403 karena
+      // paket harus dikenali di sini. Tanpa ini pembatalan optimistic update di
+      // bawah berjalan diam-diam dan sakelarnya terlihat macet tanpa sebab.
+      ApiClient.inspect(response);
       // Revert optimistic update on fail
       _user!.company?['require_opname_on_shift_close'] = currentOpname;
       _user!.company?['require_attendance'] = currentAttendance;
