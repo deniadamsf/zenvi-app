@@ -1193,5 +1193,13 @@
     "transfer_pick_all": "Lengkapi bahan, cabang asal, dan cabang tujuan",
     "transfer_same_branch": "Cabang tujuan harus berbeda dari cabang asal",
     "transfer_need_branches": "Transfer stok membutuhkan minimal dua cabang",
-    "transfer_available": "Tersedia"
+    "transfer_available": "Tersedia",
+    "purchase_success": "Langganan berhasil diaktifkan",
+    "purchase_unverified": "Pembelian belum bisa diverifikasi. Coba lagi nanti atau hubungi dukungan.",
+    "purchase_failed_start": "Tidak bisa memulai pembelian",
+    "purchase_unavailable": "Pembelian belum tersedia",
+    "per_month": "per bulan",
+    "per_year": "per tahun",
+    "restore_purchases": "Pulihkan pembelian",
+    "restore_started": "Memeriksa pembelian sebelumnya..."
 }

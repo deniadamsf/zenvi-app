@@ -17,6 +17,7 @@ use App\Http\Controllers\Api\MemberController;
 use App\Http\Controllers\Api\MemberPromoController;
 use App\Http\Controllers\Api\NotificationController;
 use App\Http\Controllers\Api\PlanController;
+use App\Http\Controllers\Api\BillingController;
 use App\Http\Controllers\PublicMenuController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
@@ -64,6 +65,8 @@ Route::middleware('auth:sanctum')->group(function () {
 
     // Paket Langganan
     Route::get('/plans', [PlanController::class, 'index']);
+    Route::get('/billing/status', [BillingController::class, 'status']);
+    Route::post('/billing/play/verify', [BillingController::class, 'verifyPlay']);
 
     // Branch APIs
     // Batas cabang hanya dipasang di pembuatan. Membaca daftar cabang tetap

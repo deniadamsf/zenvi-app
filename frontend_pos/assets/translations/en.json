@@ -1193,5 +1193,13 @@
     "transfer_pick_all": "Please fill in ingredient, source branch, and destination branch",
     "transfer_same_branch": "Destination branch must differ from source branch",
     "transfer_need_branches": "Stock transfer requires at least two branches",
-    "transfer_available": "Available"
+    "transfer_available": "Available",
+    "purchase_success": "Subscription activated successfully",
+    "purchase_unverified": "Purchase could not be verified yet. Try again later or contact support.",
+    "purchase_failed_start": "Could not start the purchase",
+    "purchase_unavailable": "Purchase not available yet",
+    "per_month": "per month",
+    "per_year": "per year",
+    "restore_purchases": "Restore purchases",
+    "restore_started": "Checking previous purchases..."
 }

@@ -37,6 +37,13 @@ return [
         'redirect' => env('GOOGLE_REDIRECT_URI'),
     ],
 
+    'play' => [
+        // Wajib lewat config(), bukan env() langsung: env() di luar folder
+        // config/ selalu null setelah `php artisan config:cache`.
+        'credentials'  => env('PLAY_CREDENTIALS'),
+        'package_name' => env('PLAY_PACKAGE_NAME', 'com.cellanoma.zenvi'),
+    ],
+
     'firebase' => [
         // Harus dibaca lewat config(), bukan env() langsung, supaya tetap
         // terbaca setelah `php artisan config:cache` dijalankan.
