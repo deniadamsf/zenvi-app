@@ -1172,5 +1172,13 @@
     "unlimited": "Unlimited",
     "purchase_coming_soon": "Purchase coming soon",
     "plan_load_failed": "Failed to load plans",
-    "retry": "Retry"
+    "retry": "Retry",
+    "quick_export": "Export Report",
+    "export_report_title": "Export Financial Report",
+    "export_report_desc": "The file follows the period and branch currently shown.",
+    "export_as_pdf": "PDF",
+    "export_as_pdf_desc": "Ready to print or send to your accountant",
+    "export_as_excel": "Excel (CSV)",
+    "export_as_excel_desc": "Can be reworked in Excel or Google Sheets",
+    "export_failed": "Failed to create export file"
 }

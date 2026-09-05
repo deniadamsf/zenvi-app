@@ -1172,5 +1172,13 @@
     "unlimited": "Tak terbatas",
     "purchase_coming_soon": "Pembelian segera dibuka",
     "plan_load_failed": "Gagal memuat paket",
-    "retry": "Coba Lagi"
+    "retry": "Coba Lagi",
+    "quick_export": "Export Laporan",
+    "export_report_title": "Export Laporan Keuangan",
+    "export_report_desc": "Berkas mengikuti periode dan cabang yang sedang ditampilkan.",
+    "export_as_pdf": "PDF",
+    "export_as_pdf_desc": "Rapi untuk dicetak atau dikirim ke akuntan",
+    "export_as_excel": "Excel (CSV)",
+    "export_as_excel_desc": "Bisa diolah ulang di Excel atau Google Sheets",
+    "export_failed": "Gagal membuat berkas export"
 }

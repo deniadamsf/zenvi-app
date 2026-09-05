@@ -28,6 +28,8 @@ import '../reservation/reservation_list_screen.dart';
 import '../membership/member_management_screen.dart';
 import '../notifications/notification_center_screen.dart';
 import '../../widgets/zenvi_header.dart';
+import '../../services/export_service.dart';
+import '../../widgets/premium_gate.dart';
 
 class _NavItemData {
   final IconData icon;
@@ -2853,6 +2855,143 @@ class _DashboardOverviewState extends State<_DashboardOverview> {
   // ---------------------------------------------------------------------------
   // 11. Quick Actions Bar
   // ---------------------------------------------------------------------------
+  /// Menawarkan export laporan keuangan sebagai PDF atau CSV.
+  ///
+  /// Kalau paket toko tidak mencakup fitur ini, yang muncul adalah tawaran
+  /// upgrade - bukan tombol yang gagal saat ditekan.
+  void _openExportSheet() {
+    final auth = Provider.of<AuthProvider>(context, listen: false);
+    if (!auth.hasFeature('export')) {
+      showPremiumUpsellSheet(
+        context,
+        const PremiumLock(feature: 'export', requiredPlan: 'premium'),
+      );
+      return;
+    }
+
+    final provider = Provider.of<ExpenseProvider>(context, listen: false);
+    final report = provider.reportAsMap;
+    final storeName = auth.user?.company?['name']?.toString() ?? 'Zenvi';
+    final theme = Theme.of(context);
+
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: Colors.transparent,
+      builder: (ctx) => Container(
+        padding: const EdgeInsets.fromLTRB(24, 20, 24, 32),
+        decoration: BoxDecoration(
+          color: theme.colorScheme.surface,
+          borderRadius: const BorderRadius.vertical(top: Radius.circular(28)),
+        ),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Center(
+              child: Container(
+                width: 40,
+                height: 4,
+                decoration: BoxDecoration(
+                  color: theme.dividerColor,
+                  borderRadius: BorderRadius.circular(2),
+                ),
+              ),
+            ),
+            const SizedBox(height: 20),
+            Text('export_report_title'.tr(context: ctx),
+                style: theme.textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold)),
+            const SizedBox(height: 4),
+            Text(
+              'export_report_desc'.tr(context: ctx),
+              style: theme.textTheme.bodySmall
+                  ?.copyWith(color: theme.colorScheme.onSurfaceVariant),
+            ),
+            const SizedBox(height: 20),
+            _buildExportOption(
+              theme: theme,
+              icon: Icons.picture_as_pdf_rounded,
+              title: 'export_as_pdf'.tr(context: ctx),
+              subtitle: 'export_as_pdf_desc'.tr(context: ctx),
+              onTap: () {
+                Navigator.pop(ctx);
+                _runExport(() => ExportService.financialReportToPdf(report, storeName: storeName));
+              },
+            ),
+            const SizedBox(height: 12),
+            _buildExportOption(
+              theme: theme,
+              icon: Icons.table_chart_rounded,
+              title: 'export_as_excel'.tr(context: ctx),
+              subtitle: 'export_as_excel_desc'.tr(context: ctx),
+              onTap: () {
+                Navigator.pop(ctx);
+                _runExport(() => ExportService.financialReportToCsv(report, storeName: storeName));
+              },
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Future<void> _runExport(Future<void> Function() task) async {
+    try {
+      await task();
+    } catch (e) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('export_failed'.tr(context: context))),
+      );
+    }
+  }
+
+  Widget _buildExportOption({
+    required ThemeData theme,
+    required IconData icon,
+    required String title,
+    required String subtitle,
+    required VoidCallback onTap,
+  }) {
+    return InkWell(
+      onTap: onTap,
+      borderRadius: BorderRadius.circular(16),
+      child: Container(
+        padding: const EdgeInsets.all(16),
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(16),
+          border: Border.all(color: theme.dividerColor.withValues(alpha: 0.4)),
+        ),
+        child: Row(
+          children: [
+            Container(
+              padding: const EdgeInsets.all(10),
+              decoration: BoxDecoration(
+                color: theme.colorScheme.primary.withValues(alpha: 0.1),
+                borderRadius: BorderRadius.circular(12),
+              ),
+              child: Icon(icon, color: theme.colorScheme.primary),
+            ),
+            const SizedBox(width: 14),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(title,
+                      style: theme.textTheme.titleSmall
+                          ?.copyWith(fontWeight: FontWeight.bold)),
+                  Text(subtitle,
+                      style: theme.textTheme.bodySmall?.copyWith(
+                          color: theme.colorScheme.onSurfaceVariant)),
+                ],
+              ),
+            ),
+            Icon(Icons.chevron_right_rounded, color: theme.colorScheme.onSurfaceVariant),
+          ],
+        ),
+      ),
+    );
+  }
+
   Widget _buildQuickActionsBar(ThemeData theme) {
     final actions = [
       {
@@ -2879,6 +3018,11 @@ class _DashboardOverviewState extends State<_DashboardOverview> {
         'label': 'quick_shift'.tr(context: context),
         'icon': Icons.access_time_filled_rounded,
         'onTap': () => Navigator.push(context, MaterialPageRoute(builder: (_) => const ShiftLogScreen())),
+      },
+      {
+        'label': 'quick_export'.tr(context: context),
+        'icon': Icons.ios_share_rounded,
+        'onTap': () => _openExportSheet(),
       },
     ];
 

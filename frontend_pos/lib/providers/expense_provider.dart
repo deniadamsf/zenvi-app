@@ -28,6 +28,8 @@ class ExpenseProvider extends ChangeNotifier {
   List<Map<String, dynamic>> _shiftSummaries = [];
   List<Map<String, dynamic>> _recentExpenses = [];
   List<Map<String, dynamic>> _expenseBreakdown = [];
+  String _reportStartDate = '';
+  String _reportEndDate = '';
 
   String _currentPeriod = 'today';
   String? _selectedBranchId; // null or 'all' = All branches
@@ -53,6 +55,27 @@ class ExpenseProvider extends ChangeNotifier {
   List<Map<String, dynamic>> get shiftSummaries => _shiftSummaries;
   List<Map<String, dynamic>> get recentExpenses => _recentExpenses;
   List<Map<String, dynamic>> get expenseBreakdown => _expenseBreakdown;
+
+  /// Laporan dalam bentuk peta, persis seperti yang dikirim server.
+  ///
+  /// Dipakai ExportService supaya isi berkas CSV/PDF tidak pernah berbeda dari
+  /// angka yang sedang tampil di layar - keduanya membaca sumber yang sama.
+  Map<String, dynamic> get reportAsMap => {
+        'start_date': _reportStartDate,
+        'end_date': _reportEndDate,
+        'total_sales': _totalSales,
+        'total_cogs': _totalCogs,
+        'gross_profit': _grossProfit,
+        'gross_margin_percent': _grossMarginPercent,
+        'total_expenses': _totalExpenses,
+        'net_profit': _netProfit,
+        'net_margin_percent': _netMarginPercent,
+        'total_orders': _totalOrders,
+        'avg_order_value': _averageOrderValue,
+        'top_products': _topProducts,
+        'payment_methods': _paymentMethods,
+        'expense_breakdown': _expenseBreakdown,
+      };
 
   String get currentPeriod => _currentPeriod;
   String? get selectedBranchId => _selectedBranchId;
@@ -151,6 +174,8 @@ class ExpenseProvider extends ChangeNotifier {
       if (response.statusCode == 200) {
         final res = jsonDecode(response.body);
         final data = res['data'] ?? {};
+        _reportStartDate = data['start_date']?.toString() ?? '';
+        _reportEndDate = data['end_date']?.toString() ?? '';
 
         _totalSales = double.tryParse(data['total_sales']?.toString() ?? '0') ?? 0.0;
         _totalCogs = double.tryParse(data['total_cogs']?.toString() ?? '0') ?? 0.0;

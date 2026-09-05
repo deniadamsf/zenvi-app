@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:easy_localization/easy_localization.dart';
+import 'package:intl/date_symbol_data_local.dart';
 
 import 'screens/auth/login_screen.dart';
 import 'widgets/zenvi_logo_widgets.dart';
@@ -48,6 +49,11 @@ void main() async {
   } catch (e) {
     debugPrint('Notification service init failed: $e');
   }
+
+  // Data locale untuk DateFormat('...', 'id_ID'). Tanpa ini, memformat tanggal
+  // dengan locale non-default melempar LocaleDataException saat dijalankan -
+  // NumberFormat aman tanpa ini, DateFormat tidak.
+  await initializeDateFormatting('id_ID');
 
   // Membaca daftar foto produk yang sudah tersimpan, supaya gambar offline
   // bisa langsung tampil di frame pertama tanpa menunggu I/O.
