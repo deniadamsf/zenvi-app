@@ -80,3 +80,20 @@ frontend_pos/ios/Podfile.lock
 frontend_pos/macos/Pods/
 frontend_pos/windows/flutter/ephemeral/
 frontend_pos/linux/flutter/ephemeral/
+
+# Kredensial service account Google (Play Billing, Firebase).
+# JANGAN PERNAH di-commit: file ini memberi akses ke data finansial akun
+# developer dan project Cloud. Sekali masuk riwayat git, ia tetap ada di sana
+# meski filenya dihapus di commit berikutnya.
+*service-account*.json
+*-firebase-adminsdk-*.json
+zenvi-*.json
+play-service-account.json
+
+# Keystore penandatanganan rilis & passwordnya.
+# JANGAN PERNAH di-commit: siapa pun yang punya keystore + password bisa
+# menandatangani APK palsu atas nama aplikasi ini.
+KEYS/
+*.jks
+*.keystore
+key.properties
