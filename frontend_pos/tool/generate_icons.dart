@@ -22,11 +22,20 @@ void main() {
   // 1. Logo penuh (dipakai iOS dan ikon legacy Android)
   final solidImage = img.Image(width: size, height: size, numChannels: 4);
   img.fill(solidImage, color: brandTeal);
-  _drawZenviTriangle(solidImage, size, whiteColor, 0.265, 0.085);
+  _drawZenviTriangle(solidImage, size, whiteColor, 0.295, 0.088);
   File('assets/images/logo.png').writeAsBytesSync(img.encodePng(solidImage));
   print('Generated assets/images/logo.png');
 
   // 2. Lapisan depan ikon adaptif Android.
+  //
+  // ANGKA ACUAN kalau ukurannya perlu disetel lagi. `padding` di sini diukur
+  // terhadap kanvas berkas ini, BUKAN terhadap ikon yang akhirnya terlihat -
+  // ic_launcher.xml masih menyusutkannya lagi ke 68% lewat inset 16%. Jadi
+  // tinggi akhir di layar depan = tinggi di kanvas ini x 0,68.
+  //
+  //   padding 0,34  -> 36% kanvas -> 25% ikon  (versi lama, terlalu kecil)
+  //   padding 0,215 -> 68% kanvas -> 46% ikon  (terlalu besar)
+  //   padding 0,295 -> 55% kanvas -> 38% ikon  (sekarang)
   //
   // Perhatikan: XML ikon adaptif menambahkan inset 16% LAGI di atas padding ini,
   // jadi angka di sini bukan ukuran akhir di layar depan. Percobaan menurunkan
@@ -34,7 +43,7 @@ void main() {
   // nilai semula, hanya sedikit lebih besar dan sedikit lebih tebal.
   final foregroundImage = img.Image(width: size, height: size, numChannels: 4);
   img.fill(foregroundImage, color: transparentColor);
-  _drawZenviTriangle(foregroundImage, size, whiteColor, 0.325, 0.076);
+  _drawZenviTriangle(foregroundImage, size, whiteColor, 0.295, 0.088);
   File('assets/images/logo_foreground.png').writeAsBytesSync(img.encodePng(foregroundImage));
   print('Generated assets/images/logo_foreground.png');
 
@@ -42,7 +51,7 @@ void main() {
   const splashSize = 512;
   final splashImage = img.Image(width: splashSize, height: splashSize, numChannels: 4);
   img.fill(splashImage, color: transparentColor);
-  _drawZenviTriangle(splashImage, splashSize, whiteColor, 0.25, 0.088);
+  _drawZenviTriangle(splashImage, splashSize, whiteColor, 0.285, 0.092);
 
   final splashDir = Directory('android/app/src/main/res/drawable');
   if (!splashDir.existsSync()) splashDir.createSync(recursive: true);
@@ -71,9 +80,19 @@ void _drawZenviTriangle(
   final padding = size * paddingFraction;
   final thickness = size * thicknessFraction;
 
-  final ax = padding, ay = padding;                    // sudut kiri atas
-  final bx = size - padding, by = padding;             // sudut kanan atas
-  final cx = size / 2.0, cy = size - padding * 1.15;   // ujung bawah
+  // Ujung bawah dulu ditaruh di `size - padding * 1.15`, jadi jarak ke tepi
+  // bawah lebih lebar daripada ke tepi atas. Sekarang simetris, lalu seluruh
+  // bentuk digeser TURUN sedikit.
+  //
+  // Geseran itu penyeimbang optis, bukan koreksi hitungan: segitiga terbalik
+  // berat di bagian atas - sisi atasnya satu garis penuh, bawahnya cuma satu
+  // titik. Ditaruh persis di tengah secara geometris, mata tetap membacanya
+  // duduk terlalu tinggi di dalam petak peluncur.
+  final nudge = size * 0.022;
+
+  final ax = padding, ay = padding + nudge;                // sudut kiri atas
+  final bx = size - padding, by = padding + nudge;         // sudut kanan atas
+  final cx = size / 2.0, cy = size - padding + nudge;      // ujung bawah
 
   // Segitiga luar dan dalam adalah segitiga yang sama, diperbesar dan
   // diperkecil terhadap titik pusat lingkaran dalam. Menggeser tiap sudut ke
