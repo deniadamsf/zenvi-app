@@ -486,7 +486,6 @@ class _EmployeeVerificationScreenState extends State<EmployeeVerificationScreen>
         title: Text(title, style: TextStyle(fontWeight: FontWeight.w600, fontSize: 14)),
         subtitle: Text(subtitle, style: TextStyle(color: theme.colorScheme.onSurfaceVariant, fontSize: 12)),
         value: value,
-        activeThumbColor: theme.colorScheme.primary,
         onChanged: onChanged,
       ),
     );

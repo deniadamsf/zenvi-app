@@ -785,7 +785,6 @@ class _PromoListTab extends StatelessWidget {
                             final isChecked = selectedProductIds.contains(p.id);
                             return CheckboxListTile(
                               value: isChecked,
-                              activeColor: theme.colorScheme.primary,
                               onChanged: (val) {
                                 setModalState(() {
                                   if (val == true) {

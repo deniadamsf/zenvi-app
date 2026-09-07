@@ -102,7 +102,6 @@ class _PaymentSettingsScreenState extends State<PaymentSettingsScreen> {
                                         onChanged: (val) async {
                                           await authProvider.updateCompanySetting(isQrisEnabled: val);
                                         },
-                                        activeThumbColor: theme.colorScheme.primary,
                                       ),
                                     ],
                                   ),
@@ -140,7 +139,6 @@ class _PaymentSettingsScreenState extends State<PaymentSettingsScreen> {
                                         onChanged: (val) async {
                                           await authProvider.updateCompanySetting(isTransferEnabled: val);
                                         },
-                                        activeThumbColor: theme.colorScheme.primary,
                                       ),
                                     ],
                                   ),

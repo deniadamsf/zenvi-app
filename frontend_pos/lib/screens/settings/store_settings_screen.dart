@@ -416,7 +416,6 @@ class _StoreSettingsScreenState extends State<StoreSettingsScreen> {
                                 ),
                                 Switch(
                                   value: isPointsEnabled,
-                                  activeThumbColor: theme.colorScheme.primary,
                                   onChanged: (val) => setModalState(() => isPointsEnabled = val),
                                 ),
                               ],

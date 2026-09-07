@@ -121,7 +121,6 @@ class _CompanySetupScreenState extends State<CompanySetupScreen> {
                         title: Text('aktifkan_kitchen_display_system_5'.tr(context: context), style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13.5)),
                         subtitle: Text('tampilkan_layar_khusus_dapur_6'.tr(context: context), style: const TextStyle(fontSize: 12)),
                         value: _isKdsEnabled,
-                        activeThumbColor: theme.colorScheme.primary,
                         secondary: Icon(Icons.kitchen_rounded, color: _isKdsEnabled ? theme.colorScheme.primary : theme.colorScheme.onSurfaceVariant, size: 22),
                         onChanged: (val) {
                           setState(() {

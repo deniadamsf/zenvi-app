@@ -437,7 +437,6 @@ class _StockManagementScreenState extends State<StockManagementScreen> {
                           title: Text('wajibkan_opname_saat_tutup_461'.tr(context: context), style: const TextStyle(fontWeight: FontWeight.bold)),
                           subtitle: Text('karyawan_harus_mengisi_stok_462'.tr(context: context)),
                           value: requireOpname,
-                          activeThumbColor: theme.colorScheme.primary,
                           onChanged: (val) async {
                             final successMsg = 'settings_saved'.tr(context: context);
                             final failMsg = 'settings_failed'.tr(context: context);

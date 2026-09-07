@@ -264,7 +264,6 @@ class _EmployeeSettingsScreenState extends State<EmployeeSettingsScreen> {
                             subtitle: Text('karyawan_tidak_bisa_absen_393'.tr(context: context)),
                             value: _parseBool(company?['require_schedule']),
                             onChanged: (val) => authProvider.updateCompanySetting(requireSchedule: val),
-                            activeThumbColor: theme.colorScheme.primary,
                             contentPadding: EdgeInsets.zero,
                           ),
                           const SizedBox(height: 16),
@@ -307,7 +306,6 @@ class _EmployeeSettingsScreenState extends State<EmployeeSettingsScreen> {
                             subtitle: Text('wajib_cek_stok_fisik_396'.tr(context: context)),
                             value: _parseBool(company?['require_opname_on_shift_close']),
                             onChanged: (val) => authProvider.updateCompanySetting(requireOpname: val),
-                            activeThumbColor: theme.colorScheme.primary,
                             contentPadding: EdgeInsets.zero,
                           ),
                           SwitchListTile(
@@ -315,7 +313,6 @@ class _EmployeeSettingsScreenState extends State<EmployeeSettingsScreen> {
                             subtitle: Text('wajib_input_modal_awal_398'.tr(context: context)),
                             value: _parseBool(company?['require_cash_drawer_balance']),
                             onChanged: (val) => authProvider.updateCompanySetting(requireCashDrawerBalance: val),
-                            activeThumbColor: theme.colorScheme.primary,
                             contentPadding: EdgeInsets.zero,
                           ),
                           ListTile(

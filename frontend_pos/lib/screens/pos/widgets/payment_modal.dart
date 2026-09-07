@@ -327,7 +327,6 @@ class _PaymentModalState extends State<PaymentModal> {
                         ),
                         Switch(
                           value: _usePoints,
-                          activeThumbColor: AppColors.warningFill,
                           onChanged: _toggleUsePoints,
                         ),
                       ],

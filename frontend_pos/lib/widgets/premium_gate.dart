@@ -161,12 +161,9 @@ class PremiumSwitch extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-
     if (!locked) {
       return Switch(
         value: value,
-        activeThumbColor: theme.colorScheme.primary,
         onChanged: onChanged,
       );
     }

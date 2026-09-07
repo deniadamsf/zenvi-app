@@ -619,7 +619,6 @@ class _AddProductScreenState extends State<AddProductScreen> {
                         title: Text('tampilkan_di_kasir_55'.tr(context: context), style: TextStyle(fontWeight: FontWeight.bold)),
                         subtitle: Text('produk_dapat_dibeli_jika_56'.tr(context: context)),
                         value: _isActive,
-                        activeTrackColor: theme.colorScheme.primary,
                         onChanged: (bool value) => setState(() => _isActive = value),
                         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
                       ),
