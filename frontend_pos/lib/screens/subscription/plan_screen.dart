@@ -2,13 +2,16 @@ import 'dart:convert';
 
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_animate/flutter_animate.dart';
 import 'package:in_app_purchase/in_app_purchase.dart';
 import 'package:provider/provider.dart';
 
 import '../../providers/auth_provider.dart';
 import '../../services/api_client.dart';
 import '../../services/billing_service.dart';
+import '../../theme/app_colors.dart';
 import '../../widgets/zenvi_header.dart';
+import 'plan_card.dart';
 
 /// Halaman "Paket Langganan".
 ///
@@ -39,6 +42,10 @@ class _PlanScreenState extends State<PlanScreen> {
   final PageController _pageController = PageController(viewportFraction: 0.88);
   int _currentPage = 0;
   Map<String, dynamic> _usage = {};
+
+  /// Bulanan atau tahunan. Satu pilihan untuk seluruh layar, bukan per kartu -
+  /// orang membandingkan harga antar paket pada dasar yang sama.
+  bool _yearly = false;
 
   final _billing = BillingService.instance;
 
@@ -135,8 +142,6 @@ class _PlanScreenState extends State<PlanScreen> {
     ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(message)));
   }
 
-  String _limitText(BuildContext context, dynamic value) =>
-      value == null ? 'unlimited'.tr(context: context) : value.toString();
 
   @override
   Widget build(BuildContext context) {
@@ -178,7 +183,9 @@ class _PlanScreenState extends State<PlanScreen> {
                               Padding(
                                 padding: const EdgeInsets.fromLTRB(16, 8, 16, 0),
                                 child: _buildFoundingBanner(theme),
-                              ),
+                              )
+                            else
+                              _buildStatusStrip(theme, auth),
                             Expanded(
                               child: PageView.builder(
                                 controller: _pageController,
@@ -196,6 +203,106 @@ class _PlanScreenState extends State<PlanScreen> {
         ),
       ),
     );
+  }
+
+  /// Pita status di paling atas: paket apa yang sedang berlaku.
+  ///
+  /// Sebelumnya layar ini langsung menampilkan kartu tanpa menyebut posisi
+  /// pengguna sama sekali, jadi pengguna paket gratis harus menggeser dan
+  /// mencari lencana kecil untuk tahu di mana dirinya berada.
+  Widget _buildStatusStrip(ThemeData theme, AuthProvider auth) {
+    final onFree = _currentPlan == 'free';
+    final planName = _plans
+            .cast<Map<String, dynamic>?>()
+            .firstWhere((p) => p?['code']?.toString() == _currentPlan, orElse: () => null)?['name']
+            ?.toString() ??
+        _currentPlan;
+
+    final expiry = auth.planExpiresAt;
+
+    return Container(
+      margin: const EdgeInsets.fromLTRB(22, 10, 22, 2),
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 13),
+      decoration: BoxDecoration(
+        color: onFree
+            ? theme.colorScheme.surfaceContainerHighest.withValues(alpha: 0.7)
+            : AppColors.premium.withValues(alpha: 0.10),
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(
+          color: onFree
+              ? theme.colorScheme.outline
+              : AppColors.premium.withValues(alpha: 0.35),
+        ),
+      ),
+      child: Row(
+        children: [
+          Container(
+            width: 34,
+            height: 34,
+            decoration: BoxDecoration(
+              color: onFree
+                  ? theme.colorScheme.onSurfaceVariant.withValues(alpha: 0.12)
+                  : AppColors.premium.withValues(alpha: 0.18),
+              borderRadius: BorderRadius.circular(11),
+            ),
+            child: Icon(
+              onFree ? Icons.lock_open_rounded : Icons.workspace_premium_rounded,
+              size: 18,
+              color: onFree ? theme.colorScheme.onSurfaceVariant : AppColors.premiumText,
+            ),
+          ),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Text(
+                  'plan_status_label'.tr(context: context).toUpperCase(),
+                  style: TextStyle(
+                    fontSize: 9.5,
+                    fontWeight: FontWeight.w800,
+                    letterSpacing: 0.9,
+                    color: theme.colorScheme.onSurfaceVariant,
+                  ),
+                ),
+                const SizedBox(height: 2),
+                Text(
+                  planName,
+                  style: TextStyle(
+                    fontSize: 15,
+                    fontWeight: FontWeight.w800,
+                    letterSpacing: -0.2,
+                    color: onFree ? theme.colorScheme.onSurface : AppColors.premiumText,
+                  ),
+                ),
+                if (!onFree && expiry != null) ...[
+                  const SizedBox(height: 1),
+                  Text(
+                    'plan_expires_on'.tr(context: context, namedArgs: {
+                      'date': DateFormat('d MMM yyyy', context.locale.languageCode).format(expiry),
+                    }),
+                    style: TextStyle(fontSize: 11, color: theme.colorScheme.onSurfaceVariant),
+                  ),
+                ],
+              ],
+            ),
+          ),
+          if (onFree)
+            Flexible(
+              child: Text(
+                'plan_free_hint'.tr(context: context),
+                textAlign: TextAlign.right,
+                style: TextStyle(
+                  fontSize: 10.5,
+                  height: 1.3,
+                  color: theme.colorScheme.onSurfaceVariant,
+                ),
+              ),
+            ),
+        ],
+      ),
+    ).animate().fadeIn(duration: 320.ms).slideY(begin: -0.15, end: 0, curve: Curves.easeOutCubic);
   }
 
   /// Titik penunjuk halaman. Bisa diketuk supaya berpindah paket tidak harus
@@ -284,161 +391,60 @@ class _PlanScreenState extends State<PlanScreen> {
 
   Widget _buildPlanCard(ThemeData theme, dynamic plan, AuthProvider auth) {
     final code = plan['code']?.toString() ?? '';
-    final isCurrent = code == _currentPlan;
-    final limits = Map<String, dynamic>.from(plan['limits'] ?? {});
-    final features = plan['features'] as List<dynamic>? ?? [];
-
-    return Container(
-      margin: const EdgeInsets.fromLTRB(6, 12, 6, 6),
-      decoration: BoxDecoration(
-        color: theme.colorScheme.surface,
-        borderRadius: BorderRadius.circular(24),
-        border: Border.all(
-          color: isCurrent ? theme.colorScheme.primary : theme.colorScheme.outline,
-          width: isCurrent ? 2 : 1,
-        ),
-      ),
-      clipBehavior: Clip.antiAlias,
-      // Daftar fitur paket Bisnis jauh lebih panjang daripada paket Gratis,
-      // jadi isinya digulir di dalam kartu - tingginya tidak boleh ikut
-      // berubah-ubah antar halaman.
-      child: RefreshIndicator(
-        onRefresh: _load,
-        child: SingleChildScrollView(
-          physics: const AlwaysScrollableScrollPhysics(parent: BouncingScrollPhysics()),
-          padding: const EdgeInsets.all(20),
-          child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            children: [
-              Text(plan['name']?.toString() ?? code,
-                  style: theme.textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold)),
-              const SizedBox(width: 8),
-              if (isCurrent)
-                Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
-                  decoration: BoxDecoration(
-                    color: theme.colorScheme.primary,
-                    borderRadius: BorderRadius.circular(20),
-                  ),
-                  child: Text('current_plan_badge'.tr(context: context),
-                      style: theme.textTheme.labelSmall?.copyWith(
-                          color: theme.colorScheme.onPrimary, fontWeight: FontWeight.bold)),
-                ),
-            ],
-          ),
-          const SizedBox(height: 16),
-          _buildLimitRow(theme, 'limit_employees'.tr(context: context),
-              _limitText(context, limits['employees']), _usage['employees']),
-          _buildLimitRow(theme, 'limit_branches'.tr(context: context),
-              _limitText(context, limits['branches']), _usage['branches']),
-          _buildLimitRow(theme, 'limit_products'.tr(context: context),
-              _limitText(context, limits['products']), _usage['products']),
-          _buildLimitRow(
-            theme,
-            'limit_history'.tr(context: context),
-            limits['history_days'] == null
-                ? 'history_full'.tr(context: context)
-                : 'history_days'
-                    .tr(context: context, namedArgs: {'days': '${limits['history_days']}'}),
-            null,
-          ),
-          if (features.isNotEmpty) ...[
-            const Divider(height: 28),
-            ...features.map((f) => Padding(
-                  padding: const EdgeInsets.only(bottom: 6),
-                  child: Row(
-                    children: [
-                      Icon(Icons.check_circle_rounded, size: 16, color: theme.colorScheme.primary),
-                      const SizedBox(width: 8),
-                      Expanded(
-                          child: Text(f['label']?.toString() ?? '',
-                              style: theme.textTheme.bodyMedium)),
-                    ],
-                  ),
-                )),
-          ],
-          if (!isCurrent && code != 'free') _buildPurchaseArea(theme, code, auth),
-        ],
-          ),
-        ),
-      ),
-    );
-  }
-
-  Widget _buildPurchaseArea(ThemeData theme, String code, AuthProvider auth) {
-    // Founding member tidak pernah ditawari membeli - paketnya sudah permanen,
-    // dan menawarkan pembelian hanya akan membingungkan.
-    if (auth.isFoundingMember) return const SizedBox.shrink();
-
     final monthly = _billing.productFor(BillingService.productIdFor(code, yearly: false) ?? '');
     final yearly = _billing.productFor(BillingService.productIdFor(code, yearly: true) ?? '');
 
-    // Produk belum tersedia: belum dibuat di Play Console, atau aplikasi dipasang
-    // di luar Play Store. Lebih jujur menyatakannya daripada menampilkan tombol
-    // yang pasti gagal ditekan.
-    if (monthly == null && yearly == null) {
-      return Padding(
-        padding: const EdgeInsets.only(top: 16),
-        child: SizedBox(
-          width: double.infinity,
-          child: FilledButton.tonal(
-            onPressed: null,
-            child: Text('purchase_unavailable'.tr(context: context)),
-          ),
-        ),
-      );
-    }
-
-    return Padding(
-      padding: const EdgeInsets.only(top: 16),
-      child: Row(
-        children: [
-          if (monthly != null)
-            Expanded(
-              child: FilledButton(
-                onPressed: _purchasing ? null : () => _buy(monthly),
-                style: FilledButton.styleFrom(padding: const EdgeInsets.symmetric(vertical: 14)),
-                child: Column(
-                  children: [
-                    Text(monthly.price, style: const TextStyle(fontWeight: FontWeight.bold)),
-                    Text('per_month'.tr(context: context), style: const TextStyle(fontSize: 11)),
-                  ],
-                ),
-              ),
-            ),
-          if (monthly != null && yearly != null) const SizedBox(width: 10),
-          if (yearly != null)
-            Expanded(
-              child: FilledButton.tonal(
-                onPressed: _purchasing ? null : () => _buy(yearly),
-                style: FilledButton.styleFrom(padding: const EdgeInsets.symmetric(vertical: 14)),
-                child: Column(
-                  children: [
-                    Text(yearly.price, style: const TextStyle(fontWeight: FontWeight.bold)),
-                    Text('per_year'.tr(context: context), style: const TextStyle(fontSize: 11)),
-                  ],
-                ),
-              ),
-            ),
-        ],
-      ),
+    return PlanCard(
+      name: plan['name']?.toString() ?? code,
+      code: code,
+      isCurrent: code == _currentPlan,
+      // Paket tengah adalah yang paling masuk akal untuk kebanyakan toko;
+      // menandainya menghemat satu keputusan bagi orang yang belum yakin.
+      isRecommended: code == 'premium' && _currentPlan == 'free',
+      limits: Map<String, dynamic>.from(plan['limits'] ?? {}),
+      usage: _usage,
+      features: (plan['features'] as List<dynamic>? ?? [])
+          .map((f) => f['label']?.toString() ?? '')
+          .where((s) => s.isNotEmpty)
+          .toList(),
+      freeIncludes: _freeIncludes(context),
+      monthlyPrice: monthly?.price,
+      yearlyPrice: yearly?.price,
+      savingPercent: _savingPercent(monthly, yearly),
+      yearlySelected: _yearly,
+      onBillingChanged: (v) => setState(() => _yearly = v),
+      onBuy: () {
+        final product = _yearly ? yearly : monthly;
+        if (product != null) _buy(product);
+      },
+      purchasing: _purchasing,
+      isFoundingMember: auth.isFoundingMember,
     );
   }
 
-  Widget _buildLimitRow(ThemeData theme, String label, String value, dynamic used) => Padding(
-        padding: const EdgeInsets.only(bottom: 8),
-        child: Row(
-          children: [
-            Expanded(
-              child: Text(label,
-                  style: theme.textTheme.bodyMedium
-                      ?.copyWith(color: theme.colorScheme.onSurfaceVariant)),
-            ),
-            Text(used == null ? value : '$used / $value',
-                style: theme.textTheme.bodyMedium?.copyWith(fontWeight: FontWeight.w600)),
-          ],
-        ),
-      );
+  /// Apa yang didapat SEMUA paket. Daftarnya ada di sisi aplikasi karena server
+  /// hanya mengirim fitur yang bisa dikunci - yang gratis justru tidak pernah
+  /// disebut di sana, dan tanpa daftar ini kartu Gratis nyaris kosong.
+  static List<String> _freeIncludes(BuildContext context) => <String>[
+        'plan_free_inc_pos'.tr(context: context),
+        'plan_free_inc_receipt'.tr(context: context),
+        'plan_free_inc_offline'.tr(context: context),
+        'plan_free_inc_shift'.tr(context: context),
+        'plan_free_inc_stock'.tr(context: context),
+        'plan_free_inc_attendance'.tr(context: context),
+        'plan_free_inc_team'.tr(context: context),
+        'plan_free_inc_expense'.tr(context: context),
+      ];
+
+  /// Berapa persen lebih murah berlangganan tahunan. Null kalau salah satu
+  /// harga tidak tersedia atau angkanya tidak masuk akal - lebih baik tidak
+  /// menampilkan klaim hemat daripada menampilkan yang salah.
+  int? _savingPercent(ProductDetails? monthly, ProductDetails? yearly) {
+    if (monthly == null || yearly == null) return null;
+    final perYearIfMonthly = monthly.rawPrice * 12;
+    if (perYearIfMonthly <= 0 || yearly.rawPrice <= 0) return null;
+    final saving = (1 - yearly.rawPrice / perYearIfMonthly) * 100;
+    if (saving < 1 || saving > 90) return null;
+    return saving.round();
+  }
 }
