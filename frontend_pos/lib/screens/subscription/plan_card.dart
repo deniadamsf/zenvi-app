@@ -67,6 +67,15 @@ class PlanCard extends StatelessWidget {
     final theme = Theme.of(context);
     final accent = _isFree ? theme.colorScheme.onSurfaceVariant : theme.colorScheme.primary;
 
+    // Garis tepi dan pemotongan isi sengaja dipisah ke dua widget.
+    //
+    // Satu Container dengan `border` sekaligus `clipBehavior` memotong anaknya
+    // tepat di garis luar tepi, jadi latar kepala kartu menimpa separuh dalam
+    // garis itu - tepinya terlihat tipis sebelah dan sudutnya bertakik. Makin
+    // tebal garisnya makin kentara, dan kartu paket yang sedang dipakai memakai
+    // garis 2px.
+    final borderWidth = isCurrent ? 2.0 : 1.0;
+
     return Container(
       margin: const EdgeInsets.fromLTRB(6, 10, 6, 6),
       decoration: BoxDecoration(
@@ -74,34 +83,38 @@ class PlanCard extends StatelessWidget {
         borderRadius: BorderRadius.circular(24),
         border: Border.all(
           color: isCurrent ? theme.colorScheme.primary : theme.colorScheme.outline,
-          width: isCurrent ? 2 : 1,
+          width: borderWidth,
         ),
       ),
-      clipBehavior: Clip.antiAlias,
-      child: SingleChildScrollView(
-        physics: const AlwaysScrollableScrollPhysics(parent: BouncingScrollPhysics()),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            _buildHeader(theme, accent),
-            Padding(
-              padding: const EdgeInsets.fromLTRB(18, 18, 18, 20),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  if (_hasPrice && !_isFree) ...[
-                    _buildBillingToggle(theme),
+      child: ClipRRect(
+        // Radius dalam dikurangi setebal garisnya supaya lengkung isi sejajar
+        // dengan lengkung tepi, bukan memotongnya.
+        borderRadius: BorderRadius.circular(24 - borderWidth),
+        child: SingleChildScrollView(
+          physics: const AlwaysScrollableScrollPhysics(parent: BouncingScrollPhysics()),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              _buildHeader(theme, accent),
+              Padding(
+                padding: const EdgeInsets.fromLTRB(18, 18, 18, 20),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    if (_hasPrice && !_isFree) ...[
+                      _buildBillingToggle(theme),
+                      const SizedBox(height: 18),
+                    ],
+                    _buildLimitGrid(theme),
                     const SizedBox(height: 18),
+                    _buildIncludes(theme, accent),
+                    const SizedBox(height: 18),
+                    _buildCta(theme),
                   ],
-                  _buildLimitGrid(theme),
-                  const SizedBox(height: 18),
-                  _buildIncludes(theme, accent),
-                  const SizedBox(height: 18),
-                  _buildCta(theme),
-                ],
+                ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );

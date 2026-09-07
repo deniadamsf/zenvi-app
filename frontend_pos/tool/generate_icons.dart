@@ -22,7 +22,7 @@ void main() {
   // 1. Logo penuh (dipakai iOS dan ikon legacy Android)
   final solidImage = img.Image(width: size, height: size, numChannels: 4);
   img.fill(solidImage, color: brandTeal);
-  _drawZenviTriangle(solidImage, size, whiteColor, 0.295, 0.088);
+  _drawZenviTriangle(solidImage, size, whiteColor, 0.325, 0.088);
   File('assets/images/logo.png').writeAsBytesSync(img.encodePng(solidImage));
   print('Generated assets/images/logo.png');
 
@@ -43,7 +43,7 @@ void main() {
   // nilai semula, hanya sedikit lebih besar dan sedikit lebih tebal.
   final foregroundImage = img.Image(width: size, height: size, numChannels: 4);
   img.fill(foregroundImage, color: transparentColor);
-  _drawZenviTriangle(foregroundImage, size, whiteColor, 0.295, 0.088);
+  _drawZenviTriangle(foregroundImage, size, whiteColor, 0.325, 0.088);
   File('assets/images/logo_foreground.png').writeAsBytesSync(img.encodePng(foregroundImage));
   print('Generated assets/images/logo_foreground.png');
 
@@ -51,7 +51,7 @@ void main() {
   const splashSize = 512;
   final splashImage = img.Image(width: splashSize, height: splashSize, numChannels: 4);
   img.fill(splashImage, color: transparentColor);
-  _drawZenviTriangle(splashImage, splashSize, whiteColor, 0.285, 0.092);
+  _drawZenviTriangle(splashImage, splashSize, whiteColor, 0.315, 0.092);
 
   final splashDir = Directory('android/app/src/main/res/drawable');
   if (!splashDir.existsSync()) splashDir.createSync(recursive: true);
@@ -80,6 +80,17 @@ void _drawZenviTriangle(
   final padding = size * paddingFraction;
   final thickness = size * thicknessFraction;
 
+  // Lambangnya dibuat lebih jangkung daripada lebar.
+  //
+  // Sebelumnya jarak tepi kiri-kanan dan atas-bawah dipakai sama, jadi kotak
+  // pembatasnya nyaris persegi - dan segitiga terbalik di dalam kotak persegi
+  // terbaca gepeng, karena sisi atasnya yang panjang mendominasi sementara
+  // turunannya pendek. Tingginya sekarang 1,3x lebarnya.
+  const heightRatio = 1.3;
+  final halfWidth = (size - padding * 2) / 2;
+  final height = halfWidth * 2 * heightRatio;
+  final top = (size - height) / 2;
+
   // Ujung bawah dulu ditaruh di `size - padding * 1.15`, jadi jarak ke tepi
   // bawah lebih lebar daripada ke tepi atas. Sekarang simetris, lalu seluruh
   // bentuk digeser TURUN sedikit.
@@ -88,11 +99,16 @@ void _drawZenviTriangle(
   // berat di bagian atas - sisi atasnya satu garis penuh, bawahnya cuma satu
   // titik. Ditaruh persis di tengah secara geometris, mata tetap membacanya
   // duduk terlalu tinggi di dalam petak peluncur.
-  final nudge = size * 0.022;
+  // Geseran halus untuk keseimbangan optis. Nilainya NEGATIF - menaikkan, bukan
+  // menurunkan - karena ujung bawah yang lancip menjulur jauh lebih panjang dari
+  // titik sudutnya daripada sisi atas yang tumpul, sehingga bentuk yang dipusatkan
+  // secara hitungan tetap terlihat melorot. Diukur dari hasil jadinya: ruang atas
+  // ~21%, ruang bawah ~17%.
+  final nudge = size * -0.015;
 
-  final ax = padding, ay = padding + nudge;                // sudut kiri atas
-  final bx = size - padding, by = padding + nudge;         // sudut kanan atas
-  final cx = size / 2.0, cy = size - padding + nudge;      // ujung bawah
+  final ax = padding, ay = top + nudge;                    // sudut kiri atas
+  final bx = size - padding, by = top + nudge;             // sudut kanan atas
+  final cx = size / 2.0, cy = top + height + nudge;        // ujung bawah
 
   // Segitiga luar dan dalam adalah segitiga yang sama, diperbesar dan
   // diperkecil terhadap titik pusat lingkaran dalam. Menggeser tiap sudut ke
