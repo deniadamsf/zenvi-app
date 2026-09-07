@@ -228,6 +228,11 @@ class CompanyController extends Controller
             'require_cash_drawer_balance' => 'sometimes|boolean',
             'is_qris_enabled' => 'sometimes|boolean',
             'is_transfer_enabled' => 'sometimes|boolean',
+            'qris_merchant_name' => 'sometimes|nullable|string|max:255',
+            'bank_accounts' => 'sometimes|array|max:5',
+            'bank_accounts.*.bank' => 'required_with:bank_accounts|string|max:100',
+            'bank_accounts.*.number' => 'required_with:bank_accounts|string|max:50',
+            'bank_accounts.*.holder' => 'sometimes|nullable|string|max:255',
             'late_tolerance_minutes' => 'sometimes|integer',
             'shift_schedules' => 'sometimes|array',
             'is_qr_menu_enabled' => 'sometimes|boolean',
@@ -290,6 +295,27 @@ class CompanyController extends Controller
         }
         if ($request->has('is_transfer_enabled')) {
             $updates['is_transfer_enabled'] = $request->is_transfer_enabled;
+        }
+        if ($request->has('qris_merchant_name')) {
+            $updates['qris_merchant_name'] = trim((string) $request->qris_merchant_name) ?: null;
+        }
+        if ($request->has('bank_accounts')) {
+            // Baris kosong dibuang di sini, bukan di aplikasi: kasir tidak boleh
+            // pernah melihat kartu rekening tanpa nomor.
+            $accounts = [];
+            foreach ((array) $request->bank_accounts as $account) {
+                $bank = trim((string) ($account['bank'] ?? ''));
+                $number = trim((string) ($account['number'] ?? ''));
+                if ($bank === '' || $number === '') {
+                    continue;
+                }
+                $accounts[] = [
+                    'bank' => $bank,
+                    'number' => $number,
+                    'holder' => trim((string) ($account['holder'] ?? '')),
+                ];
+            }
+            $updates['bank_accounts'] = $accounts;
         }
         if ($request->has('late_tolerance_minutes')) {
             $updates['late_tolerance_minutes'] = $request->late_tolerance_minutes;
@@ -577,5 +603,70 @@ class CompanyController extends Controller
         }
 
         return response()->json(['message' => 'Tidak ada file logo yang diunggah.'], 422);
+    }
+
+    /**
+     * Kode QRIS statis milik toko, yang dipindai pelanggan di depan kasir.
+     *
+     * Berbeda dari logo, gambar ini TIDAK boleh dipotong jadi kotak: memotong
+     * kode QR berarti merusaknya. Jadi hanya diperkecil dengan rasio tetap.
+     */
+    public function uploadQris(Request $request)
+    {
+        $user = $request->user();
+        if ($user->role !== 'Owner') {
+            return response()->json(['message' => 'Unauthorized'], 403);
+        }
+
+        $company = $user->company;
+        if (!$company) {
+            return response()->json(['message' => 'Perusahaan tidak ditemukan.'], 404);
+        }
+
+        if ($request->boolean('remove_qris') || $request->has('remove_qris')) {
+            if ($company->qris_image_path && file_exists(public_path($company->qris_image_path))) {
+                @unlink(public_path($company->qris_image_path));
+            }
+            $company->update(['qris_image_path' => null]);
+            return response()->json([
+                'message' => 'Gambar QRIS berhasil dihapus.',
+                'data' => $company->fresh()
+            ]);
+        }
+
+        $request->validate([
+            'qris' => 'required|image|mimes:jpeg,png,jpg,webp|max:5120',
+        ]);
+
+        if ($request->hasFile('qris')) {
+            $image = $request->file('qris');
+            $filename = 'qris_' . $company->id . '_' . time() . '.' . $image->getClientOriginalExtension();
+            $path = 'uploads/qris/' . $filename;
+
+            $manager = new ImageManager(new Driver());
+            $img = $manager->read($image);
+            // scaleDown: hanya mengecilkan kalau kebesaran, rasio dijaga, dan
+            // gambar kecil tidak diperbesar sampai buram (QR jadi sulit dipindai).
+            $img->scaleDown(width: 1400, height: 1400);
+
+            $destinationPath = public_path('uploads/qris');
+            if (!file_exists($destinationPath)) {
+                mkdir($destinationPath, 0755, true);
+            }
+            $img->save(public_path($path));
+
+            if ($company->qris_image_path && file_exists(public_path($company->qris_image_path))) {
+                @unlink(public_path($company->qris_image_path));
+            }
+
+            $company->update(['qris_image_path' => $path]);
+
+            return response()->json([
+                'message' => 'Gambar QRIS berhasil diperbarui.',
+                'data' => $company->fresh()
+            ]);
+        }
+
+        return response()->json(['message' => 'Tidak ada file QRIS yang diunggah.'], 422);
     }
 }

@@ -370,11 +370,29 @@ class _POSScreenState extends State<POSScreen> {
     final isPointsEnabled = auth.isPointsEnabled;
     final pointRedeemRate = auth.pointRedeemRate;
 
+    // Detail pembayaran non-tunai yang harus dilihat kasir: kode QRIS untuk
+    // dipindai pelanggan dan nomor rekening untuk dibacakan.
+    final qrisImageUrl = (company?['qris_image_url'] ?? '').toString();
+    final qrisMerchantName = (company?['qris_merchant_name'] ?? '').toString();
+    final rawBankAccounts = company?['bank_accounts'];
+    final bankAccounts = rawBankAccounts is List
+        ? rawBankAccounts.whereType<Map>().map((item) {
+            return <String, String>{
+              'bank': (item['bank'] ?? '').toString(),
+              'number': (item['number'] ?? '').toString(),
+              'holder': (item['holder'] ?? '').toString(),
+            };
+          }).toList()
+        : <Map<String, String>>[];
+
     PaymentModal.show(
       context: context,
       totalAmount: cart.finalAmount,
       isQrisEnabled: isQrisEnabled,
       isTransferEnabled: isTransferEnabled,
+      qrisImageUrl: qrisImageUrl,
+      qrisMerchantName: qrisMerchantName,
+      bankAccounts: bankAccounts,
       staffList: auth.activeEmployees,
       currentUserId: auth.user?.id,
       currentUserName: auth.user?.name,

@@ -41,6 +41,9 @@ class Company extends Model
         'require_cash_drawer_balance',
         'is_qris_enabled',
         'is_transfer_enabled',
+        'qris_image_path',
+        'qris_merchant_name',
+        'bank_accounts',
         'late_tolerance_minutes',
         'shift_schedules',
     ];
@@ -59,6 +62,7 @@ class Company extends Model
         'point_redeem_rate' => 'double',
         'is_qris_enabled' => 'boolean',
         'is_transfer_enabled' => 'boolean',
+        'bank_accounts' => 'array',
         'require_cash_drawer_balance' => 'boolean',
         'require_opname_on_shift_close' => 'boolean',
         'require_attendance' => 'boolean',
@@ -70,6 +74,7 @@ class Company extends Model
         'qr_menu_url',
         'store_url',
         'logo_url',
+        'qris_image_url',
         'plan',
     ];
 
@@ -185,6 +190,11 @@ class Company extends Model
             return url($this->logo_path);
         }
         return null;
+    }
+
+    public function getQrisImageUrlAttribute()
+    {
+        return $this->qris_image_path ? url($this->qris_image_path) : null;
     }
 
     public function users()

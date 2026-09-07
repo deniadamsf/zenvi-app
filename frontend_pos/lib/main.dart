@@ -39,6 +39,7 @@ import 'providers/notification_provider.dart';
 import 'services/sync_service.dart';
 import 'services/notification_service.dart';
 import 'services/product_image_cache.dart';
+import 'services/qris_image_cache.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -60,6 +61,7 @@ void main() async {
   // bisa langsung tampil di frame pertama tanpa menunggu I/O.
   try {
     await ProductImageCache.instance.warmUp();
+    await QrisImageCache.instance.warmUp();
   } catch (e) {
     debugPrint('Product image cache warm-up failed: $e');
   }

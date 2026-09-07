@@ -6,6 +6,7 @@ import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 import '../models/user_model.dart';
 import '../config/api_config.dart';
+import '../services/qris_image_cache.dart';
 import '../services/api_client.dart';
 import '../services/notification_service.dart';
 
@@ -366,6 +367,8 @@ class AuthProvider extends ChangeNotifier {
     bool? requireCashDrawerBalance,
     bool? isQrisEnabled,
     bool? isTransferEnabled,
+    String? qrisMerchantName,
+    List<Map<String, String>>? bankAccounts,
     int? lateToleranceMinutes,
     List<Map<String, String>>? shiftSchedules,
     bool? isQrMenuEnabled,
@@ -392,6 +395,8 @@ class AuthProvider extends ChangeNotifier {
     final currentCashDrawer = _user!.company?['require_cash_drawer_balance'];
     final currentQris = _user!.company?['is_qris_enabled'];
     final currentTransfer = _user!.company?['is_transfer_enabled'];
+    final currentQrisMerchant = _user!.company?['qris_merchant_name'];
+    final currentBankAccounts = _user!.company?['bank_accounts'];
     final currentTolerance = _user!.company?['late_tolerance_minutes'];
     final currentShiftSchedules = _user!.company?['shift_schedules'];
     final currentQrMenuEnabled = _user!.company?['is_qr_menu_enabled'];
@@ -415,6 +420,8 @@ class AuthProvider extends ChangeNotifier {
     if (requireCashDrawerBalance != null) _user!.company?['require_cash_drawer_balance'] = requireCashDrawerBalance ? 1 : 0;
     if (isQrisEnabled != null) _user!.company?['is_qris_enabled'] = isQrisEnabled ? 1 : 0;
     if (isTransferEnabled != null) _user!.company?['is_transfer_enabled'] = isTransferEnabled ? 1 : 0;
+    if (qrisMerchantName != null) _user!.company?['qris_merchant_name'] = qrisMerchantName;
+    if (bankAccounts != null) _user!.company?['bank_accounts'] = bankAccounts;
     if (lateToleranceMinutes != null) _user!.company?['late_tolerance_minutes'] = lateToleranceMinutes;
     if (shiftSchedules != null) _user!.company?['shift_schedules'] = shiftSchedules;
     if (isQrMenuEnabled != null) _user!.company?['is_qr_menu_enabled'] = isQrMenuEnabled ? 1 : 0;
@@ -444,6 +451,8 @@ class AuthProvider extends ChangeNotifier {
       if (requireCashDrawerBalance != null) body['require_cash_drawer_balance'] = requireCashDrawerBalance;
       if (isQrisEnabled != null) body['is_qris_enabled'] = isQrisEnabled;
       if (isTransferEnabled != null) body['is_transfer_enabled'] = isTransferEnabled;
+      if (qrisMerchantName != null) body['qris_merchant_name'] = qrisMerchantName;
+      if (bankAccounts != null) body['bank_accounts'] = bankAccounts;
       if (lateToleranceMinutes != null) body['late_tolerance_minutes'] = lateToleranceMinutes;
       if (shiftSchedules != null) body['shift_schedules'] = shiftSchedules;
       if (isQrMenuEnabled != null) body['is_qr_menu_enabled'] = isQrMenuEnabled;
@@ -495,6 +504,8 @@ class AuthProvider extends ChangeNotifier {
       _user!.company?['require_cash_drawer_balance'] = currentCashDrawer;
       _user!.company?['is_qris_enabled'] = currentQris;
       _user!.company?['is_transfer_enabled'] = currentTransfer;
+      _user!.company?['qris_merchant_name'] = currentQrisMerchant;
+      _user!.company?['bank_accounts'] = currentBankAccounts;
       _user!.company?['late_tolerance_minutes'] = currentTolerance;
       _user!.company?['shift_schedules'] = currentShiftSchedules;
       _user!.company?['is_qr_menu_enabled'] = currentQrMenuEnabled;
@@ -523,6 +534,8 @@ class AuthProvider extends ChangeNotifier {
       _user!.company?['require_cash_drawer_balance'] = currentCashDrawer;
       _user!.company?['is_qris_enabled'] = currentQris;
       _user!.company?['is_transfer_enabled'] = currentTransfer;
+      _user!.company?['qris_merchant_name'] = currentQrisMerchant;
+      _user!.company?['bank_accounts'] = currentBankAccounts;
       _user!.company?['late_tolerance_minutes'] = currentTolerance;
       _user!.company?['shift_schedules'] = currentShiftSchedules;
       _user!.company?['is_qr_menu_enabled'] = currentQrMenuEnabled;
@@ -614,6 +627,66 @@ class AuthProvider extends ChangeNotifier {
       }
     } catch (e) {
       debugPrint('removeCompanyLogo error: $e');
+    }
+    _setLoading(false);
+    return false;
+  }
+
+  /// Mengunggah gambar QRIS statis toko, yang nanti ditampilkan di layar kasir
+  /// untuk dipindai pelanggan.
+  Future<bool> uploadQrisImage(File imageFile) async {
+    if (_token == null || _user == null) return false;
+    _setLoading(true);
+    try {
+      final request = http.MultipartRequest(
+        'POST',
+        Uri.parse('$_apiUrl/companies/qris'),
+      );
+      request.headers.addAll({
+        'Authorization': 'Bearer $_token',
+        'Accept': 'application/json',
+      });
+      request.files.add(
+        await http.MultipartFile.fromPath('qris', imageFile.path),
+      );
+
+      final streamedResponse = await request.send();
+      final response = await http.Response.fromStream(streamedResponse);
+      debugPrint('uploadQrisImage response: ${response.statusCode} -> ${response.body}');
+
+      if (response.statusCode == 200) {
+        await fetchUserData();
+        _setLoading(false);
+        return true;
+      }
+    } catch (e) {
+      debugPrint('uploadQrisImage error: $e');
+    }
+    _setLoading(false);
+    return false;
+  }
+
+  Future<bool> removeQrisImage() async {
+    if (_token == null || _user == null) return false;
+    _setLoading(true);
+    try {
+      final response = await http.post(
+        Uri.parse('$_apiUrl/companies/qris'),
+        headers: {
+          'Authorization': 'Bearer $_token',
+          'Accept': 'application/json',
+          'Content-Type': 'application/json',
+        },
+        body: jsonEncode({'remove_qris': true}),
+      );
+      debugPrint('removeQrisImage response: ${response.statusCode} -> ${response.body}');
+      if (response.statusCode == 200) {
+        await fetchUserData();
+        _setLoading(false);
+        return true;
+      }
+    } catch (e) {
+      debugPrint('removeQrisImage error: $e');
     }
     _setLoading(false);
     return false;
@@ -791,7 +864,10 @@ class AuthProvider extends ChangeNotifier {
     await prefs.remove('auth_token');
     await prefs.remove('cached_user_profile');
     await prefs.remove('cached_active_shift');
-    
+
+    // QRIS toko lama tidak boleh terbawa ke akun berikutnya di perangkat yang sama.
+    await QrisImageCache.instance.clear();
+
     await gsi.GoogleSignIn.instance.signOut();
     notifyListeners();
   }

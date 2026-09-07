@@ -52,6 +52,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/companies/location', [CompanyController::class, 'updateLocation']);
     Route::post('/companies/settings', [CompanyController::class, 'updateSettings']);
     Route::post('/companies/logo', [CompanyController::class, 'uploadLogo']);
+    Route::post('/companies/qris', [CompanyController::class, 'uploadQris']);
     Route::get('/companies/employees/pending', [CompanyController::class, 'pendingEmployees']);
     Route::get('/companies/employees/active', [CompanyController::class, 'activeEmployees']);
     // Kuota karyawan ditegakkan saat OWNER MENYETUJUI, bukan saat karyawan

@@ -1,12 +1,17 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import '../../../models/member_model.dart';
 import '../../../theme/app_colors.dart';
+import '../../../widgets/qris_image.dart';
 
 class PaymentModal extends StatefulWidget {
   final double totalAmount;
   final bool isQrisEnabled;
   final bool isTransferEnabled;
+  final String? qrisImageUrl;
+  final String? qrisMerchantName;
+  final List<Map<String, String>> bankAccounts;
   final List<Map<String, dynamic>> staffList;
   final int? currentUserId;
   final String? currentUserName;
@@ -29,6 +34,9 @@ class PaymentModal extends StatefulWidget {
     required this.totalAmount,
     required this.isQrisEnabled,
     required this.isTransferEnabled,
+    this.qrisImageUrl,
+    this.qrisMerchantName,
+    this.bankAccounts = const [],
     this.staffList = const [],
     this.currentUserId,
     this.currentUserName,
@@ -44,6 +52,9 @@ class PaymentModal extends StatefulWidget {
     required double totalAmount,
     required bool isQrisEnabled,
     required bool isTransferEnabled,
+    String? qrisImageUrl,
+    String? qrisMerchantName,
+    List<Map<String, String>> bankAccounts = const [],
     List<Map<String, dynamic>> staffList = const [],
     int? currentUserId,
     String? currentUserName,
@@ -71,6 +82,9 @@ class PaymentModal extends StatefulWidget {
           totalAmount: totalAmount,
           isQrisEnabled: isQrisEnabled,
           isTransferEnabled: isTransferEnabled,
+          qrisImageUrl: qrisImageUrl,
+          qrisMerchantName: qrisMerchantName,
+          bankAccounts: bankAccounts,
           staffList: staffList,
           currentUserId: currentUserId,
           currentUserName: currentUserName,
@@ -603,65 +617,9 @@ class _PaymentModalState extends State<PaymentModal> {
                 ),
               ),
             ] else if (_selectedMethod == 'qris') ...[
-              // QRIS Info
-              Container(
-                width: double.infinity,
-                padding: const EdgeInsets.all(16),
-                decoration: BoxDecoration(
-                  color: theme.colorScheme.primary.withValues(alpha: 0.08),
-                  borderRadius: BorderRadius.circular(16),
-                  border: Border.all(color: theme.colorScheme.primary.withValues(alpha: 0.3)),
-                ),
-                child: Row(
-                  children: [
-                    Icon(Icons.qr_code_scanner_rounded, size: 40, color: theme.colorScheme.primary),
-                    const SizedBox(width: 16),
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text('pembayaran_qris_digital_312'.tr(context: context), style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14)),
-                          const SizedBox(height: 4),
-                          Text(
-                            'payment_qris_note'.tr(context: context),
-                            style: TextStyle(fontSize: 12, color: theme.colorScheme.onSurfaceVariant),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ],
-                ),
-              ),
+              _qrisPanel(theme),
             ] else if (_selectedMethod == 'transfer') ...[
-              // Transfer Info
-              Container(
-                width: double.infinity,
-                padding: const EdgeInsets.all(16),
-                decoration: BoxDecoration(
-                  color: theme.colorScheme.primary.withValues(alpha: 0.08),
-                  borderRadius: BorderRadius.circular(16),
-                  border: Border.all(color: theme.colorScheme.primary.withValues(alpha: 0.3)),
-                ),
-                child: Row(
-                  children: [
-                    Icon(Icons.account_balance_rounded, size: 40, color: theme.colorScheme.primary),
-                    const SizedBox(width: 16),
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text('transfer_bank_314'.tr(context: context), style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14)),
-                          const SizedBox(height: 4),
-                          Text(
-                            'payment_transfer_note'.tr(context: context),
-                            style: TextStyle(fontSize: 12, color: theme.colorScheme.onSurfaceVariant),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ],
-                ),
-              ),
+              _transferPanel(theme),
             ],
 
             // Optional Staff/Kapster/Terapis Selector
@@ -802,4 +760,246 @@ class _PaymentModalState extends State<PaymentModal> {
       ),
     );
   }
+
+  /// Panel QRIS di layar kasir: kode yang benar-benar bisa dipindai pelanggan,
+  /// bukan sekadar catatan teks. Gambarnya diambil dari cache lokal lebih dulu
+  /// supaya tetap muncul saat internet toko sedang mati.
+  Widget _qrisPanel(ThemeData theme) {
+    final url = widget.qrisImageUrl;
+    final merchant = (widget.qrisMerchantName ?? '').trim();
+    final hasQris = url != null && url.isNotEmpty;
+
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: theme.colorScheme.primary.withValues(alpha: 0.08),
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: theme.colorScheme.primary.withValues(alpha: 0.3)),
+      ),
+      child: Column(
+        children: [
+          Row(
+            children: [
+              Icon(Icons.qr_code_scanner_rounded, size: 40, color: theme.colorScheme.primary),
+              const SizedBox(width: 16),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text('pembayaran_qris_digital_312'.tr(context: context),
+                        style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14)),
+                    const SizedBox(height: 4),
+                    Text(
+                      hasQris
+                          ? 'payment_qris_scan_hint'.tr(context: context)
+                          : 'payment_qris_note'.tr(context: context),
+                      style: TextStyle(fontSize: 12, color: theme.colorScheme.onSurfaceVariant),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+          if (!hasQris)
+            _notSetNotice(theme, 'payment_qris_not_set'.tr(context: context))
+          else ...[
+            const SizedBox(height: 16),
+            GestureDetector(
+              onTap: () => _showQrisFullscreen(url, merchant),
+              child: Container(
+                width: 200,
+                height: 200,
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(16),
+                ),
+                clipBehavior: Clip.antiAlias,
+                child: Padding(
+                  padding: const EdgeInsets.all(8),
+                  child: QrisImage(
+                    imageUrl: url,
+                    fallback: Center(
+                      child: Icon(Icons.broken_image_outlined, size: 40, color: Colors.grey.shade400),
+                    ),
+                  ),
+                ),
+              ),
+            ),
+            if (merchant.isNotEmpty) ...[
+              const SizedBox(height: 8),
+              Text(merchant, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13)),
+            ],
+            const SizedBox(height: 4),
+            Text(
+              'payment_qris_tap_to_enlarge'.tr(context: context),
+              style: TextStyle(fontSize: 11, color: theme.colorScheme.onSurfaceVariant),
+            ),
+          ],
+        ],
+      ),
+    );
+  }
+
+  /// QRIS diperbesar sepenuh layar dengan latar putih: kamera ponsel pelanggan
+  /// butuh kontras dan ukuran, apalagi di layar kasir yang kecil.
+  void _showQrisFullscreen(String url, String merchant) {
+    showDialog(
+      context: context,
+      barrierColor: Colors.black87,
+      builder: (dialogContext) => Dialog(
+        insetPadding: const EdgeInsets.all(16),
+        backgroundColor: Colors.white,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
+        child: Padding(
+          padding: const EdgeInsets.all(20),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              if (merchant.isNotEmpty)
+                Text(
+                  merchant,
+                  textAlign: TextAlign.center,
+                  style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16, color: Colors.black),
+                ),
+              const SizedBox(height: 12),
+              Flexible(
+                child: InteractiveViewer(
+                  maxScale: 4,
+                  child: QrisImage(
+                    imageUrl: url,
+                    fallback: Icon(Icons.broken_image_outlined, size: 48, color: Colors.grey.shade400),
+                  ),
+                ),
+              ),
+              const SizedBox(height: 12),
+              TextButton(
+                onPressed: () => Navigator.pop(dialogContext),
+                child: Text('tutup_136'.tr(context: context)),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  /// Panel transfer: nomor rekening yang bisa disalin, bukan hanya imbauan
+  /// memeriksa mutasi.
+  Widget _transferPanel(ThemeData theme) {
+    final accounts = widget.bankAccounts.where((a) {
+      return (a['bank'] ?? '').trim().isNotEmpty && (a['number'] ?? '').trim().isNotEmpty;
+    }).toList();
+
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: theme.colorScheme.primary.withValues(alpha: 0.08),
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: theme.colorScheme.primary.withValues(alpha: 0.3)),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Icon(Icons.account_balance_rounded, size: 40, color: theme.colorScheme.primary),
+              const SizedBox(width: 16),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text('transfer_bank_314'.tr(context: context),
+                        style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14)),
+                    const SizedBox(height: 4),
+                    Text(
+                      'payment_transfer_note'.tr(context: context),
+                      style: TextStyle(fontSize: 12, color: theme.colorScheme.onSurfaceVariant),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+          if (accounts.isEmpty)
+            _notSetNotice(theme, 'payment_bank_not_set'.tr(context: context))
+          else ...[
+            const SizedBox(height: 12),
+            for (final account in accounts) _bankAccountCard(theme, account),
+          ],
+        ],
+      ),
+    );
+  }
+
+  Widget _bankAccountCard(ThemeData theme, Map<String, String> account) {
+    final bank = (account['bank'] ?? '').trim();
+    final number = (account['number'] ?? '').trim();
+    final holder = (account['holder'] ?? '').trim();
+
+    return Container(
+      margin: const EdgeInsets.only(bottom: 8),
+      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+      decoration: BoxDecoration(
+        color: theme.colorScheme.surface,
+        borderRadius: BorderRadius.circular(12),
+      ),
+      child: Row(
+        children: [
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(bank, style: TextStyle(fontSize: 11, color: theme.colorScheme.onSurfaceVariant)),
+                Text(
+                  number,
+                  style: const TextStyle(fontWeight: FontWeight.w900, fontSize: 16, letterSpacing: 0.5),
+                ),
+                if (holder.isNotEmpty)
+                  Text(holder, style: TextStyle(fontSize: 12, color: theme.colorScheme.onSurfaceVariant)),
+              ],
+            ),
+          ),
+          IconButton(
+            tooltip: 'payment_copy'.tr(context: context),
+            onPressed: () async {
+              await Clipboard.setData(ClipboardData(text: number));
+              if (!mounted) return;
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(
+                  content: Text('payment_copied'.tr(context: context)),
+                  behavior: SnackBarBehavior.floating,
+                  duration: const Duration(seconds: 2),
+                ),
+              );
+            },
+            icon: Icon(Icons.copy_rounded, size: 20, color: theme.colorScheme.primary),
+          ),
+        ],
+      ),
+    );
+  }
+
+  /// Ditampilkan saat metodenya dinyalakan tapi datanya belum diisi owner -
+  /// kasir perlu tahu ini kelalaian pengaturan, bukan aplikasi yang rusak.
+  Widget _notSetNotice(ThemeData theme, String message) {
+    return Padding(
+      padding: const EdgeInsets.only(top: 12),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Icon(Icons.info_outline_rounded, size: 16, color: AppColors.dangerText),
+          const SizedBox(width: 8),
+          Expanded(
+            child: Text(
+              message,
+              style: TextStyle(fontSize: 12, color: AppColors.dangerText, fontWeight: FontWeight.w600),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
 }
