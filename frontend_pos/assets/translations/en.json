@@ -9,7 +9,7 @@
     "login_btn_google": "Sign in with Google",
     "dashboard_title": "Owner Dashboard",
     "sales_summary": "Daily Sales Statistics",
-    "pos_title": "Zenvi POS",
+    "pos_title": "{} Cashier",
     "cart_title": "Shopping Cart",
     "checkout_btn": "Checkout",
     "menu_placeholder": "Menu Grid and Cart Display",
@@ -1426,5 +1426,9 @@
     "promo_discount_type_label": "Discount Type",
     "promo_min_purchase_label": "Min. Purchase (Rp)",
     "shift_closed_synced": "Shift closed. Cash and stock data are synced.",
-    "shift_opened_success": "Shift opened."
+    "shift_opened_success": "Shift opened.",
+    "pos_title_fallback": "Cashier",
+    "pos_view_grid": "Grid view",
+    "pos_view_list": "List view",
+    "pos_has_variants": "VARIANTS"
 }

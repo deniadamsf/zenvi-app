@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'printer_settings_screen.dart';
 import 'package:provider/provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import '../../providers/cart_provider.dart';
 import '../../database/database_helper.dart';
 import '../../models/product_model.dart';
@@ -31,8 +32,19 @@ class POSScreen extends StatefulWidget {
 }
 
 class _POSScreenState extends State<POSScreen> {
+  static const String _viewModePrefsKey = 'pos_list_view';
+
+  /// Kapan menu terakhir ditarik dari server.
+  ///
+  /// Sengaja statis. Berpindah tab membongkar POSScreen dan memasangnya lagi
+  /// dari nol, jadi penanda milik instance tidak akan pernah menahan apa pun -
+  /// justru itu sebabnya dulu setiap kali kasir dibuka selalu menyinkron ulang.
+  static DateTime? _lastProductSync;
+  static const Duration _syncCooldown = Duration(minutes: 5);
+
   List<ProductModel> _localProducts = [];
   bool _isLoading = true;
+  bool _isListView = false;
   String _selectedCategory = 'all';
   final TextEditingController _searchController = TextEditingController();
   String _searchQuery = '';
@@ -40,6 +52,7 @@ class _POSScreenState extends State<POSScreen> {
   @override
   void initState() {
     super.initState();
+    _restoreViewMode();
     _loadProducts();
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _fetchActiveShift();
@@ -111,16 +124,63 @@ class _POSScreenState extends State<POSScreen> {
     }
   }
 
-  Future<void> _loadProducts() async {
-    // 1. Sinkronisasi background
-    await SyncService().pullProducts();
+  Future<void> _restoreViewMode() async {
+    final prefs = await SharedPreferences.getInstance();
+    final saved = prefs.getBool(_viewModePrefsKey) ?? false;
+    if (mounted && saved != _isListView) {
+      setState(() => _isListView = saved);
+    }
+  }
 
-    // 2. Load dari lokal
-    final products = await DatabaseHelper.instance.getLocalProducts();
+  Future<void> _setListView(bool value) async {
+    setState(() => _isListView = value);
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setBool(_viewModePrefsKey, value);
+  }
+
+  /// Menampilkan menu dari database lokal LEBIH DULU, lalu menyinkron di
+  /// belakang layar.
+  ///
+  /// Sebelumnya urutannya terbalik: `await pullProducts()` dijalankan sebelum
+  /// apa pun digambar, jadi setiap kali kasir dibuka - termasuk sekadar
+  /// berpindah tab - layarnya menahan kerangka memuat selama satu perjalanan
+  /// jaringan penuh, padahal seluruh datanya sudah ada di perangkat. Makin
+  /// banyak produk berfoto, makin besar payload-nya dan makin lama tertahan.
+  Future<void> _loadProducts() async {
+    final cached = await DatabaseHelper.instance.getLocalProducts();
+    if (!mounted) return;
+    if (cached.isNotEmpty) {
+      setState(() {
+        _localProducts = cached;
+        _isLoading = false;
+      });
+    }
+
+    // Menu jarang berubah di tengah shift. Kalau baru saja ditarik, sama sekali
+    // tidak perlu menyentuh jaringan.
+    final last = _lastProductSync;
+    final isStale = last == null || DateTime.now().difference(last) > _syncCooldown;
+    if (!isStale && cached.isNotEmpty) {
+      return;
+    }
+
+    await SyncService().pullProducts();
+    if (!mounted) return;
+    _lastProductSync = DateTime.now();
+
+    final synced = await DatabaseHelper.instance.getLocalProducts();
+    if (!mounted) return;
     setState(() {
-      _localProducts = products;
+      _localProducts = synced;
       _isLoading = false;
     });
+  }
+
+  /// Dipakai tarik-untuk-menyegarkan: di sini pengguna memang MEMINTA data
+  /// terbaru, jadi jeda sinkronisasi diabaikan.
+  Future<void> _refreshProducts() async {
+    _lastProductSync = null;
+    await _loadProducts();
   }
 
   bool _checkShiftOrShowDialog(BuildContext context) {
@@ -469,27 +529,15 @@ class _POSScreenState extends State<POSScreen> {
                                                 ],
                                               ),
                                             )
-                                          : GridView.builder(
-                                              padding: EdgeInsets.only(
+                                          : _buildProductCollection(
+                                              theme,
+                                              isDesktop,
+                                              EdgeInsets.only(
                                                 top: 10,
                                                 bottom: isDesktop
                                                     ? 40
                                                     : (totalItems > 0 ? 190 : 120),
                                               ),
-                                              physics: const BouncingScrollPhysics(),
-                                              gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                                                crossAxisCount: isDesktop ? 4 : 2,
-                                                childAspectRatio: isDesktop ? 0.78 : 0.72,
-                                                crossAxisSpacing: 14,
-                                                mainAxisSpacing: 14,
-                                              ),
-                                              itemCount: _filteredProducts.length,
-                                              itemBuilder: (context, index) {
-                                                return _buildMenuCard(context, _filteredProducts[index])
-                                                    .animate(delay: (index * 30).ms)
-                                                    .fade(duration: 300.ms)
-                                                    .slideY(begin: 0.08, end: 0, curve: Curves.easeOutCubic);
-                                              },
                                             ),
                             ),
                           ],
@@ -642,8 +690,19 @@ class _POSScreenState extends State<POSScreen> {
   }
 
   Widget _buildGlassHeader(BuildContext context, ThemeData theme, Size size, bool isDesktop) {
+    // Judulnya menyebut nama toko, bukan nama aplikasi. Kasir melihat layar ini
+    // sepanjang hari; yang berguna baginya adalah tahu sedang membuka toko atau
+    // cabang yang mana - bukan diingatkan aplikasi apa yang sedang dipakai.
+    final storeName = Provider.of<AuthProvider>(context, listen: false)
+            .user
+            ?.company?['name']
+            ?.toString() ??
+        '';
+
     return ZenviHeader(
-      title: 'pos_title'.tr(context: context),
+      title: storeName.isEmpty
+          ? 'pos_title_fallback'.tr(context: context)
+          : 'pos_title'.tr(context: context, args: [storeName]),
       subtitle: 'pos_header_subtitle'.tr(context: context),
       showBackButton: widget.onNavigateBack != null || Navigator.of(context).canPop(),
       onBackPressed: () {
@@ -838,8 +897,11 @@ class _POSScreenState extends State<POSScreen> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Search box
-          Container(
+          // Search box + pemilih tampilan
+          Row(
+            children: [
+              Expanded(
+                child: Container(
             height: 44,
             decoration: BoxDecoration(
               color: theme.colorScheme.surface,
@@ -879,6 +941,11 @@ class _POSScreenState extends State<POSScreen> {
                 contentPadding: const EdgeInsets.symmetric(vertical: 11, horizontal: 12),
               ),
             ),
+                ),
+              ),
+              const SizedBox(width: 8),
+              _buildViewModeToggle(theme),
+            ],
           ),
 
           const SizedBox(height: 10),
@@ -918,6 +985,60 @@ class _POSScreenState extends State<POSScreen> {
             ),
           ),
         ],
+      ),
+    );
+  }
+
+  /// Petak dan daftar. Petak enak untuk menu bergambar; daftar memuat jauh
+  /// lebih banyak baris dalam satu layar - itu yang dibutuhkan toko dengan
+  /// ratusan produk atau yang tidak memakai foto sama sekali.
+  Widget _buildViewModeToggle(ThemeData theme) {
+    return Container(
+      height: 44,
+      padding: const EdgeInsets.all(4),
+      decoration: BoxDecoration(
+        color: theme.colorScheme.surface,
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: theme.dividerColor.withValues(alpha: 0.1)),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          _buildViewModeButton(theme, Icons.grid_view_rounded, 'pos_view_grid', !_isListView, () => _setListView(false)),
+          _buildViewModeButton(theme, Icons.view_list_rounded, 'pos_view_list', _isListView, () => _setListView(true)),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildViewModeButton(
+    ThemeData theme,
+    IconData icon,
+    String labelKey,
+    bool selected,
+    VoidCallback onTap,
+  ) {
+    return Semantics(
+      button: true,
+      selected: selected,
+      label: labelKey.tr(context: context),
+      child: InkWell(
+        borderRadius: BorderRadius.circular(12),
+        onTap: onTap,
+        child: AnimatedContainer(
+          duration: 160.ms,
+          width: 38,
+          height: 36,
+          decoration: BoxDecoration(
+            color: selected ? theme.colorScheme.primary : Colors.transparent,
+            borderRadius: BorderRadius.circular(12),
+          ),
+          child: Icon(
+            icon,
+            size: 19,
+            color: selected ? theme.colorScheme.onPrimary : theme.colorScheme.onSurfaceVariant,
+          ),
+        ),
       ),
     );
   }
@@ -1050,6 +1171,181 @@ class _POSScreenState extends State<POSScreen> {
       return Icons.shopping_bag_rounded;
     }
     return Icons.restaurant_rounded;
+  }
+
+  /// Petak atau daftar, sesuai pilihan pengguna.
+  ///
+  /// Animasi masuknya dibatasi hanya beberapa item pertama. Sebelumnya setiap
+  /// item mendapat `delay: index * 30ms`, jadi pada menu berisi 100 produk item
+  /// terakhir baru muncul tiga detik kemudian - dan seratus pengontrol animasi
+  /// dijalankan sekaligus di layar yang seharusnya langsung bisa dipakai.
+  static const int _maxStaggeredItems = 10;
+
+  Duration _entryDelay(int index) =>
+      index < _maxStaggeredItems ? (index * 30).ms : Duration.zero;
+
+  Widget _buildProductCollection(ThemeData theme, bool isDesktop, EdgeInsets padding) {
+    // Jeda sinkronisasi membuat menu bisa tertinggal sampai lima menit kalau
+    // pemilik menambah produk dari perangkat lain. Tarik-untuk-menyegarkan
+    // adalah jalan keluarnya: di sini pengguna memang meminta data terbaru,
+    // jadi jedanya diabaikan.
+    return RefreshIndicator(
+      onRefresh: _refreshProducts,
+      color: theme.colorScheme.primary,
+      child: _buildProductScrollable(theme, isDesktop, padding),
+    );
+  }
+
+  Widget _buildProductScrollable(ThemeData theme, bool isDesktop, EdgeInsets padding) {
+    if (_isListView) {
+      return ListView.separated(
+        padding: padding,
+        physics: const AlwaysScrollableScrollPhysics(parent: BouncingScrollPhysics()),
+        itemCount: _filteredProducts.length,
+        separatorBuilder: (_, _) => const SizedBox(height: 8),
+        itemBuilder: (context, index) {
+          return _buildMenuListTile(context, _filteredProducts[index])
+              .animate(delay: _entryDelay(index))
+              .fade(duration: 260.ms)
+              .slideY(begin: 0.05, end: 0, curve: Curves.easeOutCubic);
+        },
+      );
+    }
+
+    return GridView.builder(
+      padding: padding,
+      physics: const AlwaysScrollableScrollPhysics(parent: BouncingScrollPhysics()),
+      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+        crossAxisCount: isDesktop ? 4 : 2,
+        childAspectRatio: isDesktop ? 0.78 : 0.72,
+        crossAxisSpacing: 14,
+        mainAxisSpacing: 14,
+      ),
+      itemCount: _filteredProducts.length,
+      itemBuilder: (context, index) {
+        return _buildMenuCard(context, _filteredProducts[index])
+            .animate(delay: _entryDelay(index))
+            .fade(duration: 300.ms)
+            .slideY(begin: 0.08, end: 0, curve: Curves.easeOutCubic);
+      },
+    );
+  }
+
+  /// Satu baris menu. Fotonya kecil dan tetap - itu maksudnya: dalam satu layar
+  /// muat jauh lebih banyak produk daripada tampilan petak.
+  Widget _buildMenuListTile(BuildContext context, ProductModel product) {
+    final theme = Theme.of(context);
+    final auth = Provider.of<AuthProvider>(context, listen: false);
+    final isProductImageEnabled = auth.isProductImageEnabled;
+    final hasVariants = product.variants.isNotEmpty;
+
+    final thumbFallback = Container(
+      color: theme.colorScheme.primary.withValues(alpha: 0.08),
+      child: Icon(
+        _getProductCategoryIcon(product),
+        size: 22,
+        color: theme.colorScheme.primary.withValues(alpha: 0.6),
+      ),
+    );
+
+    return Material(
+      color: theme.colorScheme.surface,
+      borderRadius: BorderRadius.circular(16),
+      child: InkWell(
+        borderRadius: BorderRadius.circular(16),
+        onTap: () {
+          if (!_checkShiftOrShowDialog(context)) return;
+          if (hasVariants) {
+            _showVariantSelectionDialog(context, product);
+          } else {
+            Provider.of<CartProvider>(context, listen: false).addToCart(product);
+          }
+        },
+        child: Container(
+          padding: const EdgeInsets.all(10),
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(16),
+            border: Border.all(color: theme.dividerColor.withValues(alpha: 0.1)),
+          ),
+          child: Row(
+            children: [
+              ClipRRect(
+                borderRadius: BorderRadius.circular(12),
+                child: SizedBox(
+                  width: 52,
+                  height: 52,
+                  child: (isProductImageEnabled &&
+                          product.imageUrl != null &&
+                          product.imageUrl!.isNotEmpty)
+                      ? ProductImage(
+                          imageUrl: product.imageUrl,
+                          fit: BoxFit.cover,
+                          fallback: thumbFallback,
+                        )
+                      : thumbFallback,
+                ),
+              ),
+              const SizedBox(width: 12),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Text(
+                      product.name,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 14),
+                    ),
+                    const SizedBox(height: 3),
+                    Row(
+                      children: [
+                        Text(
+                          'Rp ${NumberFormat.decimalPattern('id').format(product.price)}',
+                          style: TextStyle(
+                            fontSize: 13,
+                            fontWeight: FontWeight.w700,
+                            color: theme.colorScheme.primary,
+                          ),
+                        ),
+                        if (hasVariants) ...[
+                          const SizedBox(width: 8),
+                          Container(
+                            padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                            decoration: BoxDecoration(
+                              color: theme.colorScheme.primary.withValues(alpha: 0.1),
+                              borderRadius: BorderRadius.circular(6),
+                            ),
+                            child: Text(
+                              'pos_has_variants'.tr(context: context),
+                              style: TextStyle(
+                                fontSize: 9,
+                                fontWeight: FontWeight.w700,
+                                color: theme.colorScheme.primary,
+                              ),
+                            ),
+                          ),
+                        ],
+                      ],
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(width: 8),
+              Container(
+                width: 34,
+                height: 34,
+                decoration: BoxDecoration(
+                  color: theme.colorScheme.primary,
+                  borderRadius: BorderRadius.circular(11),
+                ),
+                child: Icon(Icons.add_rounded, size: 19, color: theme.colorScheme.onPrimary),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
   }
 
   Widget _buildMenuCard(BuildContext context, ProductModel product) {

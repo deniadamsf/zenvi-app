@@ -9,7 +9,7 @@
     "login_btn_google": "Masuk dengan Google",
     "dashboard_title": "Dasbor Pemilik",
     "sales_summary": "Statistik Penjualan Harian",
-    "pos_title": "Kasir Zenvi",
+    "pos_title": "Kasir {}",
     "cart_title": "Keranjang Belanja",
     "checkout_btn": "Bayar",
     "menu_placeholder": "Tampilan Grid Menu dan Keranjang Belanja",
@@ -1426,5 +1426,9 @@
     "promo_discount_type_label": "Tipe Diskon",
     "promo_min_purchase_label": "Min. Pembelian (Rp)",
     "shift_closed_synced": "Shift ditutup. Data kas & stok tersinkronisasi.",
-    "shift_opened_success": "Shift berhasil dibuka!"
+    "shift_opened_success": "Shift berhasil dibuka!",
+    "pos_title_fallback": "Kasir",
+    "pos_view_grid": "Tampilan petak",
+    "pos_view_list": "Tampilan daftar",
+    "pos_has_variants": "VARIAN"
 }
