@@ -36,30 +36,19 @@ void main() {
 
   // 2. Lapisan depan ikon adaptif Android.
   //
-  // PENTING: angka di sini TIDAK boleh disamakan dengan ikon legacy di atas.
-  // Peluncur lama memakai mipmap/ic_launcher.png apa adanya, sedangkan ikon
-  // adaptif masih disusutkan ke 68% oleh inset 16% di ic_launcher.xml. Padding
-  // dan ketebalan di sini karena itu jauh lebih kecil - keduanya dibagi 0,68 -
-  // supaya hasil di layar depan sama besar dan sama tebal di kedua jenis
-  // peluncur. Ukuran akhir diverifikasi 63x57% (legacy) dan 66x60% (adaptif),
-  // sepadan dengan lambang Play Console yang dipakai sebagai patokan.
+  // Angkanya SAMA PERSIS dengan ikon legacy di atas, dan itu disengaja.
   //
-  // ANGKA ACUAN kalau ukurannya perlu disetel lagi. `padding` di sini diukur
-  // terhadap kanvas berkas ini, BUKAN terhadap ikon yang akhirnya terlihat -
-  // ic_launcher.xml masih menyusutkannya lagi ke 68% lewat inset 16%. Jadi
-  // tinggi akhir di layar depan = tinggi di kanvas ini x 0,68.
+  // Sebelumnya angka di sini dibagi 0,68 karena ic_launcher.xml membungkus
+  // lapisan ini dengan `<inset 16%>`. Ternyata tidak semua peluncur menerapkan
+  // inset itu - di MIUI lapisannya digambar penuh, jadi lambang yang sudah
+  // diperhitungkan akan menyusut malah tampil kebesaran dan sudutnya terpotong.
   //
-  //   padding 0,34  -> 36% kanvas -> 25% ikon  (versi lama, terlalu kecil)
-  //   padding 0,215 -> 68% kanvas -> 46% ikon  (terlalu besar)
-  //   padding 0,295 -> 55% kanvas -> 38% ikon  (sekarang)
-  //
-  // Perhatikan: XML ikon adaptif menambahkan inset 16% LAGI di atas padding ini,
-  // jadi angka di sini bukan ukuran akhir di layar depan. Percobaan menurunkan
-  // padding ke 0,215 membuat lambangnya jauh terlalu besar - kembali ke sekitar
-  // nilai semula, hanya sedikit lebih besar dan sedikit lebih tebal.
+  // Inset-nya sekarang dibuang dari XML (lihat _patchAdaptiveIconXml di bawah),
+  // sehingga satu ukuran berlaku di semua peluncur dan tidak ada lagi asumsi
+  // yang perlu benar.
   final foregroundImage = img.Image(width: size, height: size, numChannels: 4);
   img.fill(foregroundImage, color: transparentColor);
-  _drawZenviTriangle(foregroundImage, size, whiteColor, 0.175, 0.112);
+  _drawZenviTriangle(foregroundImage, size, whiteColor, 0.30, 0.076);
   File('assets/images/logo_foreground.png').writeAsBytesSync(img.encodePng(foregroundImage));
   print('Generated assets/images/logo_foreground.png');
 
@@ -75,7 +64,29 @@ void main() {
   print('Generated android/app/src/main/res/drawable/ic_splash_logo.png');
 
   File('assets/images/splash_logo.png').writeAsBytesSync(img.encodePng(splashImage));
+  _patchAdaptiveIconXml();
   print('Done all icon generation!');
+}
+
+/// Membuang `<inset>` dari XML ikon adaptif.
+///
+/// flutter_launcher_icons selalu menuliskan inset 16% di sana. Inset itu tidak
+/// dihormati semua peluncur, jadi ukuran lambang jadi berbeda-beda antar
+/// perangkat - persis masalah yang bikin ikon ini terpotong di MIUI. Dengan
+/// dibuang, ukurannya satu dan bisa diverifikasi.
+///
+/// Jalankan generator ini SETELAH `dart run flutter_launcher_icons`, karena
+/// alat itu menimpa berkasnya kembali.
+void _patchAdaptiveIconXml() {
+  final file = File('android/app/src/main/res/mipmap-anydpi-v26/ic_launcher.xml');
+  if (!file.existsSync()) return;
+  file.writeAsStringSync('''<?xml version="1.0" encoding="utf-8"?>
+<adaptive-icon xmlns:android="http://schemas.android.com/apk/res/android">
+  <background android:drawable="@color/ic_launcher_background"/>
+  <foreground android:drawable="@drawable/ic_launcher_foreground"/>
+</adaptive-icon>
+''');
+  print('Patched mipmap-anydpi-v26/ic_launcher.xml (inset dibuang)');
 }
 
 /// Menggambar lambang Zenvi: segitiga terbalik bergaris tebal dengan celah di
