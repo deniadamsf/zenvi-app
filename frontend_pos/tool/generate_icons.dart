@@ -30,7 +30,7 @@ void main() {
   // 1. Logo penuh (dipakai iOS dan ikon legacy Android)
   final solidImage = img.Image(width: size, height: size, numChannels: 4);
   img.fill(solidImage, color: brandTeal);
-  _drawZenviTriangle(solidImage, size, whiteColor, 0.30, 0.076);
+  _drawZenviTriangle(solidImage, size, whiteColor, 0.345, 0.068);
   File('assets/images/logo.png').writeAsBytesSync(img.encodePng(solidImage));
   print('Generated assets/images/logo.png');
 
@@ -48,7 +48,7 @@ void main() {
   // yang perlu benar.
   final foregroundImage = img.Image(width: size, height: size, numChannels: 4);
   img.fill(foregroundImage, color: transparentColor);
-  _drawZenviTriangle(foregroundImage, size, whiteColor, 0.30, 0.076);
+  _drawZenviTriangle(foregroundImage, size, whiteColor, 0.345, 0.068);
   File('assets/images/logo_foreground.png').writeAsBytesSync(img.encodePng(foregroundImage));
   print('Generated assets/images/logo_foreground.png');
 
@@ -56,7 +56,7 @@ void main() {
   const splashSize = 512;
   final splashImage = img.Image(width: splashSize, height: splashSize, numChannels: 4);
   img.fill(splashImage, color: transparentColor);
-  _drawZenviTriangle(splashImage, splashSize, whiteColor, 0.29, 0.080);
+  _drawZenviTriangle(splashImage, splashSize, whiteColor, 0.335, 0.072);
 
   final splashDir = Directory('android/app/src/main/res/drawable');
   if (!splashDir.existsSync()) splashDir.createSync(recursive: true);
