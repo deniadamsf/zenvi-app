@@ -157,11 +157,11 @@ class _ShiftScreenState extends State<ShiftScreen> {
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
                         Text(
-                          'Jarak Anda:',
+                          'shift_distance_label'.tr(context: context),
                           style: TextStyle(fontSize: 12, color: theme.colorScheme.onSurfaceVariant),
                         ),
                         Text(
-                          '${currentDistance.toStringAsFixed(0)} meter',
+                          'shift_meters_value'.tr(context: context, args: [currentDistance.toStringAsFixed(0)]),
                           style: TextStyle(fontSize: 13, fontWeight: FontWeight.bold, color: theme.colorScheme.error),
                         ),
                       ],
@@ -171,11 +171,11 @@ class _ShiftScreenState extends State<ShiftScreen> {
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
                         Text(
-                          'Batas Toko:',
+                          'shift_store_radius_label'.tr(context: context),
                           style: TextStyle(fontSize: 12, color: theme.colorScheme.onSurfaceVariant),
                         ),
                         Text(
-                          '${maxRadius.toStringAsFixed(0)} meter',
+                          'shift_meters_value'.tr(context: context, args: [maxRadius.toStringAsFixed(0)]),
                           style: TextStyle(fontSize: 13, fontWeight: FontWeight.bold, color: theme.colorScheme.onSurface),
                         ),
                       ],
@@ -644,7 +644,7 @@ class _ShiftScreenState extends State<ShiftScreen> {
                             controller: qtyControllers[index],
                             keyboardType: TextInputType.numberWithOptions(decimal: true),
                             decoration: InputDecoration(
-                              labelText: 'Sisa (${item.unit})',
+                              labelText: 'shift_remaining_unit_label'.tr(context: context, args: [item.unit]),
                               border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
                               isDense: true,
                               contentPadding: EdgeInsets.symmetric(horizontal: 10, vertical: 10),
@@ -766,10 +766,12 @@ class _ShiftScreenState extends State<ShiftScreen> {
           physics: const AlwaysScrollableScrollPhysics(parent: BouncingScrollPhysics()),
           slivers: [
             ZenviHeader.sliver(
-              title: 'manajemen_shift_title'.tr(context: context) == 'manajemen_shift_title' ? 'Manajemen Shift' : 'manajemen_shift_title'.tr(context: context),
+              title: 'manajemen_shift_title'.tr(context: context),
               showBackButton: Navigator.of(context).canPop(),
               subtitleWidget: Text(
-                isShiftOpen ? 'Sedang Bertugas' : 'Mulai Shift Anda',
+                isShiftOpen
+                    ? 'shift_on_duty_title'.tr(context: context)
+                    : 'shift_start_title'.tr(context: context),
                 style: TextStyle(
                   color: isShiftOpen ? AppColors.successText : theme.colorScheme.onSurfaceVariant,
                   fontSize: 12.5,
@@ -869,8 +871,10 @@ class _ShiftScreenState extends State<ShiftScreen> {
           Center(
             child: Text(
               requireCashDrawer
-                  ? 'Buka shift kasir dengan memasukkan saldo awal laci'
-                  : (isCashierOrOwner ? 'Buka shift kasir untuk memulai transaksi hari ini' : 'Buka shift untuk mulai bekerja & mencatat absensi'),
+                  ? 'shift_intro_opname'.tr(context: context)
+                  : (isCashierOrOwner
+                      ? 'shift_intro_cashier'.tr(context: context)
+                      : 'shift_intro_staff'.tr(context: context)),
               style: TextStyle(color: theme.colorScheme.onSurfaceVariant, fontSize: 13),
               textAlign: TextAlign.center,
             ),
@@ -937,7 +941,12 @@ class _ShiftScreenState extends State<ShiftScreen> {
                       icon: _isCheckingLocation
                           ? const SizedBox(width: 16, height: 16, child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2))
                           : const Icon(Icons.my_location, size: 18),
-                      label: Text(_isCheckingLocation ? 'Mengecek...' : 'Cek Lokasi GPS', style: const TextStyle(fontSize: 13, fontWeight: FontWeight.bold)),
+                      label: Text(
+                        _isCheckingLocation
+                            ? 'shift_checking_location'.tr(context: context)
+                            : 'shift_check_gps'.tr(context: context),
+                        style: const TextStyle(fontSize: 13, fontWeight: FontWeight.bold),
+                      ),
                     ),
                   ),
                 ],
@@ -1042,7 +1051,9 @@ class _ShiftScreenState extends State<ShiftScreen> {
                     OutlinedButton.icon(
                       onPressed: _isProcessingSelfie ? null : _takeSelfie,
                       icon: Icon(_selfieImage != null ? Icons.refresh_rounded : Icons.camera_alt_outlined, size: 18),
-                      label: Text(_selfieImage != null ? 'Foto Ulang' : 'Ambil Selfie Presensi (Wajib)'),
+                      label: Text(_selfieImage != null
+                          ? 'shift_retake_selfie'.tr(context: context)
+                          : 'shift_take_selfie'.tr(context: context)),
                       style: OutlinedButton.styleFrom(
                         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
                         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
@@ -1320,7 +1331,7 @@ class _ShiftScreenState extends State<ShiftScreen> {
                   textAlign: TextAlign.center,
                   onChanged: (_) => setState(() {}),
                   decoration: InputDecoration(
-                    hintText: 'Rp 0 (Uang Fisik Laci)',
+                    hintText: 'shift_closing_balance_hint'.tr(context: context),
                     border: InputBorder.none,
                     contentPadding: const EdgeInsets.symmetric(vertical: 16, horizontal: 16),
                     hintStyle: TextStyle(color: theme.colorScheme.onSurfaceVariant.withValues(alpha: 0.4)),
@@ -1385,13 +1396,13 @@ class _ShiftScreenState extends State<ShiftScreen> {
                     ],
                   ),
                   const SizedBox(height: 14),
-                  _buildShiftSummaryRow('Posisi / Jabatan', user?.jobTitle ?? 'karyawan_8'.tr(context: context), theme),
+                  _buildShiftSummaryRow('shift_summary_position'.tr(context: context), user?.jobTitle ?? 'karyawan_8'.tr(context: context), theme),
                   const SizedBox(height: 8),
-                  _buildShiftSummaryRow('Cabang Penugasan', shift.branch?.name ?? 'Cabang Utama', theme),
+                  _buildShiftSummaryRow('shift_summary_branch'.tr(context: context), shift.branch?.name ?? 'shift_summary_branch_fallback'.tr(context: context), theme),
                   const SizedBox(height: 8),
-                  _buildShiftSummaryRow('Waktu Mulai Bertugas', DateFormat('dd MMM yyyy, HH:mm').format(shift.startTime), theme),
+                  _buildShiftSummaryRow('shift_summary_start_time'.tr(context: context), DateFormat('dd MMM yyyy, HH:mm').format(shift.startTime), theme),
                   const SizedBox(height: 8),
-                  _buildShiftSummaryRow('Status Kehadiran', '✅ Hadir & Aktif Bertugas', theme, valueColor: AppColors.successText),
+                  _buildShiftSummaryRow('shift_summary_attendance'.tr(context: context), '✅ ${'shift_summary_attendance_present'.tr(context: context)}', theme, valueColor: AppColors.successText),
                 ],
               ),
             ),

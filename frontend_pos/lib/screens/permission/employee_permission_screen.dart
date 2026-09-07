@@ -5,6 +5,7 @@ import 'package:provider/provider.dart';
 import 'package:image_picker/image_picker.dart';
 import '../../models/employee_permission_model.dart';
 import '../../providers/employee_permission_provider.dart';
+import '../../theme/app_colors.dart';
 import '../../widgets/zenvi_header.dart';
 
 class EmployeePermissionScreen extends StatefulWidget {
@@ -63,7 +64,7 @@ class _EmployeePermissionScreenState extends State<EmployeePermissionScreen>
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text('failed_pick_image'.tr(context: context, args: [e.toString()])),
-            backgroundColor: Colors.red.shade700,
+            backgroundColor: AppColors.dangerFill,
           ),
         );
       }
@@ -71,6 +72,7 @@ class _EmployeePermissionScreenState extends State<EmployeePermissionScreen>
   }
 
   void _showImageSourcePicker() {
+    final theme = Theme.of(context);
     showModalBottomSheet(
       context: context,
       shape: const RoundedRectangleBorder(
@@ -86,20 +88,20 @@ class _EmployeePermissionScreenState extends State<EmployeePermissionScreen>
                 width: 40,
                 height: 4,
                 decoration: BoxDecoration(
-                  color: Colors.grey.shade400,
+                  color: theme.colorScheme.onSurfaceVariant,
                   borderRadius: BorderRadius.circular(2),
                 ),
               ),
               const SizedBox(height: 16),
-              const Text(
-                'Pilih Sumber Foto Bukti',
-                style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+              Text(
+                'permission_photo_source_title'.tr(context: context),
+                style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
               ),
               const SizedBox(height: 16),
               ListTile(
                 leading: const CircleAvatar(
-                  backgroundColor: Color(0xFFE8F5E9),
-                  child: Icon(Icons.camera_alt, color: Colors.green),
+                  backgroundColor: AppColors.successSoft,
+                  child: Icon(Icons.camera_alt, color: AppColors.successFill),
                 ),
                 title: Text('ambil_foto_dari_kamera_223'.tr(context: context)),
                 onTap: () {
@@ -109,8 +111,8 @@ class _EmployeePermissionScreenState extends State<EmployeePermissionScreen>
               ),
               ListTile(
                 leading: const CircleAvatar(
-                  backgroundColor: Color(0xFFE3F2FD),
-                  child: Icon(Icons.photo_library, color: Colors.blue),
+                  backgroundColor: AppColors.infoSoft,
+                  child: Icon(Icons.photo_library, color: AppColors.infoFill),
                 ),
                 title: Text('pilih_dari_galeri_224'.tr(context: context)),
                 onTap: () {
@@ -130,7 +132,7 @@ class _EmployeePermissionScreenState extends State<EmployeePermissionScreen>
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text('mohon_tuliskan_alasan_izin_225'.tr(context: context)),
-          backgroundColor: Colors.orange.shade800,
+          backgroundColor: AppColors.warningFill,
         ),
       );
       return;
@@ -140,7 +142,7 @@ class _EmployeePermissionScreenState extends State<EmployeePermissionScreen>
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text('wajib_melampirkan_foto_bukti_226'.tr(context: context)),
-          backgroundColor: Colors.red.shade700,
+          backgroundColor: AppColors.dangerFill,
         ),
       );
       return;
@@ -189,7 +191,7 @@ class _EmployeePermissionScreenState extends State<EmployeePermissionScreen>
                 ),
               ],
             ),
-            backgroundColor: Colors.green.shade700,
+            backgroundColor: AppColors.successFill,
             duration: const Duration(seconds: 4),
           ),
         );
@@ -199,8 +201,8 @@ class _EmployeePermissionScreenState extends State<EmployeePermissionScreen>
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text(result['message'] ?? 'Gagal mengirim pengajuan.'),
-            backgroundColor: Colors.red.shade700,
+            content: Text(result['message'] ?? 'permission_submit_failed_generic'.tr(context: context)),
+            backgroundColor: AppColors.dangerFill,
           ),
         );
       }
@@ -214,7 +216,7 @@ class _EmployeePermissionScreenState extends State<EmployeePermissionScreen>
 
     return Scaffold(
       appBar: ZenviHeader(
-        title: 'Pengajuan Izin Karyawan',
+        title: 'employee_permission_screen_title'.tr(context: context),
         showBackButton: true,
         bottom: Consumer<EmployeePermissionProvider>(
           builder: (context, provider, child) {
@@ -226,7 +228,7 @@ class _EmployeePermissionScreenState extends State<EmployeePermissionScreen>
               unselectedLabelColor: theme.colorScheme.onSurfaceVariant,
               labelStyle: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13),
               tabs: [
-                const Tab(icon: Icon(Icons.edit_calendar, size: 18), text: 'Buat Pengajuan'),
+                Tab(icon: const Icon(Icons.edit_calendar, size: 18), text: 'permission_tab_create'.tr(context: context)),
                 Tab(
                   icon: provider.pendingCount > 0
                       ? Badge(
@@ -234,11 +236,11 @@ class _EmployeePermissionScreenState extends State<EmployeePermissionScreen>
                             '${provider.pendingCount}',
                             style: const TextStyle(fontSize: 10, fontWeight: FontWeight.bold),
                           ),
-                          backgroundColor: Colors.orange.shade800,
+                          backgroundColor: AppColors.warningFill,
                           child: const Icon(Icons.history, size: 18),
                         )
                       : const Icon(Icons.history, size: 18),
-                  text: 'Riwayat Izin',
+                  text: 'permission_tab_history'.tr(context: context),
                 ),
               ],
             );
@@ -265,10 +267,10 @@ class _EmployeePermissionScreenState extends State<EmployeePermissionScreen>
           Container(
             padding: const EdgeInsets.all(14),
             decoration: BoxDecoration(
-              color: isDark ? Colors.blueGrey.shade900 : const Color(0xFFE8F4FD),
+              color: isDark ? AppColors.infoFill.withValues(alpha: 0.12) : AppColors.infoSoft,
               borderRadius: BorderRadius.circular(12),
               border: Border.all(
-                color: isDark ? Colors.blueGrey.shade700 : const Color(0xFFB6E0FE),
+                color: isDark ? AppColors.infoFill.withValues(alpha: 0.35) : AppColors.infoFill.withValues(alpha: 0.30),
               ),
             ),
             child: Row(
@@ -276,7 +278,7 @@ class _EmployeePermissionScreenState extends State<EmployeePermissionScreen>
               children: [
                 Icon(
                   Icons.info_outline,
-                  color: isDark ? Colors.lightBlueAccent : const Color(0xFF0288D1),
+                  color: isDark ? AppColors.infoBright : AppColors.infoText,
                   size: 22,
                 ),
                 const SizedBox(width: 12),
@@ -285,19 +287,19 @@ class _EmployeePermissionScreenState extends State<EmployeePermissionScreen>
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        'Informasi Privasi & Penyimpanan',
+                        'permission_privacy_banner_title'.tr(context: context),
                         style: TextStyle(
                           fontWeight: FontWeight.bold,
                           fontSize: 13,
-                          color: isDark ? Colors.lightBlueAccent : const Color(0xFF0277BD),
+                          color: isDark ? AppColors.infoBright : AppColors.infoText,
                         ),
                       ),
                       const SizedBox(height: 4),
                       Text(
-                        'Foto bukti yang Anda lampirkan akan otomatis dihapus permanen oleh server setelah 3 hari untuk efisiensi penyimpanan.',
+                        'permission_privacy_banner_body'.tr(context: context),
                         style: TextStyle(
                           fontSize: 12,
-                          color: isDark ? Colors.grey.shade300 : const Color(0xFF37474F),
+                          color: theme.colorScheme.onSurfaceVariant,
                         ),
                       ),
                     ],
@@ -309,9 +311,9 @@ class _EmployeePermissionScreenState extends State<EmployeePermissionScreen>
           const SizedBox(height: 20),
 
           // Pilihan Jenis Izin
-          const Text(
-            'Jenis Pengajuan Izin',
-            style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
+          Text(
+            'permission_type_section_title'.tr(context: context),
+            style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
           ),
           const SizedBox(height: 8),
           Row(
@@ -319,8 +321,8 @@ class _EmployeePermissionScreenState extends State<EmployeePermissionScreen>
               Expanded(
                 child: _buildTypeOption(
                   type: 'leave',
-                  title: 'Izin Libur',
-                  subtitle: 'Cuti / Sakit / Tidak Masuk',
+                  title: 'permission_type_leave_title'.tr(context: context),
+                  subtitle: 'permission_type_leave_subtitle'.tr(context: context),
                   icon: Icons.beach_access,
                   theme: theme,
                   isDark: isDark,
@@ -330,8 +332,8 @@ class _EmployeePermissionScreenState extends State<EmployeePermissionScreen>
               Expanded(
                 child: _buildTypeOption(
                   type: 'late',
-                  title: 'Izin Telat',
-                  subtitle: 'Terlambat Masuk Shift',
+                  title: 'permission_type_late_title'.tr(context: context),
+                  subtitle: 'permission_type_late_subtitle'.tr(context: context),
                   icon: Icons.alarm,
                   theme: theme,
                   isDark: isDark,
@@ -342,9 +344,9 @@ class _EmployeePermissionScreenState extends State<EmployeePermissionScreen>
           const SizedBox(height: 20),
 
           // Pemilih Tanggal
-          const Text(
-            'Tanggal Izin',
-            style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
+          Text(
+            'permission_date_label'.tr(context: context),
+            style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
           ),
           const SizedBox(height: 8),
           InkWell(
@@ -363,7 +365,7 @@ class _EmployeePermissionScreenState extends State<EmployeePermissionScreen>
             child: Container(
               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
               decoration: BoxDecoration(
-                border: Border.all(color: Colors.grey.shade400),
+                border: Border.all(color: theme.colorScheme.outline),
                 borderRadius: BorderRadius.circular(12),
               ),
               child: Row(
@@ -371,11 +373,11 @@ class _EmployeePermissionScreenState extends State<EmployeePermissionScreen>
                   const Icon(Icons.calendar_today, color: Colors.indigo, size: 20),
                   const SizedBox(width: 12),
                   Text(
-                    DateFormat('EEEE, dd MMMM yyyy', 'id').format(_selectedDate),
+                    DateFormat('EEEE, dd MMMM yyyy', context.locale.languageCode).format(_selectedDate),
                     style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w600),
                   ),
                   const Spacer(),
-                  const Icon(Icons.arrow_drop_down, color: Colors.grey),
+                  Icon(Icons.arrow_drop_down, color: theme.colorScheme.onSurfaceVariant),
                 ],
               ),
             ),
@@ -384,9 +386,9 @@ class _EmployeePermissionScreenState extends State<EmployeePermissionScreen>
 
           // Perkiraan Jam Tiba (Jika Telat)
           if (_selectedType == 'late') ...[
-            const Text(
-              'Perkiraan Jam Tiba di Toko',
-              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
+            Text(
+              'permission_estimated_arrival_label'.tr(context: context),
+              style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
             ),
             const SizedBox(height: 8),
             InkWell(
@@ -403,19 +405,21 @@ class _EmployeePermissionScreenState extends State<EmployeePermissionScreen>
               child: Container(
                 padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
                 decoration: BoxDecoration(
-                  border: Border.all(color: Colors.grey.shade400),
+                  border: Border.all(color: theme.colorScheme.outline),
                   borderRadius: BorderRadius.circular(12),
                 ),
                 child: Row(
                   children: [
-                    const Icon(Icons.access_time, color: Colors.orange, size: 20),
+                    const Icon(Icons.access_time, color: AppColors.warningText, size: 20),
                     const SizedBox(width: 12),
                     Text(
-                      'Pukul ${_estimatedTime.hour.toString().padLeft(2, '0')}:${_estimatedTime.minute.toString().padLeft(2, '0')} WIB',
+                      'permission_estimated_arrival_time_wib'.tr(context: context, args: [
+                        '${_estimatedTime.hour.toString().padLeft(2, '0')}:${_estimatedTime.minute.toString().padLeft(2, '0')}',
+                      ]),
                       style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w600),
                     ),
                     const Spacer(),
-                    const Icon(Icons.arrow_drop_down, color: Colors.grey),
+                    Icon(Icons.arrow_drop_down, color: theme.colorScheme.onSurfaceVariant),
                   ],
                 ),
               ),
@@ -424,16 +428,16 @@ class _EmployeePermissionScreenState extends State<EmployeePermissionScreen>
           ],
 
           // Alasan
-          const Text(
-            'Alasan / Keterangan',
-            style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
+          Text(
+            'permission_reason_label'.tr(context: context),
+            style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
           ),
           const SizedBox(height: 8),
           TextField(
             controller: _reasonController,
             maxLines: 3,
             decoration: InputDecoration(
-              hintText: 'Contoh: Sakit demam dengan surat dokter / Ban bocor di jalan...',
+              hintText: 'permission_reason_hint'.tr(context: context),
               border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
               contentPadding: const EdgeInsets.all(14),
             ),
@@ -443,14 +447,14 @@ class _EmployeePermissionScreenState extends State<EmployeePermissionScreen>
           // Upload Bukti (Wajib)
           Row(
             children: [
-              const Text(
-                'Foto Bukti (Wajib Lampirkan)',
-                style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
+              Text(
+                'permission_photo_proof_label'.tr(context: context),
+                style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
               ),
               const SizedBox(width: 6),
-              Text(
+              const Text(
                 '*',
-                style: TextStyle(color: Colors.red.shade700, fontWeight: FontWeight.bold),
+                style: TextStyle(color: AppColors.dangerText, fontWeight: FontWeight.bold),
               ),
             ],
           ),
@@ -462,25 +466,25 @@ class _EmployeePermissionScreenState extends State<EmployeePermissionScreen>
               child: Container(
                 padding: const EdgeInsets.symmetric(vertical: 24, horizontal: 16),
                 decoration: BoxDecoration(
-                  border: Border.all(color: Colors.grey.shade400, style: BorderStyle.solid),
+                  border: Border.all(color: theme.colorScheme.outline, style: BorderStyle.solid),
                   borderRadius: BorderRadius.circular(12),
-                  color: isDark ? Colors.grey.shade900 : Colors.grey.shade50,
+                  color: theme.colorScheme.surfaceContainerHighest,
                 ),
                 child: Column(
                   children: [
                     Icon(Icons.add_a_photo, size: 40, color: theme.primaryColor),
                     const SizedBox(height: 10),
                     Text(
-                      'Klik untuk Ambil Foto / Pilih Bukti',
+                      'permission_photo_proof_cta'.tr(context: context),
                       style: TextStyle(
                         fontWeight: FontWeight.w600,
                         color: theme.primaryColor,
                       ),
                     ),
                     const SizedBox(height: 4),
-                    const Text(
-                      'Surat dokter, foto kondisi, atau surat izin resmi',
-                      style: TextStyle(fontSize: 11, color: Colors.grey),
+                    Text(
+                      'permission_photo_proof_hint'.tr(context: context),
+                      style: TextStyle(fontSize: 11, color: theme.colorScheme.onSurfaceVariant),
                     ),
                   ],
                 ),
@@ -522,14 +526,14 @@ class _EmployeePermissionScreenState extends State<EmployeePermissionScreen>
                       color: Colors.black87,
                       borderRadius: BorderRadius.circular(20),
                     ),
-                    child: const Row(
+                    child: Row(
                       mainAxisSize: MainAxisSize.min,
                       children: [
-                        Icon(Icons.check, color: Colors.greenAccent, size: 14),
-                        SizedBox(width: 4),
+                        const Icon(Icons.check, color: Colors.greenAccent, size: 14),
+                        const SizedBox(width: 4),
                         Text(
-                          'Foto Bukti Terpilih',
-                          style: TextStyle(color: Colors.white, fontSize: 11, fontWeight: FontWeight.bold),
+                          'permission_photo_proof_selected'.tr(context: context),
+                          style: const TextStyle(color: Colors.white, fontSize: 11, fontWeight: FontWeight.bold),
                         ),
                       ],
                     ),
@@ -558,9 +562,9 @@ class _EmployeePermissionScreenState extends State<EmployeePermissionScreen>
                       width: 22,
                       child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2.5),
                     )
-                  : const Text(
-                      'Kirim Pengajuan Izin',
-                      style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                  : Text(
+                      'permission_submit_button'.tr(context: context),
+                      style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
                     ),
             ),
           ),
@@ -589,9 +593,9 @@ class _EmployeePermissionScreenState extends State<EmployeePermissionScreen>
         decoration: BoxDecoration(
           color: isSelected
               ? (isDark ? theme.primaryColor.withValues(alpha: 0.3) : theme.primaryColor.withValues(alpha: 0.1))
-              : (isDark ? Colors.grey.shade900 : Colors.grey.shade100),
+              : theme.colorScheme.surfaceContainerHighest,
           border: Border.all(
-            color: isSelected ? theme.primaryColor : Colors.grey.shade300,
+            color: isSelected ? theme.primaryColor : theme.colorScheme.outline,
             width: isSelected ? 2 : 1,
           ),
           borderRadius: BorderRadius.circular(12),
@@ -603,7 +607,7 @@ class _EmployeePermissionScreenState extends State<EmployeePermissionScreen>
               children: [
                 Icon(
                   icon,
-                  color: isSelected ? theme.primaryColor : Colors.grey,
+                  color: isSelected ? theme.primaryColor : theme.colorScheme.onSurfaceVariant,
                   size: 24,
                 ),
                 const Spacer(),
@@ -625,7 +629,7 @@ class _EmployeePermissionScreenState extends State<EmployeePermissionScreen>
               subtitle,
               style: TextStyle(
                 fontSize: 11,
-                color: isDark ? Colors.grey.shade400 : Colors.grey.shade600,
+                color: theme.colorScheme.onSurfaceVariant,
               ),
             ),
           ],
@@ -650,10 +654,10 @@ class _EmployeePermissionScreenState extends State<EmployeePermissionScreen>
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
               decoration: BoxDecoration(
-                color: isDark ? Colors.grey.shade900 : Colors.white,
+                color: theme.colorScheme.surface,
                 border: Border(
                   bottom: BorderSide(
-                    color: isDark ? Colors.grey.shade800 : Colors.grey.shade200,
+                    color: theme.colorScheme.outline,
                   ),
                 ),
               ),
@@ -665,9 +669,9 @@ class _EmployeePermissionScreenState extends State<EmployeePermissionScreen>
                     final key = f['key'];
 
                     Color chipColor = theme.primaryColor;
-                    if (key == 'pending') chipColor = Colors.orange.shade800;
-                    if (key == 'approved') chipColor = Colors.green.shade800;
-                    if (key == 'rejected') chipColor = Colors.red.shade800;
+                    if (key == 'pending') chipColor = AppColors.warningText;
+                    if (key == 'approved') chipColor = AppColors.successText;
+                    if (key == 'rejected') chipColor = AppColors.dangerText;
 
                     return Padding(
                       padding: const EdgeInsets.only(right: 8),
@@ -682,7 +686,7 @@ class _EmployeePermissionScreenState extends State<EmployeePermissionScreen>
                           style: TextStyle(
                             fontSize: 12.5,
                             fontWeight: isSelected ? FontWeight.bold : FontWeight.w600,
-                            color: isSelected ? Colors.white : (isDark ? Colors.grey.shade300 : Colors.grey.shade800),
+                            color: isSelected ? Colors.white : theme.colorScheme.onSurface,
                           ),
                         ),
                         selected: isSelected,
@@ -691,7 +695,7 @@ class _EmployeePermissionScreenState extends State<EmployeePermissionScreen>
                         onSelected: (val) {
                           provider.setFilterStatus(f['key'] as String);
                         },
-                        backgroundColor: isDark ? Colors.grey.shade800 : Colors.grey.shade100,
+                        backgroundColor: theme.colorScheme.surfaceContainerHighest,
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(20),
                           side: BorderSide(
@@ -743,19 +747,19 @@ class _EmployeePermissionScreenState extends State<EmployeePermissionScreen>
                             child: Column(
                               mainAxisAlignment: MainAxisAlignment.center,
                               children: [
-                                Icon(Icons.assignment_outlined, size: 64, color: Colors.grey.shade400),
+                                Icon(Icons.assignment_outlined, size: 64, color: theme.colorScheme.onSurfaceVariant),
                                 const SizedBox(height: 16),
                                 Text(
                                   provider.selectedFilterStatus == 'all'
-                                      ? 'Belum Ada Riwayat Izin'
-                                      : 'Tidak ada izin dengan status ini',
+                                      ? 'permission_history_empty_all_title'.tr(context: context)
+                                      : 'permission_history_empty_filtered_title'.tr(context: context),
                                   style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
                                 ),
                                 const SizedBox(height: 6),
                                 Text(
-                                  'Pengajuan izin libur atau telat masuk yang Anda buat akan tercatat di sini.',
+                                  'permission_history_empty_subtitle'.tr(context: context),
                                   textAlign: TextAlign.center,
-                                  style: TextStyle(color: Colors.grey.shade600, fontSize: 13),
+                                  style: TextStyle(color: theme.colorScheme.onSurfaceVariant, fontSize: 13),
                                 ),
                               ],
                             ),
@@ -786,14 +790,16 @@ class _EmployeePermissionScreenState extends State<EmployeePermissionScreen>
     bool isDark,
     EmployeePermissionProvider provider,
   ) {
-    Color statusColor;
+    Color statusFillColor;
+    Color statusTextColor;
     IconData statusIcon;
     String statusTitle;
     String statusExplanation;
 
     switch (item.status) {
       case 'approved':
-        statusColor = Colors.green;
+        statusFillColor = AppColors.successFill;
+        statusTextColor = AppColors.successText;
         statusIcon = Icons.check_circle_rounded;
         statusTitle = 'status_approved_caps'.tr(context: context);
         statusExplanation = item.type == 'late'
@@ -807,7 +813,8 @@ class _EmployeePermissionScreenState extends State<EmployeePermissionScreen>
         }
         break;
       case 'rejected':
-        statusColor = Colors.red;
+        statusFillColor = AppColors.dangerFill;
+        statusTextColor = AppColors.dangerText;
         statusIcon = Icons.cancel_rounded;
         statusTitle = 'status_rejected_caps'.tr(context: context);
         statusExplanation = (item.rejectionNote != null && item.rejectionNote!.isNotEmpty)
@@ -816,7 +823,8 @@ class _EmployeePermissionScreenState extends State<EmployeePermissionScreen>
         break;
       case 'pending':
       default:
-        statusColor = Colors.orange;
+        statusFillColor = AppColors.warningFill;
+        statusTextColor = AppColors.warningText;
         statusIcon = Icons.hourglass_top_rounded;
         statusTitle = 'status_pending_caps'.tr(context: context);
         statusExplanation = 'status_explanation_pending'.tr(context: context);
@@ -827,7 +835,7 @@ class _EmployeePermissionScreenState extends State<EmployeePermissionScreen>
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(16),
         side: BorderSide(
-          color: statusColor.withValues(alpha: 0.3),
+          color: statusFillColor.withValues(alpha: 0.3),
           width: 1.2,
         ),
       ),
@@ -841,25 +849,25 @@ class _EmployeePermissionScreenState extends State<EmployeePermissionScreen>
               width: double.infinity,
               padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
               decoration: BoxDecoration(
-                color: statusColor.withValues(alpha: 0.1),
+                color: statusFillColor.withValues(alpha: 0.1),
                 borderRadius: BorderRadius.circular(10),
-                border: Border.all(color: statusColor.withValues(alpha: 0.25)),
+                border: Border.all(color: statusFillColor.withValues(alpha: 0.25)),
               ),
               child: Row(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Icon(statusIcon, color: statusColor, size: 20),
+                  Icon(statusIcon, color: statusTextColor, size: 20),
                   const SizedBox(width: 10),
                   Expanded(
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          'STATUS: $statusTitle',
+                          'permission_status_prefix'.tr(context: context, args: [statusTitle]),
                           style: TextStyle(
                             fontWeight: FontWeight.bold,
                             fontSize: 12,
-                            color: statusColor,
+                            color: statusTextColor,
                           ),
                         ),
                         const SizedBox(height: 2),
@@ -867,7 +875,7 @@ class _EmployeePermissionScreenState extends State<EmployeePermissionScreen>
                           statusExplanation,
                           style: TextStyle(
                             fontSize: 11,
-                            color: isDark ? Colors.grey.shade300 : Colors.grey.shade800,
+                            color: theme.colorScheme.onSurface,
                             height: 1.25,
                           ),
                         ),
@@ -885,7 +893,7 @@ class _EmployeePermissionScreenState extends State<EmployeePermissionScreen>
                 Container(
                   padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
                   decoration: BoxDecoration(
-                    color: item.type == 'late' ? Colors.orange.shade50 : Colors.blue.shade50,
+                    color: item.type == 'late' ? AppColors.warningSoft : AppColors.infoSoft,
                     borderRadius: BorderRadius.circular(8),
                     border: Border.all(
                       color: item.type == 'late' ? Colors.orange.shade200 : Colors.blue.shade200,
@@ -897,7 +905,7 @@ class _EmployeePermissionScreenState extends State<EmployeePermissionScreen>
                       Icon(
                         item.type == 'late' ? Icons.alarm : Icons.beach_access,
                         size: 14,
-                        color: item.type == 'late' ? Colors.orange.shade900 : Colors.blue.shade900,
+                        color: item.type == 'late' ? AppColors.warningText : AppColors.infoText,
                       ),
                       const SizedBox(width: 6),
                       Text(
@@ -905,7 +913,7 @@ class _EmployeePermissionScreenState extends State<EmployeePermissionScreen>
                         style: TextStyle(
                           fontSize: 12,
                           fontWeight: FontWeight.bold,
-                          color: item.type == 'late' ? Colors.orange.shade900 : Colors.blue.shade900,
+                          color: item.type == 'late' ? AppColors.warningText : AppColors.infoText,
                         ),
                       ),
                     ],
@@ -914,7 +922,7 @@ class _EmployeePermissionScreenState extends State<EmployeePermissionScreen>
                 const Spacer(),
                 Row(
                   children: [
-                    const Icon(Icons.calendar_today, size: 14, color: Colors.grey),
+                    Icon(Icons.calendar_today, size: 14, color: theme.colorScheme.onSurfaceVariant),
                     const SizedBox(width: 6),
                     Text(
                       item.permissionDate,
@@ -928,11 +936,11 @@ class _EmployeePermissionScreenState extends State<EmployeePermissionScreen>
               const SizedBox(height: 8),
               Row(
                 children: [
-                  const Icon(Icons.access_time_filled_rounded, size: 15, color: Colors.orange),
+                  const Icon(Icons.access_time_filled_rounded, size: 15, color: AppColors.warningText),
                   const SizedBox(width: 6),
                   Text(
-                    'Estimasi Tiba di Tempat: ${item.estimatedArrivalTime}',
-                    style: const TextStyle(fontSize: 12.5, fontWeight: FontWeight.w600, color: Colors.orange),
+                    'permission_estimated_arrival_display'.tr(context: context, args: [item.estimatedArrivalTime ?? '']),
+                    style: const TextStyle(fontSize: 12.5, fontWeight: FontWeight.w600, color: AppColors.warningText),
                   ),
                 ],
               ),
@@ -941,7 +949,7 @@ class _EmployeePermissionScreenState extends State<EmployeePermissionScreen>
 
             // 3. Reason
             Text(
-              'Alasan Pengajuan:',
+              'permission_reason_card_label'.tr(context: context),
               style: TextStyle(fontSize: 11, fontWeight: FontWeight.bold, color: theme.colorScheme.onSurfaceVariant),
             ),
             const SizedBox(height: 3),
@@ -949,7 +957,7 @@ class _EmployeePermissionScreenState extends State<EmployeePermissionScreen>
               item.reason,
               style: TextStyle(
                 fontSize: 13,
-                color: isDark ? Colors.grey.shade200 : Colors.grey.shade900,
+                color: theme.colorScheme.onSurface,
                 height: 1.3,
               ),
             ),
@@ -962,18 +970,18 @@ class _EmployeePermissionScreenState extends State<EmployeePermissionScreen>
                 child: Container(
                   padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
                   decoration: BoxDecoration(
-                    color: isDark ? Colors.grey.shade900 : Colors.grey.shade100,
+                    color: theme.colorScheme.surfaceContainerHighest,
                     borderRadius: BorderRadius.circular(8),
-                    border: Border.all(color: Colors.grey.shade300),
+                    border: Border.all(color: theme.colorScheme.outline),
                   ),
                   child: Row(
                     mainAxisSize: MainAxisSize.min,
                     children: [
                       const Icon(Icons.image, size: 16, color: Colors.indigo),
                       const SizedBox(width: 8),
-                      const Text(
-                        'Lihat Foto Bukti (Aktif < 3 Hari)',
-                        style: TextStyle(fontSize: 12, fontWeight: FontWeight.w600, color: Colors.indigo),
+                      Text(
+                        'permission_view_photo_proof_active'.tr(context: context),
+                        style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w600, color: Colors.indigo),
                       ),
                       const SizedBox(width: 4),
                       const Icon(Icons.open_in_new, size: 14, color: Colors.indigo),
@@ -985,18 +993,18 @@ class _EmployeePermissionScreenState extends State<EmployeePermissionScreen>
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
                 decoration: BoxDecoration(
-                  color: isDark ? Colors.grey.shade900 : Colors.grey.shade100,
+                  color: theme.colorScheme.surfaceContainerHighest,
                   borderRadius: BorderRadius.circular(8),
                 ),
                 child: Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    Icon(Icons.auto_delete_outlined, size: 14, color: Colors.grey.shade600),
+                    Icon(Icons.auto_delete_outlined, size: 14, color: theme.colorScheme.onSurfaceVariant),
                     const SizedBox(width: 6),
                     Flexible(
                       child: Text(
-                        'Bukti lampiran telah kedaluwarsa & dihapus otomatis (3 hari).',
-                        style: TextStyle(fontSize: 11, color: Colors.grey.shade600, fontStyle: FontStyle.italic),
+                        'permission_photo_proof_expired_note'.tr(context: context),
+                        style: TextStyle(fontSize: 11, color: theme.colorScheme.onSurfaceVariant, fontStyle: FontStyle.italic),
                       ),
                     ),
                   ],
@@ -1010,8 +1018,8 @@ class _EmployeePermissionScreenState extends State<EmployeePermissionScreen>
                 alignment: Alignment.centerRight,
                 child: TextButton.icon(
                   onPressed: () => _confirmDelete(item.id, provider),
-                  icon: const Icon(Icons.delete_outline, size: 16, color: Colors.red),
-                  label: Text('batalkan_pengajuan_245'.tr(context: context), style: TextStyle(color: Colors.red, fontSize: 12)),
+                  icon: const Icon(Icons.delete_outline, size: 16, color: AppColors.dangerText),
+                  label: Text('batalkan_pengajuan_245'.tr(context: context), style: const TextStyle(color: AppColors.dangerText, fontSize: 12)),
                 ),
               ),
             ],
@@ -1077,15 +1085,17 @@ class _EmployeePermissionScreenState extends State<EmployeePermissionScreen>
         actions: [
           TextButton(onPressed: () => Navigator.pop(ctx), child: Text('kembali_24'.tr(context: context))),
           ElevatedButton(
-            style: ElevatedButton.styleFrom(backgroundColor: Colors.red, foregroundColor: Colors.white),
+            style: ElevatedButton.styleFrom(backgroundColor: AppColors.dangerFill, foregroundColor: Colors.white),
             onPressed: () async {
               Navigator.pop(ctx);
               final success = await provider.deletePermission(id);
               if (mounted) {
                 ScaffoldMessenger.of(context).showSnackBar(
                   SnackBar(
-                    content: Text(success ? 'Pengajuan berhasil dibatalkan.' : 'Gagal membatalkan pengajuan.'),
-                    backgroundColor: success ? Colors.green : Colors.red,
+                    content: Text(success
+                        ? 'permission_cancel_success'.tr(context: context)
+                        : 'permission_cancel_failed'.tr(context: context)),
+                    backgroundColor: success ? AppColors.successFill : AppColors.dangerFill,
                   ),
                 );
               }

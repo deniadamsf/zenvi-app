@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../models/employee_permission_model.dart';
 import '../../providers/employee_permission_provider.dart';
+import '../../theme/app_colors.dart';
 import '../../widgets/zenvi_header.dart';
 
 class OwnerPermissionManagementScreen extends StatefulWidget {
@@ -112,30 +113,30 @@ class _OwnerPermissionManagementScreenState
                     fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
                     color: isSelected
                         ? (isPendingFilter && provider.pendingCount > 0
-                            ? Colors.orange.shade900
+                            ? AppColors.warningText
                             : theme.primaryColor)
-                        : (isDark ? Colors.grey.shade300 : Colors.grey.shade800),
+                        : theme.colorScheme.onSurface,
                   ),
                 ),
                 selected: isSelected,
                 onSelected: (val) {
                   provider.setFilterStatus(f['key']!);
                 },
-                backgroundColor: isDark ? Colors.grey.shade800 : Colors.grey.shade100,
+                backgroundColor: theme.colorScheme.surfaceContainerHighest,
                 selectedColor: isPendingFilter && provider.pendingCount > 0
-                    ? Colors.orange.shade100
+                    ? AppColors.warningSoft
                     : theme.primaryColor.withValues(alpha: 0.15),
                 checkmarkColor: isPendingFilter && provider.pendingCount > 0
-                    ? Colors.orange.shade900
+                    ? AppColors.warningText
                     : theme.primaryColor,
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(20),
                   side: BorderSide(
                     color: isSelected
                         ? (isPendingFilter && provider.pendingCount > 0
-                            ? Colors.orange.shade400
+                            ? AppColors.warningFill
                             : theme.primaryColor)
-                        : (isDark ? Colors.grey.shade700 : Colors.grey.shade300),
+                        : theme.colorScheme.outline,
                   ),
                 ),
               ),
@@ -154,7 +155,7 @@ class _OwnerPermissionManagementScreenState
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Icon(Icons.mark_email_read_outlined,
-                size: 64, color: Colors.grey.shade400),
+                size: 64, color: Theme.of(context).colorScheme.onSurfaceVariant),
             const SizedBox(height: 16),
             Text(
               'tidak_ada_pengajuan_izin_251'.tr(context: context),
@@ -164,7 +165,7 @@ class _OwnerPermissionManagementScreenState
             Text(
               'saat_ini_belum_ada_252'.tr(context: context),
               textAlign: TextAlign.center,
-              style: TextStyle(color: Colors.grey.shade600, fontSize: 13),
+              style: TextStyle(color: Theme.of(context).colorScheme.onSurfaceVariant, fontSize: 13),
             ),
           ],
         ),
@@ -183,9 +184,12 @@ class _OwnerPermissionManagementScreenState
 
   Widget _buildPermissionReviewCard(EmployeePermission item, ThemeData theme,
       bool isDark, EmployeePermissionProvider provider) {
-    final statusColor = item.status == 'approved'
-        ? Colors.green
-        : (item.status == 'rejected' ? Colors.red : Colors.orange);
+    final statusFillColor = item.status == 'approved'
+        ? AppColors.successFill
+        : (item.status == 'rejected' ? AppColors.dangerFill : AppColors.warningFill);
+    final statusTextColor = item.status == 'approved'
+        ? AppColors.successText
+        : (item.status == 'rejected' ? AppColors.dangerText : AppColors.warningText);
     final statusIcon = item.status == 'approved'
         ? Icons.check_circle
         : (item.status == 'rejected' ? Icons.cancel : Icons.hourglass_top);
@@ -198,7 +202,7 @@ class _OwnerPermissionManagementScreenState
         ? 'permission_late_type'.tr(context: context)
         : 'permission_leave_type'.tr(context: context);
 
-    final empName = item.user?.name ?? 'Karyawan';
+    final empName = item.user?.name ?? 'permission_review_employee_fallback'.tr(context: context);
     final empRole = item.user?.role ?? 'Staff';
 
     return Card(
@@ -207,8 +211,8 @@ class _OwnerPermissionManagementScreenState
         borderRadius: BorderRadius.circular(14),
         side: BorderSide(
           color: item.status == 'pending'
-              ? Colors.orange.shade300
-              : (isDark ? Colors.grey.shade800 : Colors.grey.shade200),
+              ? AppColors.warningFill
+              : theme.colorScheme.outline,
           width: item.status == 'pending' ? 1.5 : 1,
         ),
       ),
@@ -246,7 +250,7 @@ class _OwnerPermissionManagementScreenState
                         empRole,
                         style: TextStyle(
                           fontSize: 12,
-                          color: isDark ? Colors.grey.shade400 : Colors.grey.shade600,
+                          color: theme.colorScheme.onSurfaceVariant,
                         ),
                       ),
                     ],
@@ -255,20 +259,20 @@ class _OwnerPermissionManagementScreenState
                 Container(
                   padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
                   decoration: BoxDecoration(
-                    color: statusColor.withValues(alpha: 0.12),
+                    color: statusFillColor.withValues(alpha: 0.12),
                     borderRadius: BorderRadius.circular(20),
                   ),
                   child: Row(
                     mainAxisSize: MainAxisSize.min,
                     children: [
-                      Icon(statusIcon, size: 14, color: statusColor),
+                      Icon(statusIcon, size: 14, color: statusTextColor),
                       const SizedBox(width: 4),
                       Text(
                         statusText,
                         style: TextStyle(
                           fontSize: 12,
                           fontWeight: FontWeight.bold,
-                          color: statusColor,
+                          color: statusTextColor,
                         ),
                       ),
                     ],
@@ -284,7 +288,7 @@ class _OwnerPermissionManagementScreenState
                 Container(
                   padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
                   decoration: BoxDecoration(
-                    color: item.type == 'late' ? Colors.orange.shade50 : Colors.blue.shade50,
+                    color: item.type == 'late' ? AppColors.warningSoft : AppColors.infoSoft,
                     borderRadius: BorderRadius.circular(8),
                     border: Border.all(
                       color: item.type == 'late' ? Colors.orange.shade200 : Colors.blue.shade200,
@@ -296,7 +300,7 @@ class _OwnerPermissionManagementScreenState
                       Icon(
                         item.type == 'late' ? Icons.alarm : Icons.beach_access,
                         size: 14,
-                        color: item.type == 'late' ? Colors.orange.shade900 : Colors.blue.shade900,
+                        color: item.type == 'late' ? AppColors.warningText : AppColors.infoText,
                       ),
                       const SizedBox(width: 6),
                       Text(
@@ -304,14 +308,14 @@ class _OwnerPermissionManagementScreenState
                         style: TextStyle(
                           fontSize: 12,
                           fontWeight: FontWeight.bold,
-                          color: item.type == 'late' ? Colors.orange.shade900 : Colors.blue.shade900,
+                          color: item.type == 'late' ? AppColors.warningText : AppColors.infoText,
                         ),
                       ),
                     ],
                   ),
                 ),
                 const SizedBox(width: 10),
-                const Icon(Icons.calendar_today, size: 14, color: Colors.grey),
+                Icon(Icons.calendar_today, size: 14, color: theme.colorScheme.onSurfaceVariant),
                 const SizedBox(width: 4),
                 Text(
                   _formatPermissionDate(context, item.permissionDate),
@@ -324,14 +328,14 @@ class _OwnerPermissionManagementScreenState
               const SizedBox(height: 6),
               Row(
                 children: [
-                  const Icon(Icons.access_time, size: 14, color: Colors.orange),
+                  const Icon(Icons.access_time, size: 14, color: AppColors.warningText),
                   const SizedBox(width: 6),
                   Text(
                     'estimated_arrival_outlet'.tr(context: context, args: [item.estimatedArrivalTime ?? '']),
                     style: const TextStyle(
                       fontSize: 13,
                       fontWeight: FontWeight.w600,
-                      color: Colors.orange,
+                      color: AppColors.warningText,
                     ),
                   ),
                 ],
@@ -344,14 +348,14 @@ class _OwnerPermissionManagementScreenState
               width: double.infinity,
               padding: const EdgeInsets.all(12),
               decoration: BoxDecoration(
-                color: isDark ? Colors.grey.shade900 : Colors.grey.shade50,
+                color: theme.colorScheme.surfaceContainerHighest,
                 borderRadius: BorderRadius.circular(10),
               ),
               child: Text(
                 item.reason,
                 style: TextStyle(
                   fontSize: 13,
-                  color: isDark ? Colors.grey.shade300 : Colors.grey.shade800,
+                  color: theme.colorScheme.onSurface,
                 ),
               ),
             ),
@@ -364,25 +368,25 @@ class _OwnerPermissionManagementScreenState
                 child: Container(
                   padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
                   decoration: BoxDecoration(
-                    color: isDark ? Colors.grey.shade800 : const Color(0xFFEFF6FF),
+                    color: isDark ? theme.colorScheme.surfaceContainerHighest : AppColors.infoSoft,
                     borderRadius: BorderRadius.circular(8),
                     border: Border.all(color: Colors.blue.shade200),
                   ),
-                  child: const Row(
+                  child: Row(
                     mainAxisSize: MainAxisSize.min,
                     children: [
-                      Icon(Icons.attach_file, size: 16, color: Colors.blue),
-                      SizedBox(width: 8),
+                      const Icon(Icons.attach_file, size: 16, color: AppColors.infoText),
+                      const SizedBox(width: 8),
                       Text(
-                        'Buka Foto Bukti Lampiran',
-                        style: TextStyle(
+                        'permission_review_open_attachment'.tr(context: context),
+                        style: const TextStyle(
                           fontSize: 12,
                           fontWeight: FontWeight.bold,
-                          color: Colors.blue,
+                          color: AppColors.infoText,
                         ),
                       ),
-                      SizedBox(width: 6),
-                      Icon(Icons.open_in_new, size: 14, color: Colors.blue),
+                      const SizedBox(width: 6),
+                      const Icon(Icons.open_in_new, size: 14, color: AppColors.infoText),
                     ],
                   ),
                 ),
@@ -391,20 +395,20 @@ class _OwnerPermissionManagementScreenState
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
                 decoration: BoxDecoration(
-                  color: isDark ? Colors.grey.shade900 : Colors.grey.shade100,
+                  color: theme.colorScheme.surfaceContainerHighest,
                   borderRadius: BorderRadius.circular(8),
                 ),
                 child: Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    Icon(Icons.auto_delete_outlined, size: 14, color: Colors.grey.shade600),
+                    Icon(Icons.auto_delete_outlined, size: 14, color: theme.colorScheme.onSurfaceVariant),
                     const SizedBox(width: 6),
                     Flexible(
                       child: Text(
                         'Bukti lampiran telah terhapus otomatis oleh sistem (>3 hari).',
                         style: TextStyle(
                           fontSize: 11,
-                          color: Colors.grey.shade600,
+                          color: theme.colorScheme.onSurfaceVariant,
                           fontStyle: FontStyle.italic,
                         ),
                       ),
@@ -419,13 +423,13 @@ class _OwnerPermissionManagementScreenState
               Container(
                 padding: const EdgeInsets.all(10),
                 decoration: BoxDecoration(
-                  color: Colors.red.shade50,
+                  color: AppColors.dangerSoft,
                   borderRadius: BorderRadius.circular(8),
                   border: Border.all(color: Colors.red.shade200),
                 ),
                 child: Text(
                   'Catatan Penolakan: ${item.rejectionNote}',
-                  style: TextStyle(fontSize: 12, color: Colors.red.shade900),
+                  style: const TextStyle(fontSize: 12, color: AppColors.dangerText),
                 ),
               ),
             ],
@@ -438,10 +442,10 @@ class _OwnerPermissionManagementScreenState
                   Expanded(
                     child: OutlinedButton.icon(
                       onPressed: () => _showRejectDialog(item.id, provider),
-                      icon: const Icon(Icons.close, color: Colors.red, size: 18),
-                      label: Text('tolak_85'.tr(context: context), style: TextStyle(color: Colors.red)),
+                      icon: const Icon(Icons.close, color: AppColors.dangerText, size: 18),
+                      label: Text('tolak_85'.tr(context: context), style: const TextStyle(color: AppColors.dangerText)),
                       style: OutlinedButton.styleFrom(
-                        side: const BorderSide(color: Colors.red),
+                        side: const BorderSide(color: AppColors.dangerText),
                         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
                       ),
                     ),
@@ -451,9 +455,9 @@ class _OwnerPermissionManagementScreenState
                     child: ElevatedButton.icon(
                       onPressed: () => _confirmApprove(item.id, provider),
                       icon: const Icon(Icons.check, color: Colors.white, size: 18),
-                      label: Text('setujui_90'.tr(context: context), style: TextStyle(fontWeight: FontWeight.bold)),
+                      label: Text('setujui_90'.tr(context: context), style: const TextStyle(fontWeight: FontWeight.bold)),
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.green.shade600,
+                        backgroundColor: AppColors.successFill,
                         foregroundColor: Colors.white,
                         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
                       ),
@@ -525,15 +529,17 @@ class _OwnerPermissionManagementScreenState
         actions: [
           TextButton(onPressed: () => Navigator.pop(ctx), child: Text('batal_5'.tr(context: context))),
           ElevatedButton(
-            style: ElevatedButton.styleFrom(backgroundColor: Colors.green, foregroundColor: Colors.white),
+            style: ElevatedButton.styleFrom(backgroundColor: AppColors.successFill, foregroundColor: Colors.white),
             onPressed: () async {
               Navigator.pop(ctx);
               final success = await provider.approvePermission(id);
               if (mounted) {
                 ScaffoldMessenger.of(context).showSnackBar(
                   SnackBar(
-                    content: Text(success ? 'Izin karyawan berhasil disetujui.' : 'Gagal menyetujui izin.'),
-                    backgroundColor: success ? Colors.green : Colors.red,
+                    content: Text(success
+                        ? 'permission_approve_success'.tr(context: context)
+                        : 'permission_approve_failed'.tr(context: context)),
+                    backgroundColor: success ? AppColors.successFill : AppColors.dangerFill,
                   ),
                 );
               }
@@ -562,7 +568,7 @@ class _OwnerPermissionManagementScreenState
               controller: noteController,
               maxLines: 2,
               decoration: InputDecoration(
-                hintText: 'Contoh: Jadwal shift sudah padat / Dokumen kurang jelas',
+                hintText: 'permission_reject_reason_hint'.tr(context: context),
                 border: OutlineInputBorder(),
               ),
             ),
@@ -571,15 +577,17 @@ class _OwnerPermissionManagementScreenState
         actions: [
           TextButton(onPressed: () => Navigator.pop(ctx), child: Text('batal_5'.tr(context: context))),
           ElevatedButton(
-            style: ElevatedButton.styleFrom(backgroundColor: Colors.red, foregroundColor: Colors.white),
+            style: ElevatedButton.styleFrom(backgroundColor: AppColors.dangerFill, foregroundColor: Colors.white),
             onPressed: () async {
               Navigator.pop(ctx);
               final success = await provider.rejectPermission(id, rejectionNote: noteController.text.trim());
               if (mounted) {
                 ScaffoldMessenger.of(context).showSnackBar(
                   SnackBar(
-                    content: Text(success ? 'Pengajuan izin telah ditolak.' : 'Gagal menolak pengajuan.'),
-                    backgroundColor: success ? Colors.orange : Colors.red,
+                    content: Text(success
+                        ? 'permission_reject_success'.tr(context: context)
+                        : 'permission_reject_failed'.tr(context: context)),
+                    backgroundColor: success ? AppColors.warningFill : AppColors.dangerFill,
                   ),
                 );
               }
