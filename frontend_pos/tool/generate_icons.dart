@@ -12,10 +12,8 @@ import 'package:image/image.dart' as img;
 void main() {
   const size = 1024;
 
-  // Teal merek yang sama dengan AppColors.brand. Sebelumnya berkas ini memakai
-  // #00796B (teal Material lama) sementara pubspec memakai #0D7C83 dan aplikasi
-  // memakai #0D9488 - tiga teal berbeda untuk satu lambang yang sama.
-  final brandTeal = img.ColorRgba8(0x0D, 0x94, 0x88, 255);
+  // Teal ikon: #0D7C83, sesuai pilihan pemilik produk.
+  final brandTeal = img.ColorRgba8(0x0D, 0x7C, 0x83, 255);
   final whiteColor = img.ColorRgba8(255, 255, 255, 255);
   final transparentColor = img.ColorRgba8(0, 0, 0, 0);
 
@@ -24,24 +22,19 @@ void main() {
   // 1. Logo penuh (dipakai iOS dan ikon legacy Android)
   final solidImage = img.Image(width: size, height: size, numChannels: 4);
   img.fill(solidImage, color: brandTeal);
-  _drawZenviTriangle(solidImage, size, whiteColor, 0.255, 0.098);
+  _drawZenviTriangle(solidImage, size, whiteColor, 0.265, 0.085);
   File('assets/images/logo.png').writeAsBytesSync(img.encodePng(solidImage));
   print('Generated assets/images/logo.png');
 
   // 2. Lapisan depan ikon adaptif Android.
   //
-  // Padding di sini sengaja KECIL. Zona aman sudah diurus di tempat lain:
-  // mipmap-anydpi-v26/ic_launcher.xml membungkus lapisan ini dengan inset 16%,
-  // yang menyisakan 68% kanvas - sudah di atas 66% yang dijamin selalu terlihat
-  // oleh topeng peluncur. Memberi padding besar di sini berarti lambangnya
-  // ter-inset DUA KALI, dan itu penyebab ikonnya terlihat kecil di layar depan.
-  //
-  // Garisnya juga dipertebal mengikuti lambang yang membesar: ketebalan diukur
-  // terhadap kanvas, jadi kalau angkanya tidak ikut naik, lambang yang lebih
-  // besar justru terlihat lebih kurus.
+  // Perhatikan: XML ikon adaptif menambahkan inset 16% LAGI di atas padding ini,
+  // jadi angka di sini bukan ukuran akhir di layar depan. Percobaan menurunkan
+  // padding ke 0,215 membuat lambangnya jauh terlalu besar - kembali ke sekitar
+  // nilai semula, hanya sedikit lebih besar dan sedikit lebih tebal.
   final foregroundImage = img.Image(width: size, height: size, numChannels: 4);
   img.fill(foregroundImage, color: transparentColor);
-  _drawZenviTriangle(foregroundImage, size, whiteColor, 0.215, 0.115);
+  _drawZenviTriangle(foregroundImage, size, whiteColor, 0.325, 0.076);
   File('assets/images/logo_foreground.png').writeAsBytesSync(img.encodePng(foregroundImage));
   print('Generated assets/images/logo_foreground.png');
 
@@ -49,7 +42,7 @@ void main() {
   const splashSize = 512;
   final splashImage = img.Image(width: splashSize, height: splashSize, numChannels: 4);
   img.fill(splashImage, color: transparentColor);
-  _drawZenviTriangle(splashImage, splashSize, whiteColor, 0.245, 0.10);
+  _drawZenviTriangle(splashImage, splashSize, whiteColor, 0.25, 0.088);
 
   final splashDir = Directory('android/app/src/main/res/drawable');
   if (!splashDir.existsSync()) splashDir.createSync(recursive: true);

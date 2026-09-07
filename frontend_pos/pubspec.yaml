@@ -121,9 +121,7 @@ flutter_launcher_icons:
   ios: true
   image_path: "assets/images/logo.png"
   min_sdk_android: 21
-  # Sama dengan AppColors.brand. Sebelumnya #0D7C83 - teal keempat yang
-  # berbeda tipis dari teal merek, tapi terlihat jelas berdampingan.
-  adaptive_icon_background: "#0D9488"
+  adaptive_icon_background: "#0D7C83"
   adaptive_icon_foreground: "assets/images/logo_foreground.png"
   remove_alpha_ios: true
 
