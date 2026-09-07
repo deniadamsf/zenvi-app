@@ -22,11 +22,19 @@ void main() {
   // 1. Logo penuh (dipakai iOS dan ikon legacy Android)
   final solidImage = img.Image(width: size, height: size, numChannels: 4);
   img.fill(solidImage, color: brandTeal);
-  _drawZenviTriangle(solidImage, size, whiteColor, 0.325, 0.088);
+  _drawZenviTriangle(solidImage, size, whiteColor, 0.255, 0.082);
   File('assets/images/logo.png').writeAsBytesSync(img.encodePng(solidImage));
   print('Generated assets/images/logo.png');
 
   // 2. Lapisan depan ikon adaptif Android.
+  //
+  // PENTING: angka di sini TIDAK boleh disamakan dengan ikon legacy di atas.
+  // Peluncur lama memakai mipmap/ic_launcher.png apa adanya, sedangkan ikon
+  // adaptif masih disusutkan ke 68% oleh inset 16% di ic_launcher.xml. Padding
+  // dan ketebalan di sini karena itu jauh lebih kecil - keduanya dibagi 0,68 -
+  // supaya hasil di layar depan sama besar dan sama tebal di kedua jenis
+  // peluncur. Ukuran akhir diverifikasi 63x57% (legacy) dan 66x60% (adaptif),
+  // sepadan dengan lambang Play Console yang dipakai sebagai patokan.
   //
   // ANGKA ACUAN kalau ukurannya perlu disetel lagi. `padding` di sini diukur
   // terhadap kanvas berkas ini, BUKAN terhadap ikon yang akhirnya terlihat -
@@ -43,7 +51,7 @@ void main() {
   // nilai semula, hanya sedikit lebih besar dan sedikit lebih tebal.
   final foregroundImage = img.Image(width: size, height: size, numChannels: 4);
   img.fill(foregroundImage, color: transparentColor);
-  _drawZenviTriangle(foregroundImage, size, whiteColor, 0.325, 0.088);
+  _drawZenviTriangle(foregroundImage, size, whiteColor, 0.115, 0.120);
   File('assets/images/logo_foreground.png').writeAsBytesSync(img.encodePng(foregroundImage));
   print('Generated assets/images/logo_foreground.png');
 
@@ -51,7 +59,7 @@ void main() {
   const splashSize = 512;
   final splashImage = img.Image(width: splashSize, height: splashSize, numChannels: 4);
   img.fill(splashImage, color: transparentColor);
-  _drawZenviTriangle(splashImage, splashSize, whiteColor, 0.315, 0.092);
+  _drawZenviTriangle(splashImage, splashSize, whiteColor, 0.245, 0.086);
 
   final splashDir = Directory('android/app/src/main/res/drawable');
   if (!splashDir.existsSync()) splashDir.createSync(recursive: true);
@@ -80,13 +88,11 @@ void _drawZenviTriangle(
   final padding = size * paddingFraction;
   final thickness = size * thicknessFraction;
 
-  // Lambangnya dibuat lebih jangkung daripada lebar.
+  // Tinggi lambang relatif terhadap lebarnya.
   //
-  // Sebelumnya jarak tepi kiri-kanan dan atas-bawah dipakai sama, jadi kotak
-  // pembatasnya nyaris persegi - dan segitiga terbalik di dalam kotak persegi
-  // terbaca gepeng, karena sisi atasnya yang panjang mendominasi sementara
-  // turunannya pendek. Tingginya sekarang 1,3x lebarnya.
-  const heightRatio = 1.3;
+  // Sempat disetel 1,3 (jangkung) dan hasilnya justru terlihat kurus. Patokan
+  // sekarang lambang Play Console: sedikit lebih lebar daripada tinggi.
+  const heightRatio = 0.90;
   final halfWidth = (size - padding * 2) / 2;
   final height = halfWidth * 2 * heightRatio;
   final top = (size - height) / 2;
