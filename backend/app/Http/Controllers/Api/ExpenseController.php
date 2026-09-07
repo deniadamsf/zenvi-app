@@ -443,26 +443,38 @@ class ExpenseController extends Controller
             ];
         }
 
+        // Laporan laba rugi penuh adalah fitur berbayar. Mengikuti pendekatan
+        // yang sama seperti batas riwayat di atas: angka yang tidak boleh
+        // dilihat DIKOSONGKAN, permintaannya tidak ditolak. Dashboard paket
+        // gratis tetap hidup dengan omzet, jumlah pesanan, dan pengeluaran -
+        // yang hilang hanya perhitungan laba dan bedah analitiknya.
+        //
+        // Sekaligus ini yang menegakkan fitur `export`: berkas Excel/PDF
+        // dirakit di aplikasi dari payload ini, jadi begitu angkanya null tidak
+        // ada laba rugi yang bisa diekspor sekalipun tombolnya dipaksa.
+        $hasFullReport = Entitlements::for($request->user()->company)->hasFeature('full_report');
+
         return response()->json([
             'message' => 'Financial report generated',
             'data' => [
+                'full_report' => $hasFullReport,
                 'period' => $period,
                 'start_date' => $startDate->toDateString(),
                 'end_date' => $endDate->toDateString(),
                 'total_sales' => $totalSales,
-                'total_cogs' => $totalCogs,
-                'gross_profit' => $grossProfit,
-                'gross_margin_percent' => $grossMarginPercent,
+                'total_cogs' => $hasFullReport ? $totalCogs : null,
+                'gross_profit' => $hasFullReport ? $grossProfit : null,
+                'gross_margin_percent' => $hasFullReport ? $grossMarginPercent : null,
                 'total_expenses' => $totalExpenses,
-                'net_profit' => $netProfit,
-                'net_margin_percent' => $netMarginPercent,
+                'net_profit' => $hasFullReport ? $netProfit : null,
+                'net_margin_percent' => $hasFullReport ? $netMarginPercent : null,
                 'total_orders' => $totalOrders,
                 'avg_order_value' => $avgOrderValue,
                 'average_order_value' => $avgOrderValue,
                 'chart_data' => $chartData,
-                'hourly_sales' => $hourlySales,
+                'hourly_sales' => $hasFullReport ? $hourlySales : [],
                 'payment_methods' => $paymentMethods,
-                'top_products' => $topProducts,
+                'top_products' => $hasFullReport ? $topProducts : [],
                 // Dipangkas kalau paket tidak mencakupnya: mengirim data yang
                 // tidak berhak ditampilkan hanya memboroskan bandwidth, dan
                 // membuat klien yang dimodifikasi tetap bisa melihatnya.
@@ -470,7 +482,7 @@ class ExpenseController extends Controller
                     ->hasFeature('consolidated_report') ? $branchPerformance : [],
                 'shift_summaries' => $shiftSummaries,
                 'recent_expenses' => $recentExpenses,
-                'expense_breakdown' => $expenseBreakdown,
+                'expense_breakdown' => $hasFullReport ? $expenseBreakdown : [],
             ]
         ]);
     }
