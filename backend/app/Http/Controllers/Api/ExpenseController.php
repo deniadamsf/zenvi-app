@@ -443,15 +443,17 @@ class ExpenseController extends Controller
             ];
         }
 
-        // Laporan laba rugi penuh adalah fitur berbayar. Mengikuti pendekatan
-        // yang sama seperti batas riwayat di atas: angka yang tidak boleh
-        // dilihat DIKOSONGKAN, permintaannya tidak ditolak. Dashboard paket
-        // gratis tetap hidup dengan omzet, jumlah pesanan, dan pengeluaran -
-        // yang hilang hanya perhitungan laba dan bedah analitiknya.
+        // Ringkasan laba rugi - omzet, HPP, laba kotor, laba bersih, margin -
+        // sengaja GRATIS untuk semua paket. Itu angka yang membuat pemilik toko
+        // membuka aplikasi tiap hari; menguncinya menahan justru kebiasaan yang
+        // paling ingin ditumbuhkan.
         //
-        // Sekaligus ini yang menegakkan fitur `export`: berkas Excel/PDF
-        // dirakit di aplikasi dari payload ini, jadi begitu angkanya null tidak
-        // ada laba rugi yang bisa diekspor sekalipun tombolnya dipaksa.
+        // `full_report` menyisakan bedah analitiknya: jam ramai, produk
+        // terlaris, dan rincian pengeluaran per jenis. Itu yang dipakai untuk
+        // mengambil keputusan, bukan sekadar memantau.
+        //
+        // Mengikuti pendekatan yang sama seperti batas riwayat di atas: bagian
+        // yang tidak boleh dilihat DIKOSONGKAN, permintaannya tidak ditolak.
         $hasFullReport = Entitlements::for($request->user()->company)->hasFeature('full_report');
 
         return response()->json([
@@ -462,12 +464,12 @@ class ExpenseController extends Controller
                 'start_date' => $startDate->toDateString(),
                 'end_date' => $endDate->toDateString(),
                 'total_sales' => $totalSales,
-                'total_cogs' => $hasFullReport ? $totalCogs : null,
-                'gross_profit' => $hasFullReport ? $grossProfit : null,
-                'gross_margin_percent' => $hasFullReport ? $grossMarginPercent : null,
+                'total_cogs' => $totalCogs,
+                'gross_profit' => $grossProfit,
+                'gross_margin_percent' => $grossMarginPercent,
                 'total_expenses' => $totalExpenses,
-                'net_profit' => $hasFullReport ? $netProfit : null,
-                'net_margin_percent' => $hasFullReport ? $netMarginPercent : null,
+                'net_profit' => $netProfit,
+                'net_margin_percent' => $netMarginPercent,
                 'total_orders' => $totalOrders,
                 'avg_order_value' => $avgOrderValue,
                 'average_order_value' => $avgOrderValue,

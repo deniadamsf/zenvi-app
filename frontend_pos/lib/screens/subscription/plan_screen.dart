@@ -29,6 +29,15 @@ class _PlanScreenState extends State<PlanScreen> {
   String? _error;
   String _currentPlan = 'free';
   List<dynamic> _plans = [];
+
+  /// Kartu paket digeser ke samping, bukan ditumpuk ke bawah.
+  ///
+  /// Ditumpuk, membandingkan dua paket berarti menggulir bolak-balik sambil
+  /// mengingat angka yang sudah lewat layar. Digeser, satu paket mengisi satu
+  /// layar penuh dan tetangganya mengintip di tepi - itu yang memberi tahu
+  /// bahwa masih ada paket lain tanpa perlu tulisan apa pun.
+  final PageController _pageController = PageController(viewportFraction: 0.88);
+  int _currentPage = 0;
   Map<String, dynamic> _usage = {};
 
   final _billing = BillingService.instance;
@@ -42,6 +51,7 @@ class _PlanScreenState extends State<PlanScreen> {
 
   @override
   void dispose() {
+    _pageController.dispose();
     _billing.dispose();
     super.dispose();
   }
@@ -86,8 +96,22 @@ class _PlanScreenState extends State<PlanScreen> {
       setState(() {
         _currentPlan = data['current_plan']?.toString() ?? 'free';
         _plans = data['plans'] as List<dynamic>? ?? [];
+
+        // Buka di paket yang sedang dipakai supaya pengguna melihat posisinya
+        // sendiri dulu, lalu menggeser untuk melihat yang di atasnya.
+        final currentIndex =
+            _plans.indexWhere((p) => p['code']?.toString() == _currentPlan);
+        _currentPage = currentIndex < 0 ? 0 : currentIndex;
         _usage = Map<String, dynamic>.from(data['usage'] ?? {});
         _isLoading = false;
+      });
+
+      // PageController baru terpasang setelah PageView selesai dibangun, jadi
+      // lompatannya menunggu frame berikutnya. Tanpa ini kartu terbuka di
+      // halaman pertama sementara titik penunjuknya menyorot halaman lain.
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (!mounted || !_pageController.hasClients) return;
+        _pageController.jumpToPage(_currentPage);
       });
     } catch (_) {
       if (!mounted) return;
@@ -148,20 +172,68 @@ class _PlanScreenState extends State<PlanScreen> {
                   ? const Center(child: CircularProgressIndicator())
                   : _error != null
                       ? _buildError(theme)
-                      : RefreshIndicator(
-                          onRefresh: _load,
-                          child: ListView(
-                            padding: const EdgeInsets.all(16),
-                            children: [
-                              if (auth.isFoundingMember) _buildFoundingBanner(theme),
-                              ..._plans.map((plan) => _buildPlanCard(theme, plan, auth)),
-                              const SizedBox(height: 24),
-                            ],
-                          ),
+                      : Column(
+                          children: [
+                            if (auth.isFoundingMember)
+                              Padding(
+                                padding: const EdgeInsets.fromLTRB(16, 8, 16, 0),
+                                child: _buildFoundingBanner(theme),
+                              ),
+                            Expanded(
+                              child: PageView.builder(
+                                controller: _pageController,
+                                itemCount: _plans.length,
+                                onPageChanged: (i) => setState(() => _currentPage = i),
+                                itemBuilder: (context, index) =>
+                                    _buildPlanCard(theme, _plans[index], auth),
+                              ),
+                            ),
+                            _buildPageDots(theme),
+                          ],
                         ),
             ),
           ],
         ),
+      ),
+    );
+  }
+
+  /// Titik penunjuk halaman. Bisa diketuk supaya berpindah paket tidak harus
+  /// selalu lewat gesekan.
+  Widget _buildPageDots(ThemeData theme) {
+    if (_plans.length < 2) return const SizedBox(height: 16);
+
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(16, 4, 16, 18),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: List<Widget>.generate(_plans.length, (i) {
+          final active = i == _currentPage;
+          return Semantics(
+            button: true,
+            selected: active,
+            label: _plans[i]['name']?.toString() ?? '',
+            child: GestureDetector(
+              onTap: () => _pageController.animateToPage(
+                i,
+                duration: const Duration(milliseconds: 280),
+                curve: Curves.easeOutCubic,
+              ),
+              child: AnimatedContainer(
+                duration: const Duration(milliseconds: 220),
+                margin: const EdgeInsets.symmetric(horizontal: 4),
+                height: 8,
+                width: active ? 24 : 8,
+                decoration: BoxDecoration(
+                  color: active
+                      ? theme.colorScheme.primary
+                      : theme.colorScheme.onSurfaceVariant.withValues(alpha: 0.3),
+                  borderRadius: BorderRadius.circular(999),
+                ),
+              ),
+            ),
+          );
+        }),
       ),
     );
   }
@@ -217,17 +289,25 @@ class _PlanScreenState extends State<PlanScreen> {
     final features = plan['features'] as List<dynamic>? ?? [];
 
     return Container(
-      margin: const EdgeInsets.only(bottom: 16),
-      padding: const EdgeInsets.all(20),
+      margin: const EdgeInsets.fromLTRB(6, 12, 6, 6),
       decoration: BoxDecoration(
         color: theme.colorScheme.surface,
-        borderRadius: BorderRadius.circular(20),
+        borderRadius: BorderRadius.circular(24),
         border: Border.all(
-          color: isCurrent ? theme.colorScheme.primary : theme.dividerColor.withValues(alpha: 0.3),
+          color: isCurrent ? theme.colorScheme.primary : theme.colorScheme.outline,
           width: isCurrent ? 2 : 1,
         ),
       ),
-      child: Column(
+      clipBehavior: Clip.antiAlias,
+      // Daftar fitur paket Bisnis jauh lebih panjang daripada paket Gratis,
+      // jadi isinya digulir di dalam kartu - tingginya tidak boleh ikut
+      // berubah-ubah antar halaman.
+      child: RefreshIndicator(
+        onRefresh: _load,
+        child: SingleChildScrollView(
+          physics: const AlwaysScrollableScrollPhysics(parent: BouncingScrollPhysics()),
+          padding: const EdgeInsets.all(20),
+          child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Row(
@@ -281,6 +361,8 @@ class _PlanScreenState extends State<PlanScreen> {
           ],
           if (!isCurrent && code != 'free') _buildPurchaseArea(theme, code, auth),
         ],
+          ),
+        ),
       ),
     );
   }

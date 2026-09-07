@@ -924,14 +924,11 @@ class _DashboardOverviewState extends State<_DashboardOverview> {
 
                   // 3. Hero KPI Summary Cards (Net Profit, Sales, Expenses, AOV)
                   //
-                  // Tanpa fitur laporan penuh, server mengosongkan angka laba
-                  // rugi. Kartunya dibungkus gerbang supaya yang terlihat adalah
-                  // tawaran upgrade, bukan "Rp 0" yang terbaca seperti kerusakan.
-                  PremiumGate(
-                    locked: !authProvider.hasFeature('full_report'),
-                    feature: 'full_report',
-                    child: _buildKPICards(theme, expenseProvider, isDesktop),
-                  ),
+                  // Sengaja TIDAK digerbangi. Ini angka yang membuat pemilik
+                  // toko membuka aplikasi tiap hari - menguncinya menahan justru
+                  // kebiasaan yang paling ingin ditumbuhkan. Yang berbayar
+                  // adalah bedah analitiknya, bukan ringkasannya.
+                  _buildKPICards(theme, expenseProvider, isDesktop),
 
                   const SizedBox(height: 20),
 
