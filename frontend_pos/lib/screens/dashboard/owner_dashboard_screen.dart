@@ -3146,6 +3146,32 @@ class _DashboardOverviewState extends State<_DashboardOverview> {
 // ---------------------------------------------------------
 // MORE MENU SCREEN
 // ---------------------------------------------------------
+class _MoreMenuItem {
+  final IconData icon;
+  final String label;
+  final String description;
+  final Widget page;
+
+  _MoreMenuItem({
+    required this.icon,
+    required this.label,
+    required this.description,
+    required this.page,
+  });
+}
+
+class _MoreMenuGroup {
+  final String title;
+  final Color accent;
+  final List<_MoreMenuItem> items;
+
+  _MoreMenuGroup({
+    required this.title,
+    required this.accent,
+    required this.items,
+  });
+}
+
 class _MoreMenuScreen extends StatelessWidget {
   final Function(Widget) onNavigate;
 
@@ -3157,22 +3183,107 @@ class _MoreMenuScreen extends StatelessWidget {
     final authProvider = Provider.of<AuthProvider>(context);
     final company = authProvider.user?.company;
     final isMembershipEnabled = company?['is_membership_enabled'] == true || company?['is_membership_enabled'] == 1;
-    
-    final List<_NavItemData> extraItems = [
-      _NavItemData(Icons.notifications_rounded, 'pusat_notifikasi_503'.tr(context: context), const NotificationCenterScreen()),
-      _NavItemData(Icons.storefront_rounded, 'kelola_cabang_504'.tr(context: context), const BranchListScreen()),
-      _NavItemData(Icons.approval_rounded, 'persetujuan_izin_505'.tr(context: context), const OwnerPermissionManagementScreen()),
-      _NavItemData(Icons.event_seat_rounded, 'reservasi_506'.tr(context: context), const ReservationListScreen()),
-      if (isMembershipEnabled)
-        _NavItemData(Icons.card_membership_rounded, 'membership_507'.tr(context: context), const MemberManagementScreen()),
-      _NavItemData(Icons.emoji_events_rounded, 'performa_508'.tr(context: context), const EmployeePerformanceScreen()),
-      _NavItemData(Icons.how_to_reg, 'karyawan_509'.tr(context: context), const EmployeeVerificationScreen()),
-      _NavItemData(Icons.inventory_2_rounded, 'produk_510'.tr(context: context), const ProductListScreen()),
-      _NavItemData(Icons.inventory, 'stok_511'.tr(context: context), const StockManagementScreen()),
-      _NavItemData(Icons.receipt_long, 'log_transaksi_512'.tr(context: context), const OwnerTransactionLogScreen()),
-      _NavItemData(Icons.money_off, 'pengeluaran_513'.tr(context: context), const ExpenseScreen()),
-      _NavItemData(Icons.access_time_filled_rounded, 'shift_log_514'.tr(context: context), const ShiftLogScreen()),
+
+    final List<_MoreMenuGroup> groups = [
+      _MoreMenuGroup(
+        title: 'more_group_daily'.tr(context: context),
+        accent: theme.colorScheme.primary,
+        items: [
+          _MoreMenuItem(
+            icon: Icons.event_seat_rounded,
+            label: 'reservasi_506'.tr(context: context),
+            description: 'more_desc_reservation'.tr(context: context),
+            page: const ReservationListScreen(),
+          ),
+          _MoreMenuItem(
+            icon: Icons.receipt_long,
+            label: 'log_transaksi_512'.tr(context: context),
+            description: 'more_desc_transaction_log'.tr(context: context),
+            page: const OwnerTransactionLogScreen(),
+          ),
+          _MoreMenuItem(
+            icon: Icons.access_time_filled_rounded,
+            label: 'shift_log_514'.tr(context: context),
+            description: 'more_desc_shift_log'.tr(context: context),
+            page: const ShiftLogScreen(),
+          ),
+        ],
+      ),
+      _MoreMenuGroup(
+        title: 'more_group_catalog'.tr(context: context),
+        accent: AppColors.infoText,
+        items: [
+          _MoreMenuItem(
+            icon: Icons.inventory_2_rounded,
+            label: 'produk_510'.tr(context: context),
+            description: 'more_desc_product'.tr(context: context),
+            page: const ProductListScreen(),
+          ),
+          _MoreMenuItem(
+            icon: Icons.inventory,
+            label: 'stok_511'.tr(context: context),
+            description: 'more_desc_stock'.tr(context: context),
+            page: const StockManagementScreen(),
+          ),
+        ],
+      ),
+      _MoreMenuGroup(
+        title: 'more_group_team'.tr(context: context),
+        accent: AppColors.warningText,
+        items: [
+          _MoreMenuItem(
+            icon: Icons.how_to_reg,
+            label: 'karyawan_509'.tr(context: context),
+            description: 'more_desc_employee'.tr(context: context),
+            page: const EmployeeVerificationScreen(),
+          ),
+          _MoreMenuItem(
+            icon: Icons.approval_rounded,
+            label: 'persetujuan_izin_505'.tr(context: context),
+            description: 'more_desc_permission_approval'.tr(context: context),
+            page: const OwnerPermissionManagementScreen(),
+          ),
+          _MoreMenuItem(
+            icon: Icons.emoji_events_rounded,
+            label: 'performa_508'.tr(context: context),
+            description: 'more_desc_performance'.tr(context: context),
+            page: const EmployeePerformanceScreen(),
+          ),
+        ],
+      ),
+      _MoreMenuGroup(
+        title: 'more_group_business'.tr(context: context),
+        accent: AppColors.successText,
+        items: [
+          _MoreMenuItem(
+            icon: Icons.storefront_rounded,
+            label: 'kelola_cabang_504'.tr(context: context),
+            description: 'more_desc_branch'.tr(context: context),
+            page: const BranchListScreen(),
+          ),
+          if (isMembershipEnabled)
+            _MoreMenuItem(
+              icon: Icons.card_membership_rounded,
+              label: 'membership_507'.tr(context: context),
+              description: 'more_desc_membership'.tr(context: context),
+              page: const MemberManagementScreen(),
+            ),
+          _MoreMenuItem(
+            icon: Icons.money_off,
+            label: 'pengeluaran_513'.tr(context: context),
+            description: 'more_desc_expense'.tr(context: context),
+            page: const ExpenseScreen(),
+          ),
+          _MoreMenuItem(
+            icon: Icons.notifications_rounded,
+            label: 'pusat_notifikasi_503'.tr(context: context),
+            description: 'more_desc_notification_center'.tr(context: context),
+            page: const NotificationCenterScreen(),
+          ),
+        ],
+      ),
     ];
+
     return Scaffold(
       backgroundColor: Colors.transparent,
       body: CustomScrollView(
@@ -3195,65 +3306,125 @@ class _MoreMenuScreen extends StatelessWidget {
             ],
           ),
           SliverPadding(
-            padding: const EdgeInsets.fromLTRB(24, 24, 24, 120),
-            sliver: SliverGrid(
-              gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                crossAxisCount: 2,
-                crossAxisSpacing: 16,
-                mainAxisSpacing: 16,
-                childAspectRatio: 1.1,
-              ),
+            padding: const EdgeInsets.fromLTRB(20, 4, 20, 120),
+            sliver: SliverList(
               delegate: SliverChildBuilderDelegate(
-                (context, index) {
-                  final item = extraItems[index];
-                  return Material(
-                    color: Colors.transparent,
-                    child: InkWell(
-                      onTap: () {
-                        Navigator.push(context, MaterialPageRoute(builder: (_) => item.page));
-                      },
-                      borderRadius: BorderRadius.circular(20),
-                      child: Container(
+                (context, groupIndex) {
+                  final group = groups[groupIndex];
+                  return Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Padding(
+                        padding: const EdgeInsets.fromLTRB(4, 22, 4, 10),
+                        child: Text(
+                          group.title,
+                          style: TextStyle(
+                            fontSize: 11,
+                            fontWeight: FontWeight.w800,
+                            letterSpacing: 1.0,
+                            color: theme.colorScheme.onSurfaceVariant,
+                          ),
+                        ),
+                      ),
+                      Container(
+                        clipBehavior: Clip.antiAlias,
                         decoration: BoxDecoration(
                           color: theme.colorScheme.surface,
                           borderRadius: BorderRadius.circular(20),
-                          border: Border.all(color: theme.dividerColor.withValues(alpha: 0.08)),
-                          boxShadow: [
-                            BoxShadow(
-                              color: theme.shadowColor.withValues(alpha: 0.03),
-                              blurRadius: 16,
-                              offset: const Offset(0, 4),
-                            )
-                          ],
+                          border: Border.all(color: theme.colorScheme.outline),
                         ),
                         child: Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
                           children: [
-                            Container(
-                              padding: const EdgeInsets.all(16),
-                              decoration: BoxDecoration(
-                                color: theme.colorScheme.primary.withValues(alpha: 0.1),
-                                shape: BoxShape.circle,
-                              ),
-                              child: Icon(item.icon, size: 30, color: theme.colorScheme.primary),
-                            ),
-                            const SizedBox(height: 14),
-                            Text(
-                              item.label,
-                              style: GoogleFonts.outfit(fontWeight: FontWeight.w700, fontSize: 13.5),
-                              textAlign: TextAlign.center,
-                            ),
+                            for (int i = 0; i < group.items.length; i++) ...[
+                              if (i > 0)
+                                Divider(
+                                  height: 1,
+                                  thickness: 1,
+                                  indent: 62,
+                                  color: theme.dividerColor,
+                                ),
+                              _MoreMenuRow(item: group.items[i], accent: group.accent),
+                            ],
                           ],
                         ),
                       ),
-                    ),
-                  ).animate().fade(delay: Duration(milliseconds: 40 * index)).scale(begin: const Offset(0.9, 0.9));
+                    ],
+                  ).animate().fade(delay: Duration(milliseconds: 60 * groupIndex)).slideY(begin: 0.05, end: 0);
                 },
-                childCount: extraItems.length,
+                childCount: groups.length,
               ),
             ),
           ),
         ],
+      ),
+    );
+  }
+}
+
+class _MoreMenuRow extends StatelessWidget {
+  final _MoreMenuItem item;
+  final Color accent;
+
+  const _MoreMenuRow({required this.item, required this.accent});
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    return Material(
+      color: Colors.transparent,
+      child: InkWell(
+        onTap: () {
+          Navigator.push(context, MaterialPageRoute(builder: (_) => item.page));
+        },
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 13),
+          child: Row(
+            children: [
+              Container(
+                width: 38,
+                height: 38,
+                decoration: BoxDecoration(
+                  color: accent.withValues(alpha: 0.12),
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                alignment: Alignment.center,
+                child: Icon(item.icon, size: 19, color: accent),
+              ),
+              const SizedBox(width: 14),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Text(
+                      item.label,
+                      style: TextStyle(
+                        fontSize: 14,
+                        fontWeight: FontWeight.w600,
+                        color: theme.colorScheme.onSurface,
+                      ),
+                    ),
+                    const SizedBox(height: 2),
+                    Text(
+                      item.description,
+                      style: TextStyle(
+                        fontSize: 11.5,
+                        color: theme.colorScheme.onSurfaceVariant,
+                      ),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  ],
+                ),
+              ),
+              Icon(
+                Icons.chevron_right_rounded,
+                size: 18,
+                color: theme.colorScheme.onSurfaceVariant.withValues(alpha: 0.5),
+              ),
+            ],
+          ),
+        ),
       ),
     );
   }

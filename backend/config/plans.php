@@ -45,7 +45,7 @@ return [
         'qr_menu'             => 'QR menu & halaman toko',
         'reservation'         => 'Reservasi',
         'kds'                 => 'Kitchen Display System',
-        'full_report'         => 'Laporan laba rugi penuh',
+        'full_report'         => 'Analisis penjualan mendalam',
         'export'              => 'Export Excel & PDF',
         'multi_branch'        => 'Multi-cabang',
         'branch_stock'        => 'Stok per cabang',

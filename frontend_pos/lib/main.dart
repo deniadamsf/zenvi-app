@@ -4,6 +4,7 @@ import 'package:easy_localization/easy_localization.dart';
 import 'package:intl/date_symbol_data_local.dart';
 
 import 'screens/auth/login_screen.dart';
+import 'screens/onboarding/onboarding_screen.dart';
 import 'widgets/zenvi_logo_widgets.dart';
 import 'screens/auth/role_selection_screen.dart';
 import 'screens/auth/pending_approval_screen.dart';
@@ -63,6 +64,11 @@ void main() async {
     debugPrint('Product image cache warm-up failed: $e');
   }
 
+  // Dibaca SEBELUM runApp. Kalau dibaca setelah pohon widget berdiri, layar
+  // login sempat tergambar satu frame sebelum sambutan menggantikannya - dan
+  // kedipan itu justru muncul tepat di kesan pertama.
+  final onboardingSeen = await OnboardingScreen.hasBeenSeen();
+
   // Memulai pemantauan sinyal internet secara background
   SyncService().startMonitoringConnectivity();
 
@@ -92,14 +98,18 @@ void main() async {
           ChangeNotifierProvider(create: (_) => MemberPromoProvider()),
           ChangeNotifierProvider(create: (_) => NotificationProvider()),
         ],
-        child: const ZenviApp(),
+        child: ZenviApp(onboardingSeen: onboardingSeen),
       ),
     ),
   );
 }
 
 class ZenviApp extends StatelessWidget {
-  const ZenviApp({super.key});
+  const ZenviApp({super.key, required this.onboardingSeen});
+
+  /// Dibaca di `main()` sebelum runApp; dioper ke bawah supaya AuthGate tidak
+  /// perlu menunggu I/O sendiri dan menimbulkan kedipan di kesan pertama.
+  final bool onboardingSeen;
 
   @override
   Widget build(BuildContext context) {
@@ -136,18 +146,36 @@ class ZenviApp extends StatelessWidget {
         '/permissions': (context) => const OwnerPermissionManagementScreen(),
         '/reservations': (context) => const ReservationListScreen(),
       },
-      home: const AuthGate(),
+      home: AuthGate(onboardingSeen: onboardingSeen),
     );
   }
 }
 
 /// Gerbang Autentikasi Cerdas
 /// Mengarahkan pengguna langsung ke Dashboard / POS tanpa perlu login berulang kali saat restart.
-class AuthGate extends StatelessWidget {
-  const AuthGate({super.key});
+class AuthGate extends StatefulWidget {
+  const AuthGate({super.key, required this.onboardingSeen});
+
+  final bool onboardingSeen;
+
+  @override
+  State<AuthGate> createState() => _AuthGateState();
+}
+
+class _AuthGateState extends State<AuthGate> {
+  late bool _onboardingDone = widget.onboardingSeen;
 
   @override
   Widget build(BuildContext context) {
+    // Sambutan mendahului segalanya, termasuk pemulihan sesi: pemasangan baru
+    // tidak punya sesi untuk dipulihkan, dan pengguna lama tidak pernah sampai
+    // ke sini karena penandanya sudah tersimpan.
+    if (!_onboardingDone) {
+      return OnboardingScreen(
+        onFinished: () => setState(() => _onboardingDone = true),
+      );
+    }
+
     return Consumer<AuthProvider>(
       builder: (context, auth, _) {
         // Saat pembacaan cache lokal dari disk sedang berjalan
