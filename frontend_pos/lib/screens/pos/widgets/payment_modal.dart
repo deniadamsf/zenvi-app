@@ -843,7 +843,13 @@ class _PaymentModalState extends State<PaymentModal> {
 
   /// QRIS diperbesar sepenuh layar dengan latar putih: kamera ponsel pelanggan
   /// butuh kontras dan ukuran, apalagi di layar kasir yang kecil.
+  ///
+  /// Nominalnya ikut ditampilkan besar-besar. QRIS statis tidak membawa jumlah
+  /// tagihan, jadi pelanggan mengetiknya sendiri - dan justru di layar inilah
+  /// dia melihatnya terakhir kali sebelum mengetik.
   void _showQrisFullscreen(String url, String merchant) {
+    final amount = currencyFormatter.format(_netPayableAmount);
+
     showDialog(
       context: context,
       barrierColor: Colors.black87,
@@ -862,6 +868,21 @@ class _PaymentModalState extends State<PaymentModal> {
                   textAlign: TextAlign.center,
                   style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16, color: Colors.black),
                 ),
+              const SizedBox(height: 8),
+              Text(
+                'payment_qris_amount_label'.tr(context: context),
+                style: const TextStyle(fontSize: 12, color: Colors.black54),
+              ),
+              Text(
+                amount,
+                textAlign: TextAlign.center,
+                style: const TextStyle(
+                  fontWeight: FontWeight.w900,
+                  fontSize: 28,
+                  color: Colors.black,
+                  letterSpacing: 0.5,
+                ),
+              ),
               const SizedBox(height: 12),
               Flexible(
                 child: InteractiveViewer(

@@ -160,15 +160,15 @@ class ReceiptWidget extends StatelessWidget {
           if (resolvedStorePhone.isNotEmpty) ...[
             const SizedBox(height: 2),
             Text(
-              'Telp: $resolvedStorePhone',
+              '${'receipt_label_phone'.tr(context: context)}: $resolvedStorePhone',
               style: const TextStyle(fontSize: 11, fontFamily: 'Courier', color: Colors.black),
               textAlign: TextAlign.center,
             ),
           ],
           const SizedBox(height: 8),
-          const Text(
-            'Struk Belanja',
-            style: TextStyle(fontSize: 14, fontFamily: 'Courier', color: Colors.black),
+          Text(
+            'receipt_title'.tr(context: context),
+            style: const TextStyle(fontSize: 14, fontFamily: 'Courier', color: Colors.black),
           ),
           const SizedBox(height: 16),
           
@@ -177,7 +177,7 @@ class ReceiptWidget extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Text(
-                'No: $receiptNo',
+                '${'receipt_label_no'.tr(context: context)}: $receiptNo',
                 style: const TextStyle(fontSize: 12, fontFamily: 'Courier', color: Colors.black),
               ),
               Text(
@@ -190,7 +190,7 @@ class ReceiptWidget extends StatelessWidget {
           Row(
             children: [
               Text(
-                'Kasir: $resolvedCashierName',
+                '${'receipt_label_cashier'.tr(context: context)}: $resolvedCashierName',
                 style: const TextStyle(fontSize: 12, fontFamily: 'Courier', color: Colors.black),
               ),
             ],
@@ -201,7 +201,7 @@ class ReceiptWidget extends StatelessWidget {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Text(
-                  'Member: $activeMemberName',
+                  '${'receipt_label_member'.tr(context: context)}: $activeMemberName',
                   style: const TextStyle(fontSize: 12, fontWeight: FontWeight.bold, fontFamily: 'Courier', color: Colors.black),
                 ),
                 if (activeMemberPhone != null && activeMemberPhone.isNotEmpty)
@@ -247,11 +247,11 @@ class ReceiptWidget extends StatelessWidget {
               ),
             ))
           else if (isOffline)
-            const Padding(
-              padding: EdgeInsets.symmetric(vertical: 8.0),
+            Padding(
+              padding: const EdgeInsets.symmetric(vertical: 8.0),
               child: Text(
-                'Detail item offline disembunyikan.',
-                style: TextStyle(fontSize: 12, fontFamily: 'Courier', fontStyle: FontStyle.italic, color: Colors.black),
+                'receipt_offline_items_hidden'.tr(context: context),
+                style: const TextStyle(fontSize: 12, fontFamily: 'Courier', fontStyle: FontStyle.italic, color: Colors.black),
               ),
             ),
             
@@ -264,9 +264,9 @@ class ReceiptWidget extends StatelessWidget {
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                const Text(
-                  'Subtotal',
-                  style: TextStyle(fontSize: 12, fontFamily: 'Courier', color: Colors.black),
+                Text(
+                  'receipt_subtotal'.tr(context: context),
+                  style: const TextStyle(fontSize: 12, fontFamily: 'Courier', color: Colors.black),
                 ),
                 Text(
                   NumberFormat.currency(locale: 'id_ID', symbol: 'Rp', decimalDigits: 0).format(grandTotal + (activeMemberDiscount ?? 0) + activePointRedeemAmount),
@@ -279,9 +279,9 @@ class ReceiptWidget extends StatelessWidget {
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  const Text(
-                    'Diskon Member',
-                    style: TextStyle(fontSize: 12, fontFamily: 'Courier', color: Colors.black),
+                  Text(
+                    'receipt_member_discount'.tr(context: context),
+                    style: const TextStyle(fontSize: 12, fontFamily: 'Courier', color: Colors.black),
                   ),
                   Text(
                     '-${NumberFormat.currency(locale: 'id_ID', symbol: 'Rp', decimalDigits: 0).format(activeMemberDiscount)}',
@@ -296,7 +296,10 @@ class ReceiptWidget extends StatelessWidget {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   Text(
-                    'Tukar Poin ($activePointsRedeemed Pts)',
+                    'receipt_point_redeem'.tr(
+                      context: context,
+                      namedArgs: {'points': '$activePointsRedeemed'},
+                    ),
                     style: const TextStyle(fontSize: 12, fontFamily: 'Courier', color: Colors.black),
                   ),
                   Text(
@@ -313,9 +316,9 @@ class ReceiptWidget extends StatelessWidget {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              const Text(
-                'TOTAL',
-                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, fontFamily: 'Courier', color: Colors.black),
+              Text(
+                'receipt_total'.tr(context: context),
+                style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold, fontFamily: 'Courier', color: Colors.black),
               ),
               Text(
                 NumberFormat.currency(locale: 'id_ID', symbol: 'Rp', decimalDigits: 0).format(grandTotal),
@@ -328,12 +331,16 @@ class ReceiptWidget extends StatelessWidget {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              const Text(
-                'Metode Bayar',
-                style: TextStyle(fontSize: 12, fontFamily: 'Courier', color: Colors.black),
+              Text(
+                'receipt_payment_method'.tr(context: context),
+                style: const TextStyle(fontSize: 12, fontFamily: 'Courier', color: Colors.black),
               ),
               Text(
-                activeMethod == 'qris' ? 'qris_4'.tr(context: context) : (activeMethod == 'transfer' ? 'TRANSFER BANK' : 'TUNAI (CASH)'),
+                activeMethod == 'qris'
+                    ? 'qris_4'.tr(context: context)
+                    : (activeMethod == 'transfer'
+                        ? 'payment_method_transfer'.tr(context: context)
+                        : 'payment_method_cash'.tr(context: context)),
                 style: const TextStyle(fontSize: 12, fontWeight: FontWeight.bold, fontFamily: 'Courier', color: Colors.black),
               ),
             ],
@@ -343,9 +350,9 @@ class ReceiptWidget extends StatelessWidget {
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                const Text(
-                  'Bayar Tunai',
-                  style: TextStyle(fontSize: 12, fontFamily: 'Courier', color: Colors.black),
+                Text(
+                  'receipt_cash_received'.tr(context: context),
+                  style: const TextStyle(fontSize: 12, fontFamily: 'Courier', color: Colors.black),
                 ),
                 Text(
                   NumberFormat.currency(locale: 'id_ID', symbol: 'Rp', decimalDigits: 0).format(activeReceived),
@@ -357,9 +364,9 @@ class ReceiptWidget extends StatelessWidget {
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                const Text(
-                  'Kembalian',
-                  style: TextStyle(fontSize: 12, fontFamily: 'Courier', color: Colors.black),
+                Text(
+                  'receipt_change'.tr(context: context),
+                  style: const TextStyle(fontSize: 12, fontFamily: 'Courier', color: Colors.black),
                 ),
                 Text(
                   NumberFormat.currency(locale: 'id_ID', symbol: 'Rp', decimalDigits: 0).format(activeChange ?? (activeReceived - grandTotal)),
@@ -374,12 +381,12 @@ class ReceiptWidget extends StatelessWidget {
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                const Text(
-                  'Poin Diperoleh',
-                  style: TextStyle(fontSize: 11, fontFamily: 'Courier', color: Colors.black),
+                Text(
+                  'receipt_points_earned'.tr(context: context),
+                  style: const TextStyle(fontSize: 11, fontFamily: 'Courier', color: Colors.black),
                 ),
                 Text(
-                  '+${(grandTotal / 1000).floor()} Pts',
+                  '+${(grandTotal / 1000).floor()} ${'receipt_points_unit'.tr(context: context)}',
                   style: const TextStyle(fontSize: 11, fontWeight: FontWeight.bold, fontFamily: 'Courier', color: Colors.black),
                 ),
               ],
@@ -387,9 +394,9 @@ class ReceiptWidget extends StatelessWidget {
           ],
           
           const SizedBox(height: 24),
-          const Text(
-            'Terima kasih telah berbelanja!',
-            style: TextStyle(fontSize: 12, fontFamily: 'Courier', color: Colors.black),
+          Text(
+            'receipt_thanks'.tr(context: context),
+            style: const TextStyle(fontSize: 12, fontFamily: 'Courier', color: Colors.black),
           ),
           const SizedBox(height: 8),
           // ZENVI POS sekarang di bawah sebagai branding

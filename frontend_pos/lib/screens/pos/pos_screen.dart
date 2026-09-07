@@ -19,6 +19,7 @@ import '../../providers/reservation_provider.dart';
 import '../../models/reservation_model.dart';
 import 'member_selection_modal.dart';
 import 'reservation_selection_modal.dart';
+import '../../services/qris_image_cache.dart';
 import '../../widgets/product_image.dart';
 import '../../widgets/zenvi_header.dart';
 
@@ -58,6 +59,23 @@ class _POSScreenState extends State<POSScreen> {
       _fetchActiveShift();
       final auth = Provider.of<AuthProvider>(context, listen: false);
       auth.fetchActiveEmployees();
+
+      // Data pembayaran (QRIS & rekening) bisa saja baru diubah owner dari
+      // perangkat lain. Tanpa tarik ulang di sini, kasir yang aplikasinya sudah
+      // terbuka sejak pagi tetap melihat data lama sampai aplikasi dibuka ulang -
+      // dan itu terasa seperti aplikasi rusak, padahal cuma datanya basi.
+      auth.fetchUserData().then((_) {
+        if (!mounted) return;
+        final qrisUrl = (auth.user?.company?['qris_image_url'] ?? '').toString();
+        if (qrisUrl.isNotEmpty) {
+          // Diunduh sekarang selagi masih online, supaya kodenya tetap bisa
+          // dipindai kalau internet mati di tengah jam sibuk.
+          QrisImageCache.instance.download(qrisUrl);
+        }
+      }).catchError((e) {
+        debugPrint('POS refresh data perusahaan gagal (offline?): $e');
+      });
+
       final company = auth.user?.company;
       final isMembershipEnabled = company?['is_membership_enabled'] == true || company?['is_membership_enabled'] == 1;
       if (isMembershipEnabled) {

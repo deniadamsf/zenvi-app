@@ -203,7 +203,10 @@ class PrinterService {
     
     // Phone if exists
     if (safeCompany['phone'] != null && safeCompany['phone'].toString().isNotEmpty) {
-      bytes += generator.text('Telp: ${safeCompany['phone']}', styles: const PosStyles(align: PosAlign.center));
+      bytes += generator.text(
+        '${'receipt_label_phone'.tr()}: ${safeCompany['phone']}',
+        styles: const PosStyles(align: PosAlign.center),
+      );
     }
     
     bytes += generator.hr();
@@ -211,13 +214,23 @@ class PrinterService {
     // Receipt Info
     final printTime = transactionTime ?? DateTime.now();
     final dateFormat = DateFormat('dd/MM/yyyy HH:mm');
-    bytes += generator.text('No   : $receiptNumber');
-    bytes += generator.text('Tgl  : ${dateFormat.format(printTime)}');
-    bytes += generator.text('Kasir: $cashierName');
+    // Label diratakan berdasarkan yang terpanjang, bukan spasi tetap seperti
+    // dulu: panjang kata berbeda di tiap bahasa, dan titik dua yang tidak lurus
+    // langsung terlihat di struk.
+    final labelNo = 'receipt_label_no'.tr();
+    final labelDate = 'receipt_label_date'.tr();
+    final labelCashier = 'receipt_label_cashier'.tr();
+    final infoWidth = _widestLabel([labelNo, labelDate, labelCashier]);
+    bytes += generator.text('${labelNo.padRight(infoWidth)}: $receiptNumber');
+    bytes += generator.text('${labelDate.padRight(infoWidth)}: ${dateFormat.format(printTime)}');
+    bytes += generator.text('${labelCashier.padRight(infoWidth)}: $cashierName');
     if (memberName != null && memberName.isNotEmpty) {
-      bytes += generator.text('Member: $memberName');
+      final labelMember = 'receipt_label_member'.tr();
+      final labelPhone = 'receipt_label_phone'.tr();
+      final memberWidth = _widestLabel([labelMember, labelPhone]);
+      bytes += generator.text('${labelMember.padRight(memberWidth)}: $memberName');
       if (memberPhone != null && memberPhone.isNotEmpty) {
-        bytes += generator.text('Telp  : $memberPhone');
+        bytes += generator.text('${labelPhone.padRight(memberWidth)}: $memberPhone');
       }
     }
     
@@ -249,44 +262,47 @@ class PrinterService {
     
     // Member Discount & Subtotal (if discount exists)
     if (memberDiscountAmount != null && memberDiscountAmount > 0) {
-      bytes += _buildTotalLine(generator, 'Subtotal:', 'Rp${(total + memberDiscountAmount).toStringAsFixed(0)}', maxChar);
-      bytes += _buildTotalLine(generator, 'Diskon Member:', '-Rp${memberDiscountAmount.toStringAsFixed(0)}', maxChar);
+      bytes += _buildTotalLine(generator, '${'receipt_subtotal'.tr()}:', 'Rp${(total + memberDiscountAmount).toStringAsFixed(0)}', maxChar);
+      bytes += _buildTotalLine(generator, '${'receipt_member_discount'.tr()}:', '-Rp${memberDiscountAmount.toStringAsFixed(0)}', maxChar);
     }
 
     // Totals
     if (tax > 0) {
-      bytes += _buildTotalLine(generator, 'Subtotal:', 'Rp${subtotal.toStringAsFixed(0)}', maxChar);
-      bytes += _buildTotalLine(generator, 'Pajak:', 'Rp${tax.toStringAsFixed(0)}', maxChar);
+      bytes += _buildTotalLine(generator, '${'receipt_subtotal'.tr()}:', 'Rp${subtotal.toStringAsFixed(0)}', maxChar);
+      bytes += _buildTotalLine(generator, '${'receipt_tax'.tr()}:', 'Rp${tax.toStringAsFixed(0)}', maxChar);
     }
 
     // Final Total
     bytes += generator.text(
-      _formatTotalLine('TOTAL:', 'Rp${total.toStringAsFixed(0)}', maxChar),
+      _formatTotalLine('${'receipt_total'.tr()}:', 'Rp${total.toStringAsFixed(0)}', maxChar),
       styles: const PosStyles(bold: true, align: PosAlign.right, height: PosTextSize.size2, width: PosTextSize.size1),
     );
 
     // Payment details
-    String payType = 'TUNAI';
+    String payType = 'payment_method_cash_short'.tr();
     if (paymentMethod == 'qris') {
       payType = 'qris_4'.tr();
     } else if (paymentMethod == 'transfer') {
-      payType = 'TRANSFER';
+      payType = 'payment_method_transfer_short'.tr();
     }
-    bytes += _buildTotalLine(generator, 'Metode Bayar:', payType, maxChar);
+    bytes += _buildTotalLine(generator, '${'receipt_payment_method'.tr()}:', payType, maxChar);
     if (paymentMethod == 'cash' && cashReceived != null) {
-      bytes += _buildTotalLine(generator, 'Bayar Tunai:', 'Rp${cashReceived.toStringAsFixed(0)}', maxChar);
-      bytes += _buildTotalLine(generator, 'Kembali:', 'Rp${(cashChange ?? (cashReceived - total)).toStringAsFixed(0)}', maxChar);
+      bytes += _buildTotalLine(generator, '${'receipt_cash_received'.tr()}:', 'Rp${cashReceived.toStringAsFixed(0)}', maxChar);
+      bytes += _buildTotalLine(generator, '${'receipt_change'.tr()}:', 'Rp${(cashChange ?? (cashReceived - total)).toStringAsFixed(0)}', maxChar);
     }
 
     if (memberName != null && memberName.isNotEmpty) {
       final pointsEarned = (total / 1000).floor();
-      bytes += _buildTotalLine(generator, 'Poin Diperoleh:', '+$pointsEarned Pts', maxChar);
+      bytes += _buildTotalLine(generator, '${'receipt_points_earned'.tr()}:', '+$pointsEarned ${'receipt_points_unit'.tr()}', maxChar);
     }
 
     bytes += generator.feed(1);
-    bytes += generator.text('Terima Kasih Atas Kunjungan Anda', styles: const PosStyles(align: PosAlign.center));
-    bytes += generator.text('Barang yang sudah dibeli', styles: const PosStyles(align: PosAlign.center));
-    bytes += generator.text('tidak dapat ditukar/dikembalikan', styles: const PosStyles(align: PosAlign.center));
+    for (final line in _wrapText('receipt_thanks_print'.tr(), maxChar)) {
+      bytes += generator.text(line, styles: const PosStyles(align: PosAlign.center));
+    }
+    for (final line in _wrapText('receipt_no_exchange'.tr(), maxChar)) {
+      bytes += generator.text(line, styles: const PosStyles(align: PosAlign.center));
+    }
     
     // ZENVI POS branding di bawah
     bytes += generator.feed(1);
@@ -295,6 +311,31 @@ class PrinterService {
     bytes += generator.feed(3);
     
     return bytes;
+  }
+
+  static int _widestLabel(List<String> labels) {
+    return labels.fold<int>(0, (widest, label) => label.length > widest ? label.length : widest);
+  }
+
+  /// Memecah kalimat mengikuti lebar kertas. Dulu barisnya dipotong manual di
+  /// kode, yang hanya benar untuk satu bahasa - terjemahan yang lebih panjang
+  /// akan terpotong printer.
+  static List<String> _wrapText(String text, int maxChar) {
+    final lines = <String>[];
+    var current = '';
+    for (final word in text.split(RegExp(r'\s+'))) {
+      if (word.isEmpty) continue;
+      if (current.isEmpty) {
+        current = word;
+      } else if (current.length + 1 + word.length <= maxChar) {
+        current = '$current $word';
+      } else {
+        lines.add(current);
+        current = word;
+      }
+    }
+    if (current.isNotEmpty) lines.add(current);
+    return lines;
   }
 
   static List<int> _buildTotalLine(Generator generator, String label, String value, int maxChar) {
