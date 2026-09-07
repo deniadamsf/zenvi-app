@@ -64,6 +64,27 @@ void main() {
   print('Generated android/app/src/main/res/drawable/ic_splash_logo.png');
 
   File('assets/images/splash_logo.png').writeAsBytesSync(img.encodePng(splashImage));
+
+  // 4. Ikon Play Store (512x512, buram penuh - Play Console memasang maskernya
+  // sendiri, jadi berkasnya tidak boleh tembus pandang).
+  //
+  // Digambar dari angka yang SAMA dengan ikon aplikasi di atas. Sebelumnya
+  // berkas ini dibuat sekali lalu ditinggalkan, jadi setiap kali ketebalan
+  // lambang disetel ulang di sini, ikon di halaman Play Store tertinggal -
+  // lambangnya terlihat jauh lebih tipis daripada ikon yang terpasang di ponsel
+  // pengguna. Sekarang ikut dibangun ulang setiap kali generator ini jalan.
+  const storeSize = 512;
+  final storeImage = img.Image(width: storeSize, height: storeSize, numChannels: 4);
+  img.fill(storeImage, color: brandTeal);
+  _drawZenviTriangle(storeImage, storeSize, whiteColor, 0.345, 0.068);
+
+  // Aset toko tinggal di akar repo, sejajar dengan folder aplikasi.
+  final storeDir = Directory('../playstore_assets');
+  if (!storeDir.existsSync()) storeDir.createSync(recursive: true);
+  File('../playstore_assets/playstore_icon_512x512.png')
+      .writeAsBytesSync(img.encodePng(storeImage));
+  print('Generated ../playstore_assets/playstore_icon_512x512.png');
+
   _patchAdaptiveIconXml();
   print('Done all icon generation!');
 }
