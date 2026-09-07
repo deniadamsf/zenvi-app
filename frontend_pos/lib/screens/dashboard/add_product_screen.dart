@@ -69,7 +69,10 @@ class _AddProductScreenState extends State<AddProductScreen> {
   }
 
   Future<void> _pickImage() async {
+    // Warna dan judul diambil sebelum await mana pun: sesudahnya BuildContext
+    // sudah melintasi async gap dan tidak aman dipakai.
     final primaryColor = Theme.of(context).colorScheme.primary;
+    final cropTitle = 'product_crop_title'.tr(context: context);
     final XFile? pickedFile = await _picker.pickImage(
       source: ImageSource.gallery,
       imageQuality: 100,
@@ -84,14 +87,14 @@ class _AddProductScreenState extends State<AddProductScreen> {
         maxHeight: 600,
         uiSettings: [
           AndroidUiSettings(
-            toolbarTitle: 'Potong Gambar',
+            toolbarTitle: cropTitle,
             toolbarColor: primaryColor,
             toolbarWidgetColor: Colors.white,
             initAspectRatio: CropAspectRatioPreset.square,
             lockAspectRatio: true,
           ),
           IOSUiSettings(
-            title: 'Potong Gambar',
+            title: cropTitle,
             aspectRatioLockEnabled: true,
           ),
         ],
@@ -226,7 +229,9 @@ class _AddProductScreenState extends State<AddProductScreen> {
       if (!mounted) return;
       if (success) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(widget.product == null ? 'Produk berhasil ditambahkan!' : 'Produk berhasil diperbarui!')),
+          SnackBar(content: Text(widget.product == null
+              ? 'product_added_success'.tr(context: context)
+              : 'product_updated_success'.tr(context: context))),
         );
         Navigator.pop(context);
       } else {
@@ -285,7 +290,9 @@ class _AddProductScreenState extends State<AddProductScreen> {
         physics: const AlwaysScrollableScrollPhysics(parent: BouncingScrollPhysics()),
         slivers: [
           ZenviHeader.sliver(
-            title: isEditing ? 'Edit Produk' : 'Tambah Produk',
+            title: isEditing
+                ? 'product_edit_title'.tr(context: context)
+                : 'product_add_title'.tr(context: context),
             showBackButton: true,
           ),
           
@@ -346,17 +353,17 @@ class _AddProductScreenState extends State<AddProductScreen> {
                     TextFormField(
                       controller: _nameController,
                       decoration: inputDecoration.copyWith(
-                        labelText: 'Nama Produk',
+                        labelText: 'nama_produk_57'.tr(context: context),
                         prefixIcon: const Icon(Icons.fastfood_rounded),
                       ),
-                      validator: (value) => value!.isEmpty ? 'Nama produk wajib diisi' : null,
+                      validator: (value) => value!.isEmpty ? 'product_name_required'.tr(context: context) : null,
                     ),
                     const SizedBox(height: 16),
                     TextFormField(
                       controller: _categoryController,
                       decoration: inputDecoration.copyWith(
-                        labelText: 'Kategori (Opsional)',
-                        hintText: 'Contoh: Makanan, Minuman...',
+                        labelText: 'product_category_label'.tr(context: context),
+                        hintText: 'product_category_hint'.tr(context: context),
                         prefixIcon: const Icon(Icons.category_rounded),
                       ),
                     ),
@@ -390,12 +397,12 @@ class _AddProductScreenState extends State<AddProductScreen> {
                       controller: _priceController,
                       keyboardType: TextInputType.number,
                       decoration: inputDecoration.copyWith(
-                        labelText: 'Harga Jual (Rp)',
+                        labelText: 'product_price_label'.tr(context: context),
                         prefixIcon: const Icon(Icons.payments_rounded),
                       ),
                       validator: (value) {
-                        if (value == null || value.isEmpty) return 'Harga wajib diisi';
-                        if (double.tryParse(value) == null) return 'Harga harus angka';
+                        if (value == null || value.isEmpty) return 'product_price_required'.tr(context: context);
+                        if (double.tryParse(value) == null) return 'product_price_numeric'.tr(context: context);
                         return null;
                       },
                     ),
@@ -411,7 +418,7 @@ class _AddProductScreenState extends State<AddProductScreen> {
                             controller: _discountNominalController,
                             keyboardType: TextInputType.number,
                             decoration: inputDecoration.copyWith(
-                              labelText: 'Nominal (Rp)',
+                              labelText: 'product_amount_rp_label'.tr(context: context),
                               prefixIcon: const Icon(Icons.money_off_rounded),
                             ),
                           ),
@@ -422,7 +429,7 @@ class _AddProductScreenState extends State<AddProductScreen> {
                             controller: _discountPercentController,
                             keyboardType: TextInputType.number,
                             decoration: inputDecoration.copyWith(
-                              labelText: 'Persen (%)',
+                              labelText: 'product_percent_label'.tr(context: context),
                               prefixIcon: const Icon(Icons.percent_rounded),
                             ),
                           ),
@@ -478,7 +485,7 @@ class _AddProductScreenState extends State<AddProductScreen> {
                                     child: TextFormField(
                                       controller: _variants[index]['name_controller'],
                                       decoration: inputDecoration.copyWith(
-                                        hintText: 'Nama Varian',
+                                        hintText: 'product_variant_name_hint'.tr(context: context),
                                         contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
                                       ),
                                     ),
@@ -490,7 +497,7 @@ class _AddProductScreenState extends State<AddProductScreen> {
                                       controller: _variants[index]['price_controller'],
                                       keyboardType: TextInputType.number,
                                       decoration: inputDecoration.copyWith(
-                                        hintText: 'Harga Tambahan',
+                                        hintText: 'product_variant_price_hint'.tr(context: context),
                                         contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
                                       ),
                                     ),
@@ -581,7 +588,7 @@ class _AddProductScreenState extends State<AddProductScreen> {
                                       controller: _selectedIngredients[index]['controller'],
                                       keyboardType: const TextInputType.numberWithOptions(decimal: true),
                                       decoration: inputDecoration.copyWith(
-                                        hintText: 'Takaran',
+                                        hintText: 'product_portion_hint'.tr(context: context),
                                         contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
                                       ),
                                     ),
@@ -629,7 +636,11 @@ class _AddProductScreenState extends State<AddProductScreen> {
                         ),
                         child: isLoading
                             ? const SizedBox(height: 24, width: 24, child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2))
-                            : Text(isEditing ? 'Simpan Perubahan' : 'Simpan Produk', style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+                            : Text(
+                                isEditing
+                                    ? 'product_save_changes'.tr(context: context)
+                                    : 'product_save_new'.tr(context: context),
+                                style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
                       ),
                     ),
                   ],

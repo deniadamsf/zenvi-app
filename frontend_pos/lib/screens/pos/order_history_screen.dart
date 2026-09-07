@@ -327,7 +327,7 @@ class _OrderHistoryScreenState extends State<OrderHistoryScreen> {
             physics: const AlwaysScrollableScrollPhysics(parent: BouncingScrollPhysics()),
             slivers: [
               ZenviHeader.sliver(
-                title: 'Riwayat Transaksi',
+                title: 'order_history_title'.tr(context: context),
                 showBackButton: true,
                 actions: [
                   IconButton(
@@ -379,7 +379,7 @@ class _OrderHistoryScreenState extends State<OrderHistoryScreen> {
                       final offlineId = data['local_id'];
                       final rawItems = data['items'] as List<dynamic>? ?? [];
                       final dummyItems = rawItems.map((x) {
-                        final pName = x['product_name'] ?? x['variant_name'] ?? 'Produk';
+                        final pName = x['product_name'] ?? x['variant_name'] ?? 'product_fallback_name'.tr(context: context);
                         final qty = int.tryParse(x['qty']?.toString() ?? '1') ?? 1;
                         final subtotal = double.tryParse(x['subtotal']?.toString() ?? '0') ?? 0.0;
                         return OrderItemModel(
@@ -477,7 +477,7 @@ class _OrderHistoryScreenState extends State<OrderHistoryScreen> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    isOffline ? 'Offline Order' : 'Order #${order.id}',
+                    isOffline ? 'order_offline_label'.tr(context: context) : 'Order #${order.id}',
                     style: theme.textTheme.titleMedium?.copyWith(
                       fontWeight: FontWeight.bold,
                       decoration: isVoided ? TextDecoration.lineThrough : null,

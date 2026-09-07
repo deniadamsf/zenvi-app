@@ -123,7 +123,9 @@ class _BranchFormScreenState extends State<BranchFormScreen> {
     if (success) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text(widget.branch == null ? 'Cabang berhasil ditambahkan' : 'Cabang berhasil diperbarui'),
+          content: Text(widget.branch == null
+              ? 'branch_added_success'.tr(context: context)
+              : 'branch_updated_success'.tr(context: context)),
           backgroundColor: AppColors.successText,
         ),
       );
@@ -131,7 +133,7 @@ class _BranchFormScreenState extends State<BranchFormScreen> {
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text(provider.error ?? 'Gagal menyimpan cabang. Silakan periksa koneksi.'),
+          content: Text(provider.error ?? 'branch_save_failed'.tr(context: context)),
           backgroundColor: AppColors.dangerText,
         ),
       );
@@ -145,7 +147,9 @@ class _BranchFormScreenState extends State<BranchFormScreen> {
     return Scaffold(
       backgroundColor: theme.colorScheme.surface,
       appBar: ZenviHeader(
-        title: widget.branch == null ? 'Tambah Cabang Baru' : 'Edit Cabang',
+        title: widget.branch == null
+            ? 'branch_add_title'.tr(context: context)
+            : 'branch_edit_title'.tr(context: context),
         showBackButton: true,
       ),
       body: Column(
@@ -159,8 +163,8 @@ class _BranchFormScreenState extends State<BranchFormScreen> {
                   TextField(
                     controller: _nameController,
                     decoration: InputDecoration(
-                      labelText: 'Nama Cabang',
-                      hintText: 'Contoh: Cabang Kemang, Cabang 2',
+                      labelText: 'branch_name_label'.tr(context: context),
+                      hintText: 'branch_name_hint'.tr(context: context),
                       border: OutlineInputBorder(borderRadius: BorderRadius.circular(16)),
                       prefixIcon: const Icon(Icons.storefront_rounded),
                     ),
@@ -170,11 +174,11 @@ class _BranchFormScreenState extends State<BranchFormScreen> {
                     controller: _radiusController,
                     keyboardType: TextInputType.number,
                     decoration: InputDecoration(
-                      labelText: 'Radius Absensi Karyawan (Meter)',
+                      labelText: 'branch_radius_label'.tr(context: context),
                       hintText: '50 - 500',
                       border: OutlineInputBorder(borderRadius: BorderRadius.circular(16)),
                       prefixIcon: const Icon(Icons.radar_rounded),
-                      suffixText: 'Meter',
+                      suffixText: 'branch_radius_suffix'.tr(context: context),
                     ),
                   ),
                   const SizedBox(height: 24),

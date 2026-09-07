@@ -297,7 +297,7 @@ class _PaymentModalState extends State<PaymentModal> {
                                     Row(
                                       children: [
                                         Text(
-                                          'Tukar Poin Member',
+                                          'payment_redeem_points_title'.tr(context: context),
                                           style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13, color: theme.colorScheme.onSurface),
                                         ),
                                         const SizedBox(width: 6),
@@ -344,7 +344,7 @@ class _PaymentModalState extends State<PaymentModal> {
                               keyboardType: TextInputType.number,
                               style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
                               decoration: InputDecoration(
-                                labelText: 'Jumlah Poin Ditukar',
+                                labelText: 'payment_points_amount_label'.tr(context: context),
                                 suffixText: 'Poin',
                                 prefixIcon: const Icon(Icons.redeem_rounded, size: 18, color: AppColors.warningText),
                                 contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
@@ -553,7 +553,7 @@ class _PaymentModalState extends State<PaymentModal> {
                 keyboardType: TextInputType.number,
                 style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                 decoration: InputDecoration(
-                  labelText: 'Uang Diterima (Rp)',
+                  labelText: 'payment_cash_received_label'.tr(context: context),
                   prefixIcon: const Icon(Icons.attach_money_rounded),
                   filled: true,
                   fillColor: theme.colorScheme.surfaceContainerHighest.withValues(alpha: 0.3),
@@ -584,7 +584,9 @@ class _PaymentModalState extends State<PaymentModal> {
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     Text(
-                      isCashValid ? 'Kembalian:' : 'Uang Kurang:',
+                      isCashValid
+                          ? 'payment_change_label'.tr(context: context)
+                          : 'payment_shortfall_label'.tr(context: context),
                       style: TextStyle(
                         fontWeight: FontWeight.bold,
                         color: isCashValid ? AppColors.successText : AppColors.dangerText,
@@ -622,7 +624,7 @@ class _PaymentModalState extends State<PaymentModal> {
                           Text('pembayaran_qris_digital_312'.tr(context: context), style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14)),
                           const SizedBox(height: 4),
                           Text(
-                            'Minta pelanggan memindai QRIS toko. Pastikan notifikasi dana masuk telah terkonfirmasi.',
+                            'payment_qris_note'.tr(context: context),
                             style: TextStyle(fontSize: 12, color: theme.colorScheme.onSurfaceVariant),
                           ),
                         ],
@@ -652,7 +654,7 @@ class _PaymentModalState extends State<PaymentModal> {
                           Text('transfer_bank_314'.tr(context: context), style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14)),
                           const SizedBox(height: 4),
                           Text(
-                            'Periksa bukti mutasi atau bukti transfer bank sebelum mengonfirmasi pesanan.',
+                            'payment_transfer_note'.tr(context: context),
                             style: TextStyle(fontSize: 12, color: theme.colorScheme.onSurfaceVariant),
                           ),
                         ],
@@ -689,7 +691,7 @@ class _PaymentModalState extends State<PaymentModal> {
                           Icon(Icons.badge_outlined, size: 16, color: theme.colorScheme.secondary),
                           const SizedBox(width: 6),
                           Text(
-                            'Staf / Terapis / Kapster (Opsional)',
+                            'payment_staff_label'.tr(context: context),
                             style: TextStyle(
                               fontSize: 12,
                               fontWeight: FontWeight.bold,
@@ -715,7 +717,7 @@ class _PaymentModalState extends State<PaymentModal> {
                             child: Text(
                               widget.currentUserName != null && widget.currentUserName!.isNotEmpty
                                   ? 'Saya Sendiri / Kasir (${widget.currentUserName})'
-                                  : 'Dilayani Sendiri oleh Kasir',
+                                  : 'payment_served_by_cashier'.tr(context: context),
                             ),
                           ),
                           ...otherStaff.map((staff) {
@@ -788,7 +790,9 @@ class _PaymentModalState extends State<PaymentModal> {
                 ),
                 child: Text(
                   _selectedMethod == 'cash'
-                      ? (isCashValid ? 'Selesaikan Pembayaran Tunai' : 'Nominal Masih Kurang')
+                      ? (isCashValid
+                          ? 'payment_finish_cash'.tr(context: context)
+                          : 'payment_amount_still_short'.tr(context: context))
                       : 'Konfirmasi Pembayaran ${_selectedMethod.toUpperCase()}',
                   style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
                 ),

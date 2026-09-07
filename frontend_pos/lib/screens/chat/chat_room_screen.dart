@@ -299,7 +299,7 @@ class _ChatRoomScreenState extends State<ChatRoomScreen> {
                         textInputAction: TextInputAction.send,
                         onSubmitted: (_) => _sendMessage(),
                         decoration: InputDecoration(
-                          hintText: 'Ketik pesan...',
+                          hintText: 'chat_message_hint'.tr(context: context),
                           border: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(24),
                             borderSide: BorderSide.none,

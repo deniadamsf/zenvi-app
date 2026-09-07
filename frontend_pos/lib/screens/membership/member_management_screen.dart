@@ -276,7 +276,9 @@ class _MemberListTabState extends State<_MemberListTab> {
                         icon: isSubmitting
                             ? SizedBox(width: 18, height: 18, child: CircularProgressIndicator(strokeWidth: 2, color: theme.colorScheme.onPrimary))
                             : const Icon(Icons.person_add_rounded),
-                        label: Text(isSubmitting ? 'Menyimpan...' : 'Simpan Member'),
+                        label: Text(isSubmitting
+                            ? 'member_saving'.tr(context: context)
+                            : 'member_save_button'.tr(context: context)),
                       ),
                     ),
                   ],
@@ -453,7 +455,7 @@ class _MemberListTabState extends State<_MemberListTab> {
             child: TextField(
               controller: _searchController,
               decoration: InputDecoration(
-                hintText: 'Cari nama, telepon, atau kode member...',
+                hintText: 'member_search_hint'.tr(context: context),
                 prefixIcon: Icon(Icons.search_rounded, size: 20, color: theme.colorScheme.onSurfaceVariant),
                 suffixIcon: _searchController.text.isNotEmpty
                     ? IconButton(
@@ -738,11 +740,11 @@ class _PromoListTab extends StatelessWidget {
                     const SizedBox(height: 16),
                     TextField(controller: nameCtrl, decoration: const InputDecoration(labelText: 'Nama Promo *', prefixIcon: Icon(Icons.local_offer_rounded))),
                     const SizedBox(height: 12),
-                    TextField(controller: descCtrl, decoration: const InputDecoration(labelText: 'Deskripsi', prefixIcon: Icon(Icons.description_rounded)), maxLines: 2),
+                    TextField(controller: descCtrl, decoration: InputDecoration(labelText: 'promo_description_label'.tr(context: context), prefixIcon: const Icon(Icons.description_rounded)), maxLines: 2),
                     const SizedBox(height: 12),
                     DropdownButtonFormField<String>(
                       initialValue: discountType,
-                      decoration: const InputDecoration(labelText: 'Tipe Diskon', prefixIcon: Icon(Icons.category_rounded)),
+                      decoration: InputDecoration(labelText: 'promo_discount_type_label'.tr(context: context), prefixIcon: const Icon(Icons.category_rounded)),
                       items: [
                         DropdownMenuItem(value: 'percent', child: Text('persentase_190'.tr(context: context))),
                         DropdownMenuItem(value: 'nominal', child: Text('potongan_nominal_rp_191'.tr(context: context))),
@@ -754,7 +756,9 @@ class _PromoListTab extends StatelessWidget {
                     TextField(
                       controller: valueCtrl,
                       decoration: InputDecoration(
-                        labelText: discountType == 'percent' ? 'Nilai Diskon (%)' : 'Nilai (Rp)',
+                        labelText: discountType == 'percent'
+                            ? 'member_discount_percent_label'.tr(context: context)
+                            : 'member_discount_amount_label'.tr(context: context),
                         prefixIcon: const Icon(Icons.discount_rounded),
                       ),
                       keyboardType: TextInputType.number,
@@ -762,7 +766,7 @@ class _PromoListTab extends StatelessWidget {
                     const SizedBox(height: 12),
                     TextField(
                       controller: minPurchaseCtrl,
-                      decoration: const InputDecoration(labelText: 'Min. Pembelian (Rp)', prefixIcon: Icon(Icons.money_rounded)),
+                      decoration: InputDecoration(labelText: 'promo_min_purchase_label'.tr(context: context), prefixIcon: const Icon(Icons.money_rounded)),
                       keyboardType: TextInputType.number,
                     ),
                     const SizedBox(height: 16),
@@ -998,7 +1002,9 @@ class _PromoListTab extends StatelessWidget {
                   borderRadius: BorderRadius.circular(8),
                 ),
                 child: Text(
-                  promo.isActive ? 'Aktif' : 'Nonaktif',
+                  promo.isActive
+                      ? 'member_promo_active'.tr()
+                      : 'member_promo_inactive'.tr(),
                   style: TextStyle(
                     fontSize: 11,
                     fontWeight: FontWeight.bold,

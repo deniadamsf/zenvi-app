@@ -115,7 +115,7 @@ class _ExpenseScreenState extends State<ExpenseScreen> {
                               controller: _qtyController,
                               keyboardType: TextInputType.number,
                               decoration: InputDecoration(
-                                labelText: 'Jumlah Kuantitas (Stok Bertambah)',
+                                labelText: 'expense_qty_label'.tr(context: context),
                                 border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
                                 filled: true,
                                 fillColor: theme.colorScheme.surface,
@@ -128,7 +128,7 @@ class _ExpenseScreenState extends State<ExpenseScreen> {
                             controller: _amountController,
                             keyboardType: TextInputType.number,
                             decoration: InputDecoration(
-                              labelText: 'Total Biaya (Rp)', 
+                              labelText: 'expense_total_cost_label'.tr(context: context), 
                               prefixText: 'rp_3'.tr(context: context),
                               border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
                               filled: true,
@@ -140,7 +140,7 @@ class _ExpenseScreenState extends State<ExpenseScreen> {
                             controller: _descController,
                             maxLines: 2,
                             decoration: InputDecoration(
-                              labelText: 'Keterangan (Opsional)',
+                              labelText: 'expense_note_label'.tr(context: context),
                               border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
                               filled: true,
                               fillColor: theme.colorScheme.surface,
@@ -232,7 +232,7 @@ class _ExpenseScreenState extends State<ExpenseScreen> {
         physics: const AlwaysScrollableScrollPhysics(parent: BouncingScrollPhysics()),
         slivers: [
           ZenviHeader.sliver(
-            title: 'Catatan Pengeluaran',
+            title: 'expense_records_title'.tr(context: context),
             showBackButton: true,
           ),
           
@@ -266,15 +266,15 @@ class _ExpenseScreenState extends State<ExpenseScreen> {
                     if (exp.expenseType == 'ingredient_restock') {
                       icon = Icons.inventory_2_rounded;
                       color = Colors.orange;
-                      titleStr = 'Restock Bahan';
+                      titleStr = 'expense_type_restock'.tr(context: context);
                     } else if (exp.expenseType == 'salary') {
                       icon = Icons.payments_rounded;
                       color = Colors.purple;
-                      titleStr = 'Gaji Karyawan';
+                      titleStr = 'expense_type_salary'.tr(context: context);
                     } else {
                       icon = Icons.receipt_long_rounded;
                       color = Colors.blueGrey;
-                      titleStr = 'Lainnya';
+                      titleStr = 'lainnya_14'.tr(context: context);
                     }
 
                     return Container(

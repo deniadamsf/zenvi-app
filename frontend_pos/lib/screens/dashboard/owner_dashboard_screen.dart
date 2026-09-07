@@ -412,7 +412,7 @@ class _DashboardOverviewState extends State<_DashboardOverview> {
                         controller: qtyController,
                         keyboardType: const TextInputType.numberWithOptions(decimal: true),
                         decoration: InputDecoration(
-                          labelText: 'Jumlah Kuantitas Dibeli (Stok Bertambah)',
+                          labelText: 'expense_qty_purchased_label'.tr(context: context),
                           filled: true,
                           fillColor: theme.colorScheme.surfaceContainerHighest.withValues(alpha: 0.35),
                           border: OutlineInputBorder(borderRadius: BorderRadius.circular(16), borderSide: BorderSide.none),
@@ -425,7 +425,7 @@ class _DashboardOverviewState extends State<_DashboardOverview> {
                       controller: amountController,
                       keyboardType: TextInputType.number,
                       decoration: InputDecoration(
-                        labelText: 'Nominal Biaya (Rp)',
+                        labelText: 'expense_cost_amount_label'.tr(context: context),
                         prefixText: 'rp_3'.tr(context: context),
                         filled: true,
                         fillColor: theme.colorScheme.surfaceContainerHighest.withValues(alpha: 0.35),
@@ -437,7 +437,7 @@ class _DashboardOverviewState extends State<_DashboardOverview> {
                     TextField(
                       controller: descController,
                       decoration: InputDecoration(
-                        labelText: 'Keterangan (Opsional)',
+                        labelText: 'expense_note_label'.tr(context: context),
                         filled: true,
                         fillColor: theme.colorScheme.surfaceContainerHighest.withValues(alpha: 0.35),
                         border: OutlineInputBorder(borderRadius: BorderRadius.circular(16), borderSide: BorderSide.none),
@@ -986,7 +986,7 @@ class _DashboardOverviewState extends State<_DashboardOverview> {
     final company = auth.user?.company;
     final companyName = company?['name'] ?? 'toko_saya_9'.tr(context: context);
     final companyCode = company?['code']?.toString() ?? '';
-    final userName = auth.user?.name ?? 'Owner';
+    final userName = auth.user?.name ?? 'owner_5'.tr(context: context);
     final dateStr = DateFormat('EEEE, d MMM yyyy', context.locale.languageCode).format(DateTime.now());
 
     return Column(
@@ -1069,7 +1069,7 @@ class _DashboardOverviewState extends State<_DashboardOverview> {
                       const SizedBox(width: 5),
                       Text(
                         'live_system_status'.tr(context: context) == 'live_system_status'
-                            ? 'Live System'
+                            ? 'dashboard_live_system'.tr(context: context)
                             : 'live_system_status'.tr(context: context),
                         style: const TextStyle(
                           fontSize: 10,
@@ -2416,7 +2416,11 @@ class _DashboardOverviewState extends State<_DashboardOverview> {
             getTooltipColor: (spot) => theme.colorScheme.surfaceContainerHighest,
             getTooltipItems: (touchedSpots) {
               return touchedSpots.map((spot) {
-                final label = spot.barIndex == 0 ? 'Omzet' : spot.barIndex == 1 ? 'Laba' : 'Beban';
+                final label = spot.barIndex == 0
+                    ? 'revenue_label'.tr(context: context)
+                    : spot.barIndex == 1
+                        ? 'profit_label'.tr(context: context)
+                        : 'expense_label'.tr(context: context);
                 final color = spot.barIndex == 0 ? AppColors.chartRevenue : spot.barIndex == 1 ? AppColors.chartProfit : AppColors.chartExpense;
                 return LineTooltipItem(
                   '$label: Rp ${NumberFormat.decimalPattern('id').format(spot.y)}',

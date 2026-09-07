@@ -85,7 +85,7 @@ class _ShiftScreenState extends State<ShiftScreen> {
         const Duration(seconds: 6),
         onTimeout: () {
           if (lastKnown != null) return lastKnown;
-          throw Exception('Waktu pencarian sinyal GPS habis. Pastikan GPS aktif di area terbuka.');
+          throw Exception('shift_gps_timeout'.tr());
         },
       );
     } catch (e) {
@@ -259,7 +259,7 @@ class _ShiftScreenState extends State<ShiftScreen> {
       
       Position? position = await _getSafePosition();
       if (position == null) {
-        throw Exception('Gagal mendapatkan sinyal GPS. Silakan coba beberapa saat lagi.');
+        throw Exception('shift_gps_failed'.tr());
       }
       
       if (!mounted) return;
@@ -540,7 +540,7 @@ class _ShiftScreenState extends State<ShiftScreen> {
 
       if (success && mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Shift berhasil dibuka!'.tr()), backgroundColor: AppColors.successFill),
+          SnackBar(content: Text('shift_opened_success'.tr(context: context)), backgroundColor: AppColors.successFill),
         );
         _openingBalanceController.clear();
         setState(() {
@@ -733,7 +733,7 @@ class _ShiftScreenState extends State<ShiftScreen> {
 
       if (success && mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Shift ditutup. Data kas & stok tersinkronisasi.'.tr()), backgroundColor: AppColors.successFill),
+          SnackBar(content: Text('shift_closed_synced'.tr(context: context)), backgroundColor: AppColors.successFill),
         );
         _closingBalanceController.clear();
       }
@@ -883,7 +883,7 @@ class _ShiftScreenState extends State<ShiftScreen> {
           
           if (requireCashDrawer) ...[
             Text(
-              'Saldo Awal Kasir (Uang Tunai di Laci):',
+              'shift_opening_balance_prompt'.tr(context: context),
               style: TextStyle(color: theme.colorScheme.onSurface, fontWeight: FontWeight.bold, fontSize: 13),
             ),
             const SizedBox(height: 8),
@@ -922,7 +922,7 @@ class _ShiftScreenState extends State<ShiftScreen> {
                   Icon(Icons.location_off, color: theme.colorScheme.error, size: 36),
                   const SizedBox(height: 8),
                   Text(
-                    'Lokasi Anda belum tervalidasi di area cabang.',
+                    'shift_location_not_validated'.tr(context: context),
                     style: TextStyle(color: theme.colorScheme.error, fontWeight: FontWeight.bold, fontSize: 13),
                     textAlign: TextAlign.center,
                   ),
@@ -980,7 +980,7 @@ class _ShiftScreenState extends State<ShiftScreen> {
                                 ),
                                 const SizedBox(height: 10),
                                 Text(
-                                  'Deteksi wajah...',
+                                  'shift_detecting_face'.tr(context: context),
                                   style: TextStyle(
                                     fontSize: 11,
                                     fontWeight: FontWeight.w600,
@@ -1039,7 +1039,7 @@ class _ShiftScreenState extends State<ShiftScreen> {
                                 Icon(Icons.face_retouching_natural_rounded, size: 44, color: theme.colorScheme.onSurfaceVariant.withValues(alpha: 0.4)),
                                 const SizedBox(height: 6),
                                 Text(
-                                  'Auto-Crop Wajah',
+                                  'shift_auto_crop_face'.tr(context: context),
                                   style: TextStyle(fontSize: 11, color: theme.colorScheme.onSurfaceVariant.withValues(alpha: 0.6)),
                                 ),
                               ],
@@ -1090,8 +1090,8 @@ class _ShiftScreenState extends State<ShiftScreen> {
                 );
               },
               icon: const Icon(Icons.edit_calendar_rounded, size: 18),
-              label: const Text(
-                'Ajukan Izin Libur / Telat Masuk',
+              label: Text(
+                'shift_request_permission_cta'.tr(context: context),
                 style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13),
               ),
               style: OutlinedButton.styleFrom(
@@ -1204,7 +1204,7 @@ class _ShiftScreenState extends State<ShiftScreen> {
                   
                   // Saldo Awal
                   if (requireCashDrawer) ...[
-                    _buildShiftSummaryRow('Saldo Awal Kasir', currencyFormatter.format(shift.openingBalance), theme),
+                    _buildShiftSummaryRow('shift_summary_opening_balance'.tr(context: context), currencyFormatter.format(shift.openingBalance), theme),
                     const Padding(
                       padding: EdgeInsets.symmetric(vertical: 8.0),
                       child: Divider(height: 1),
@@ -1243,7 +1243,7 @@ class _ShiftScreenState extends State<ShiftScreen> {
 
                   // Total Omzet
                   _buildShiftSummaryRow(
-                    'Total Seluruh Penjualan', 
+                    'shift_total_all_sales'.tr(context: context), 
                     currencyFormatter.format(shift.totalRevenue ?? 0), 
                     theme,
                     isBold: true,
@@ -1277,8 +1277,8 @@ class _ShiftScreenState extends State<ShiftScreen> {
                                 children: [
                                   Icon(Icons.point_of_sale_rounded, size: 16, color: theme.colorScheme.primary),
                                   const SizedBox(width: 6),
-                                  const Text(
-                                    'Kas Fisik di Laci Kasir',
+                                  Text(
+                                    'shift_physical_cash_label'.tr(context: context),
                                     style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13),
                                   ),
                                 ],
@@ -1314,7 +1314,7 @@ class _ShiftScreenState extends State<ShiftScreen> {
               
               // Input Closing Balance
               Text(
-                'Hitung Uang Tunai di Laci & Masukkan Saldo Akhir:',
+                'shift_count_cash_prompt'.tr(context: context),
                 style: TextStyle(color: theme.colorScheme.onSurface, fontSize: 13, fontWeight: FontWeight.bold),
               ),
               const SizedBox(height: 8),

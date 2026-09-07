@@ -195,8 +195,8 @@ class _EmployeeVerificationScreenState extends State<EmployeeVerificationScreen>
                     const SizedBox(height: 20),
 
                     // Preset Role Selection
-                    const Text(
-                      'Pilih Template Peran (Preset)',
+                    Text(
+                      'verify_preset_section'.tr(context: context),
                       style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
                     ),
                     const SizedBox(height: 10),
@@ -217,8 +217,8 @@ class _EmployeeVerificationScreenState extends State<EmployeeVerificationScreen>
                     TextField(
                       controller: titleController,
                       decoration: InputDecoration(
-                        labelText: 'Nama Jabatan / Posisi',
-                        hintText: 'Contoh: Kasir Utama, Kapster Senior, Barista',
+                        labelText: 'verify_job_title_label'.tr(context: context),
+                        hintText: 'verify_job_title_hint'.tr(context: context),
                         prefixIcon: const Icon(Icons.badge_outlined),
                         border: OutlineInputBorder(borderRadius: BorderRadius.circular(14)),
                         filled: true,
@@ -228,16 +228,16 @@ class _EmployeeVerificationScreenState extends State<EmployeeVerificationScreen>
                     const SizedBox(height: 20),
 
                     // Modular Permissions Switch
-                    const Text(
-                      'Modul & Fitur yang Dapat Diakses',
+                    Text(
+                      'verify_modules_section'.tr(context: context),
                       style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
                     ),
                     const SizedBox(height: 10),
 
                     _buildPermissionSwitchTile(
                       icon: Icons.point_of_sale_rounded,
-                      title: 'Aplikasi Kasir (POS)',
-                      subtitle: 'Buka shift kasir, catat transaksi & cetak struk',
+                      title: 'verify_module_pos_title'.tr(context: context),
+                      subtitle: 'verify_module_pos_desc'.tr(context: context),
                       value: canAccessPos,
                       onChanged: (val) {
                         setModalState(() {
@@ -251,8 +251,8 @@ class _EmployeeVerificationScreenState extends State<EmployeeVerificationScreen>
 
                     _buildPermissionSwitchTile(
                       icon: Icons.inventory_2_rounded,
-                      title: 'Kelola Stok & Bahan Baku',
-                      subtitle: 'Lihat sisa stok, tambah & kurangi stok bahan',
+                      title: 'verify_module_stock_title'.tr(context: context),
+                      subtitle: 'verify_module_stock_desc'.tr(context: context),
                       value: canAccessStock,
                       onChanged: (val) {
                         setModalState(() {
@@ -266,8 +266,8 @@ class _EmployeeVerificationScreenState extends State<EmployeeVerificationScreen>
 
                     _buildPermissionSwitchTile(
                       icon: Icons.event_seat_rounded,
-                      title: 'Daftar Reservasi Online',
-                      subtitle: 'Melihat dan konfirmasi jadwal reservasi pelanggan',
+                      title: 'verify_module_reservation_title'.tr(context: context),
+                      subtitle: 'verify_module_reservation_desc'.tr(context: context),
                       value: canAccessReservations,
                       onChanged: (val) {
                         setModalState(() {
@@ -281,8 +281,8 @@ class _EmployeeVerificationScreenState extends State<EmployeeVerificationScreen>
 
                     _buildPermissionSwitchTile(
                       icon: Icons.receipt_long_rounded,
-                      title: 'Pencatatan Pengeluaran Kas',
-                      subtitle: 'Mencatat pengeluaran operasional outlet',
+                      title: 'verify_module_expense_title'.tr(context: context),
+                      subtitle: 'verify_module_expense_desc'.tr(context: context),
                       value: canAccessExpenses,
                       onChanged: (val) {
                         setModalState(() {
@@ -296,8 +296,8 @@ class _EmployeeVerificationScreenState extends State<EmployeeVerificationScreen>
                     
                     _buildPermissionSwitchTile(
                       icon: Icons.kitchen_rounded,
-                      title: 'Akses KDS / Dapur',
-                      subtitle: 'Melihat dan memproses pesanan khusus dapur',
+                      title: 'verify_module_kds_title'.tr(context: context),
+                      subtitle: 'verify_module_kds_desc'.tr(context: context),
                       value: canAccessKds,
                       onChanged: (val) {
                         setModalState(() {
@@ -320,9 +320,9 @@ class _EmployeeVerificationScreenState extends State<EmployeeVerificationScreen>
                         children: [
                           Icon(Icons.info_outline, size: 20, color: theme.colorScheme.primary),
                           const SizedBox(width: 10),
-                          const Expanded(
+                          Expanded(
                             child: Text(
-                              'Fitur Absensi & Chat selalu aktif untuk semua karyawan agar performa & kehadiran tetap tercatat.',
+                              'verify_always_on_note'.tr(context: context),
                               style: TextStyle(fontSize: 12),
                             ),
                           ),
@@ -409,7 +409,9 @@ class _EmployeeVerificationScreenState extends State<EmployeeVerificationScreen>
                           }
                         },
                         child: Text(
-                          isApproving ? 'Setujui Karyawan' : 'Simpan Hak Akses',
+                          isApproving
+                              ? 'verify_approve_button'.tr(context: context)
+                              : 'verify_save_access_button'.tr(context: context),
                           style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
                         ),
                       ),
