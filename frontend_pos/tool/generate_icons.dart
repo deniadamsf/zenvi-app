@@ -9,6 +9,14 @@ import 'package:image/image.dart' as img;
 ///
 /// Ikonnya digambar, bukan berkas desain, supaya bisa disetel dari angka -
 /// ketebalan dan besarnya tinggal diubah di sini lalu dibangun ulang.
+// Yang menentukan lambang terpotong atau tidak BUKAN lebarnya, tapi jarak
+// sudut terjauhnya dari pusat ikon. Peluncur memasang maskernya sendiri -
+// kotak membulat, lingkaran, dan lain-lain - dan segitiga punya sudut yang
+// menjulur ke arah tepi, tidak seperti lambang yang bentuknya membulat.
+//
+// Acuan terukur, dalam persen radius ikon:
+//   83% -> terpotong di peluncur MIUI
+//   71% -> aman di kotak membulat maupun lingkaran  (setelan sekarang)
 void main() {
   const size = 1024;
 
@@ -22,7 +30,7 @@ void main() {
   // 1. Logo penuh (dipakai iOS dan ikon legacy Android)
   final solidImage = img.Image(width: size, height: size, numChannels: 4);
   img.fill(solidImage, color: brandTeal);
-  _drawZenviTriangle(solidImage, size, whiteColor, 0.255, 0.082);
+  _drawZenviTriangle(solidImage, size, whiteColor, 0.30, 0.076);
   File('assets/images/logo.png').writeAsBytesSync(img.encodePng(solidImage));
   print('Generated assets/images/logo.png');
 
@@ -51,7 +59,7 @@ void main() {
   // nilai semula, hanya sedikit lebih besar dan sedikit lebih tebal.
   final foregroundImage = img.Image(width: size, height: size, numChannels: 4);
   img.fill(foregroundImage, color: transparentColor);
-  _drawZenviTriangle(foregroundImage, size, whiteColor, 0.115, 0.120);
+  _drawZenviTriangle(foregroundImage, size, whiteColor, 0.175, 0.112);
   File('assets/images/logo_foreground.png').writeAsBytesSync(img.encodePng(foregroundImage));
   print('Generated assets/images/logo_foreground.png');
 
@@ -59,7 +67,7 @@ void main() {
   const splashSize = 512;
   final splashImage = img.Image(width: splashSize, height: splashSize, numChannels: 4);
   img.fill(splashImage, color: transparentColor);
-  _drawZenviTriangle(splashImage, splashSize, whiteColor, 0.245, 0.086);
+  _drawZenviTriangle(splashImage, splashSize, whiteColor, 0.29, 0.080);
 
   final splashDir = Directory('android/app/src/main/res/drawable');
   if (!splashDir.existsSync()) splashDir.createSync(recursive: true);
