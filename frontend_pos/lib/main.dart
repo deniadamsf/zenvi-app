@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:intl/date_symbol_data_local.dart';
@@ -134,9 +135,20 @@ class ZenviApp extends StatelessWidget {
           minScaleFactor: 0.85,
           maxScaleFactor: 1.15,
         );
-        return MediaQuery(
-          data: mediaQuery.copyWith(textScaler: clampedTextScaler),
-          child: child ?? const SizedBox.shrink(),
+        // Gaya ikon status bar dipasang di sini supaya berlaku untuk seluruh
+        // layar, termasuk yang memakai header buatan sendiri tanpa AppBar -
+        // dan itu mayoritas layar di aplikasi ini. Layar yang punya AppBar
+        // tetap bisa menimpanya karena AnnotatedRegion miliknya lebih dalam.
+        final overlayStyle = Theme.of(context).brightness == Brightness.dark
+            ? ThemeProvider.darkOverlayStyle
+            : ThemeProvider.lightOverlayStyle;
+
+        return AnnotatedRegion<SystemUiOverlayStyle>(
+          value: overlayStyle,
+          child: MediaQuery(
+            data: mediaQuery.copyWith(textScaler: clampedTextScaler),
+            child: child ?? const SizedBox.shrink(),
+          ),
         );
       },
       routes: {
@@ -182,10 +194,16 @@ class _AuthGateState extends State<AuthGate> {
       builder: (context, auth, _) {
         // Saat pembacaan cache lokal dari disk sedang berjalan
         if (auth.isInitializing) {
-          return const Scaffold(
-            backgroundColor: Color(0xFF00796B),
-            body: Center(
-              child: ZenviLoadingAnimation(size: 96, variant: ZenviLogoVariant.solid),
+          // Latarnya teal gelap - satu-satunya layar yang melawan gaya
+          // terang bawaan aplikasi - jadi ikon status bar dibalik ke putih
+          // supaya tetap terbaca, persis seperti saat splash.
+          return AnnotatedRegion<SystemUiOverlayStyle>(
+            value: ThemeProvider.darkOverlayStyle,
+            child: const Scaffold(
+              backgroundColor: Color(0xFF00796B),
+              body: Center(
+                child: ZenviLoadingAnimation(size: 96, variant: ZenviLogoVariant.solid),
+              ),
             ),
           );
         }

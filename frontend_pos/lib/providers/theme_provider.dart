@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -6,6 +7,33 @@ import '../theme/app_colors.dart';
 
 class ThemeProvider extends ChangeNotifier {
   static const String _prefsKey = 'is_dark_mode';
+
+  /// Warna ikon jam, sinyal, dan baterai di status bar tidak mengikuti tema
+  /// dengan sendirinya. Android mewarisinya dari splash - yang berlatar teal
+  /// gelap, jadi ikonnya putih - dan tidak ada satu pun tempat di aplikasi ini
+  /// yang menggantinya setelah Flutter menggambar. Akibatnya ikon putih itu
+  /// tertinggal di atas latar terang dan seolah lenyap. Kedua gaya di bawah
+  /// dipasang eksplisit: lewat AppBarTheme untuk layar ber-AppBar, dan lewat
+  /// AnnotatedRegion di main.dart untuk layar yang memakai header sendiri.
+  static const SystemUiOverlayStyle lightOverlayStyle = SystemUiOverlayStyle(
+    statusBarColor: Colors.transparent,
+    // Android
+    statusBarIconBrightness: Brightness.dark,
+    // iOS
+    statusBarBrightness: Brightness.light,
+    systemNavigationBarColor: AppColors.lightBg,
+    systemNavigationBarIconBrightness: Brightness.dark,
+    systemNavigationBarDividerColor: Colors.transparent,
+  );
+
+  static const SystemUiOverlayStyle darkOverlayStyle = SystemUiOverlayStyle(
+    statusBarColor: Colors.transparent,
+    statusBarIconBrightness: Brightness.light,
+    statusBarBrightness: Brightness.dark,
+    systemNavigationBarColor: AppColors.darkBg,
+    systemNavigationBarIconBrightness: Brightness.light,
+    systemNavigationBarDividerColor: Colors.transparent,
+  );
 
   ThemeProvider() {
     _restore();
@@ -154,6 +182,10 @@ class ThemeProvider extends ChangeNotifier {
         backgroundColor: Colors.transparent,
         elevation: 0,
         foregroundColor: AppColors.textStrong,
+        // Tanpa ini AppBar menebak warna ikon status bar dari backgroundColor.
+        // Latarnya transparan, ditebak gelap, ikonnya jadi putih di atas latar
+        // terang.
+        systemOverlayStyle: lightOverlayStyle,
         centerTitle: true,
         scrolledUnderElevation: 0,
         titleTextStyle: TextStyle(
@@ -252,6 +284,7 @@ class ThemeProvider extends ChangeNotifier {
         backgroundColor: Colors.transparent,
         elevation: 0,
         foregroundColor: AppColors.darkTextStrong,
+        systemOverlayStyle: darkOverlayStyle,
         centerTitle: true,
         scrolledUnderElevation: 0,
         titleTextStyle: TextStyle(
