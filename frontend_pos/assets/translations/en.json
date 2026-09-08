@@ -1021,6 +1021,7 @@
     "notes_label_prefix": "Notes: {}",
     "type_processed_success": "{} successfully processed!",
     "failed_process_type": "Failed to process {}.",
+    "failed_process_type_code": "Failed to process {}. (code {})",
     "type_label_prefix": "Type: {}",
     "failed_pick_image": "Failed to pick image: {}",
     "last_1_year": "Last 1 Year",

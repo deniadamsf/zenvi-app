@@ -1021,6 +1021,7 @@
     "notes_label_prefix": "Catatan: {}",
     "type_processed_success": "{} berhasil diproses!",
     "failed_process_type": "Gagal memproses {}.",
+    "failed_process_type_code": "Gagal memproses {}. (kode {})",
     "type_label_prefix": "Jenis: {}",
     "failed_pick_image": "Gagal mengambil gambar: {}",
     "last_1_year": "1 Tahun Terakhir",

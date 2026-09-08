@@ -70,6 +70,16 @@ class ApiClient {
     return response;
   }
 
+  static Future<http.Response> patch(String path, {Object? body}) async {
+    final response = await http.patch(
+      _uri(path),
+      headers: await _headers(json: true),
+      body: body == null ? null : jsonEncode(body),
+    );
+    inspect(response);
+    return response;
+  }
+
   static Future<http.Response> delete(String path) async {
     final response = await http.delete(_uri(path), headers: await _headers());
     inspect(response);

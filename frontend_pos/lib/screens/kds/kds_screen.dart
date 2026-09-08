@@ -2,12 +2,12 @@ import 'dart:async';
 import 'dart:convert';
 import 'dart:ui';
 import 'package:flutter/material.dart';
-import 'package:http/http.dart' as http;
 import 'package:provider/provider.dart';
 import 'package:easy_localization/easy_localization.dart';
 import '../../providers/auth_provider.dart';
 import '../../providers/branch_provider.dart';
-import '../../config/api_config.dart';
+import '../../services/api_client.dart';
+import '../../widgets/premium_gate.dart';
 import '../../widgets/zenvi_header.dart';
 import '../../theme/app_colors.dart';
 
@@ -23,6 +23,7 @@ class _KdsScreenState extends State<KdsScreen> {
   bool _isLoading = true;
   List<dynamic> _orders = [];
   String? _errorMessage;
+  PremiumLock? _lock;
   int? _selectedBranchId;
   String _selectedTab = 'active'; // 'active', 'preparing', 'ready'
   bool _isTvDisplayMode = false; // TV Monitor Hands-Free View Only mode
@@ -65,7 +66,6 @@ class _KdsScreenState extends State<KdsScreen> {
     }
 
     try {
-      final auth = Provider.of<AuthProvider>(context, listen: false);
       final queryParams = <String, String>{};
       if (_selectedBranchId != null) {
         queryParams['branch_id'] = _selectedBranchId.toString();
@@ -76,33 +76,44 @@ class _KdsScreenState extends State<KdsScreen> {
         queryParams['status'] = 'preparing';
       }
 
-      final uri = Uri.parse('${ApiConfig.baseUrl}/orders/kds').replace(
-        queryParameters: queryParams.isNotEmpty ? queryParams : null,
-      );
-
-      final headers = {
-        'Authorization': 'Bearer ${auth.token}',
-        'Content-Type': 'application/json',
-        'Accept': 'application/json',
-      };
-      final response = await http.get(uri, headers: headers);
+      final response = await ApiClient.get('/orders/kds', query: queryParams);
+      if (!mounted) return;
 
       if (response.statusCode == 200) {
         final data = jsonDecode(response.body);
-        if (mounted) {
-          setState(() {
-            _orders = data['data'] ?? [];
-            _isLoading = false;
-            _errorMessage = null;
-          });
-        }
-      } else {
-        if (mounted && !silent) {
-          setState(() {
-            _errorMessage = 'failed_process_type'.tr(context: context, args: ['KDS']);
-            _isLoading = false;
-          });
-        }
+        setState(() {
+          _orders = data['data'] ?? [];
+          _isLoading = false;
+          _errorMessage = null;
+          _lock = null;
+        });
+        return;
+      }
+
+      // 403 bertipe: paket toko tidak mencakup KDS. Polling dihentikan supaya
+      // tawaran upgrade tidak muncul lagi tiap 12 detik, dan layarnya
+      // menerangkan apa yang terkunci alih-alih memasang tombol "Coba lagi"
+      // yang tidak akan pernah berhasil.
+      final lock = ApiClient.parseLock(response);
+      if (lock != null) {
+        _pollTimer?.cancel();
+        setState(() {
+          _lock = lock;
+          _orders = [];
+          _errorMessage = null;
+          _isLoading = false;
+        });
+        return;
+      }
+
+      if (!silent) {
+        setState(() {
+          _errorMessage = response.statusCode == 401
+              ? 'sesi_telah_berakhir_silakan_43'.tr(context: context)
+              : 'failed_process_type_code'
+                  .tr(context: context, args: ['KDS', '${response.statusCode}']);
+          _isLoading = false;
+        });
       }
     } catch (e) {
       if (mounted && !silent) {
@@ -116,23 +127,17 @@ class _KdsScreenState extends State<KdsScreen> {
 
   Future<void> _updateKdsStatus(int orderId, String newStatus) async {
     try {
-      final auth = Provider.of<AuthProvider>(context, listen: false);
-      final url = Uri.parse('${ApiConfig.baseUrl}/orders/$orderId/kds-status');
-      final headers = {
-        'Authorization': 'Bearer ${auth.token}',
-        'Content-Type': 'application/json',
-        'Accept': 'application/json',
-      };
-      final response = await http.patch(
-        url,
-        headers: headers,
-        body: jsonEncode({'kds_status': newStatus}),
+      final response = await ApiClient.patch(
+        '/orders/$orderId/kds-status',
+        body: {'kds_status': newStatus},
       );
 
       if (response.statusCode == 200) {
         _fetchKdsOrders(silent: true);
       } else {
-        if (!mounted) return;
+        // Respons terkunci sudah memunculkan tawaran upgrade sendiri; snackbar
+        // "gagal memperbarui" di atasnya hanya menutupi alasan sebenarnya.
+        if (!mounted || ApiClient.parseLock(response) != null) return;
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text('gagal_memperbarui_status_pesanan_177'.tr(context: context))),
         );
@@ -147,23 +152,17 @@ class _KdsScreenState extends State<KdsScreen> {
 
   Future<void> _updateItemKdsStatus(int orderId, int itemId, String newStatus) async {
     try {
-      final auth = Provider.of<AuthProvider>(context, listen: false);
-      final url = Uri.parse('${ApiConfig.baseUrl}/orders/$orderId/items/$itemId/kds-status');
-      final headers = {
-        'Authorization': 'Bearer ${auth.token}',
-        'Content-Type': 'application/json',
-        'Accept': 'application/json',
-      };
-      final response = await http.patch(
-        url,
-        headers: headers,
-        body: jsonEncode({'kds_status': newStatus}),
+      final response = await ApiClient.patch(
+        '/orders/$orderId/items/$itemId/kds-status',
+        body: {'kds_status': newStatus},
       );
 
       if (response.statusCode == 200) {
         _fetchKdsOrders(silent: true);
       } else {
-        if (!mounted) return;
+        // Respons terkunci sudah memunculkan tawaran upgrade sendiri; snackbar
+        // "gagal memperbarui" di atasnya hanya menutupi alasan sebenarnya.
+        if (!mounted || ApiClient.parseLock(response) != null) return;
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text('gagal_memperbarui_status_pesanan_177'.tr(context: context))),
         );
@@ -447,6 +446,41 @@ class _KdsScreenState extends State<KdsScreen> {
   Widget _buildBody(ThemeData theme) {
     if (_isLoading && _orders.isEmpty) {
       return const Center(child: CircularProgressIndicator());
+    }
+
+    if (_lock != null && _orders.isEmpty) {
+      final lock = _lock!;
+      return Center(
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 32),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              PremiumBadge(plan: lock.requiredPlan ?? 'premium'),
+              const SizedBox(height: 16),
+              Text(
+                'feature_locked_title'.tr(context: context),
+                style: theme.textTheme.titleMedium,
+                textAlign: TextAlign.center,
+              ),
+              const SizedBox(height: 8),
+              Text(
+                lock.message ?? 'feature_locked_desc'.tr(context: context),
+                style: theme.textTheme.bodyMedium?.copyWith(
+                  color: theme.textTheme.bodyMedium?.color?.withValues(alpha: 0.7),
+                ),
+                textAlign: TextAlign.center,
+              ),
+              const SizedBox(height: 20),
+              ElevatedButton.icon(
+                onPressed: () => showPremiumUpsellSheet(context, lock),
+                icon: const Icon(Icons.workspace_premium_rounded),
+                label: Text('upsell_cta'.tr(context: context)),
+              ),
+            ],
+          ),
+        ),
+      );
     }
 
     if (_errorMessage != null && _orders.isEmpty) {
