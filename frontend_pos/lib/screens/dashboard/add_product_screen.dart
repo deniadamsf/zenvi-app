@@ -25,6 +25,7 @@ class _AddProductScreenState extends State<AddProductScreen> {
   final _nameController = TextEditingController();
   final _categoryController = TextEditingController();
   final _priceController = TextEditingController();
+  final _costPriceController = TextEditingController(text: '0');
   final _discountNominalController = TextEditingController(text: '0');
   final _discountPercentController = TextEditingController(text: '0');
   bool _isActive = true;
@@ -46,6 +47,7 @@ class _AddProductScreenState extends State<AddProductScreen> {
       _nameController.text = widget.product!.name;
       _categoryController.text = widget.product!.category ?? '';
       _priceController.text = widget.product!.price.toStringAsFixed(0);
+      _costPriceController.text = widget.product!.costPrice.toStringAsFixed(0);
       _discountNominalController.text = widget.product!.discountNominal.toStringAsFixed(0);
       _discountPercentController.text = widget.product!.discountPercent.toStringAsFixed(0);
       _isActive = widget.product!.isActive;
@@ -203,6 +205,7 @@ class _AddProductScreenState extends State<AddProductScreen> {
           name: _nameController.text,
           category: _categoryController.text.trim(),
           price: double.parse(_priceController.text),
+          costPrice: double.tryParse(_costPriceController.text) ?? 0.0,
           discountNominal: double.tryParse(_discountNominalController.text) ?? 0.0,
           discountPercent: double.tryParse(_discountPercentController.text) ?? 0.0,
           isActive: _isActive,
@@ -216,6 +219,7 @@ class _AddProductScreenState extends State<AddProductScreen> {
           name: _nameController.text,
           category: _categoryController.text.trim(),
           price: double.parse(_priceController.text),
+          costPrice: double.tryParse(_costPriceController.text) ?? 0.0,
           discountNominal: double.tryParse(_discountNominalController.text) ?? 0.0,
           discountPercent: double.tryParse(_discountPercentController.text) ?? 0.0,
           isActive: _isActive,
@@ -247,6 +251,7 @@ class _AddProductScreenState extends State<AddProductScreen> {
     _nameController.dispose();
     _categoryController.dispose();
     _priceController.dispose();
+    _costPriceController.dispose();
     _discountNominalController.dispose();
     _discountPercentController.dispose();
     for (var item in _selectedIngredients) {
@@ -403,6 +408,26 @@ class _AddProductScreenState extends State<AddProductScreen> {
                       validator: (value) {
                         if (value == null || value.isEmpty) return 'product_price_required'.tr(context: context);
                         if (double.tryParse(value) == null) return 'product_price_numeric'.tr(context: context);
+                        return null;
+                      },
+                    ),
+                    const SizedBox(height: 16),
+                    TextFormField(
+                      controller: _costPriceController,
+                      keyboardType: const TextInputType.numberWithOptions(decimal: true),
+                      decoration: inputDecoration.copyWith(
+                        labelText: 'product_cost_price_label'.tr(context: context),
+                        prefixIcon: const Icon(Icons.savings_rounded),
+                        helperText: _selectedIngredients.isNotEmpty
+                            ? 'product_cost_price_recipe_hint'.tr(context: context)
+                            : 'product_cost_price_hint'.tr(context: context),
+                        helperMaxLines: 3,
+                      ),
+                      validator: (value) {
+                        if (value == null || value.trim().isEmpty) return null;
+                        final parsed = double.tryParse(value);
+                        if (parsed == null) return 'product_cost_price_numeric'.tr(context: context);
+                        if (parsed < 0) return 'product_cost_price_numeric'.tr(context: context);
                         return null;
                       },
                     ),

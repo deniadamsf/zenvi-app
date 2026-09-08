@@ -153,6 +153,86 @@ class _StockManagementScreenState extends State<StockManagementScreen> {
     );
   }
 
+  /// Ubah harga modal per satuan. Tanpa ini, bahan yang terlanjur bercost 0
+  /// hanya bisa dibetulkan lewat restock - dan HPP di laporan tetap 0.
+  void _showCostDialog(int ingredientId, String ingredientName, String unit, double currentCost) {
+    final costController = TextEditingController(
+      text: currentCost > 0 ? currentCost.toStringAsFixed(0) : '',
+    );
+    final theme = Theme.of(context);
+
+    showDialog(
+      context: context,
+      builder: (dialogCtx) {
+        return AlertDialog(
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+          title: Text(
+            'dialog_ingredient_cost_title'.tr(context: context, args: [ingredientName]),
+            style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+          ),
+          content: SingleChildScrollView(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                TextField(
+                  controller: costController,
+                  autofocus: true,
+                  keyboardType: const TextInputType.numberWithOptions(decimal: true),
+                  decoration: InputDecoration(
+                    labelText: 'ingredient_cost_per_unit_label'.tr(context: context, args: [unit]),
+                    helperText: 'ingredient_cost_per_unit_helper'.tr(context: context),
+                    helperMaxLines: 3,
+                  ),
+                ),
+              ],
+            ),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(dialogCtx),
+              child: Text('batal_5'.tr(context: context)),
+            ),
+            ElevatedButton(
+              style: ElevatedButton.styleFrom(
+                backgroundColor: theme.colorScheme.primary,
+                foregroundColor: Colors.white,
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+              ),
+              onPressed: () async {
+                final cost = double.tryParse(costController.text.trim());
+                if (cost == null || cost < 0) {
+                  ScaffoldMessenger.of(dialogCtx).showSnackBar(
+                    SnackBar(content: Text('ingredient_cost_invalid'.tr(context: context))),
+                  );
+                  return;
+                }
+
+                final prov = Provider.of<IngredientProvider>(dialogCtx, listen: false);
+                final success = await prov.updateCost(ingredientId, cost);
+
+                if (dialogCtx.mounted) {
+                  Navigator.pop(dialogCtx);
+                }
+                if (mounted) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: Text(success
+                          ? 'ingredient_cost_updated'.tr(context: context)
+                          : 'ingredient_cost_update_failed'.tr(context: context)),
+                      backgroundColor: success ? null : AppColors.dangerFill,
+                    ),
+                  );
+                }
+              },
+              child: Text('simpan_6'.tr(context: context)),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
   void _showActionDialog(String type, int ingredientId, String ingredientName) {
     final qtyController = TextEditingController();
     final priceController = TextEditingController();
@@ -561,6 +641,29 @@ class _StockManagementScreenState extends State<StockManagementScreen> {
                                       ),
                                     ),
                                   ),
+                                Container(
+                                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                                  margin: const EdgeInsets.only(top: 4),
+                                  decoration: BoxDecoration(
+                                    color: item.costPerUnit > 0
+                                        ? AppColors.successFill.withValues(alpha: 0.1)
+                                        : AppColors.warningFill.withValues(alpha: 0.15),
+                                    borderRadius: BorderRadius.circular(8),
+                                  ),
+                                  child: Text(
+                                    item.costPerUnit > 0
+                                        ? 'ingredient_cost_badge'.tr(context: context, args: [
+                                            NumberFormat.decimalPattern('id').format(item.costPerUnit),
+                                            item.unit,
+                                          ])
+                                        : 'ingredient_cost_empty_badge'.tr(context: context),
+                                    style: TextStyle(
+                                      fontSize: 11,
+                                      fontWeight: FontWeight.w600,
+                                      color: item.costPerUnit > 0 ? AppColors.successText : AppColors.warningText,
+                                    ),
+                                  ),
+                                ),
                                 Padding(
                                   padding: const EdgeInsets.only(top: 4.0),
                                   child: Text(
@@ -597,6 +700,14 @@ class _StockManagementScreenState extends State<StockManagementScreen> {
                                       icon: Icons.delete_outline_rounded,
                                       color: AppColors.dangerFill,
                                       onTap: () => _showActionDialog('wastage', item.id, item.name),
+                                    ),
+                                    const SizedBox(width: 8),
+                                    _buildStockActionButton(
+                                      context: context,
+                                      label: 'ingredient_cost_action'.tr(context: context),
+                                      icon: Icons.savings_rounded,
+                                      color: AppColors.warningFill,
+                                      onTap: () => _showCostDialog(item.id, item.name, item.unit, item.costPerUnit),
                                     ),
                                   ],
                                 ),

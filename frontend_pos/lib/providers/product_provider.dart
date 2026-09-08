@@ -70,6 +70,7 @@ class ProductProvider extends ChangeNotifier {
     required String name,
     String? category,
     required double price,
+    double costPrice = 0.0,
     required bool isActive,
     double discountNominal = 0.0,
     double discountPercent = 0.0,
@@ -93,6 +94,7 @@ class ProductProvider extends ChangeNotifier {
         request.fields['category'] = category.trim();
       }
       request.fields['price'] = price.toString();
+      request.fields['cost_price'] = costPrice.toString();
       request.fields['is_active'] = isActive ? '1' : '0';
       request.fields['discount_nominal'] = discountNominal.toString();
       request.fields['discount_percent'] = discountPercent.toString();
@@ -136,6 +138,7 @@ class ProductProvider extends ChangeNotifier {
     required String name,
     String? category,
     required double price,
+    double costPrice = 0.0,
     required bool isActive,
     double discountNominal = 0.0,
     double discountPercent = 0.0,
@@ -160,6 +163,7 @@ class ProductProvider extends ChangeNotifier {
         request.fields['category'] = category.trim();
       }
       request.fields['price'] = price.toString();
+      request.fields['cost_price'] = costPrice.toString();
       request.fields['is_active'] = isActive ? '1' : '0';
       request.fields['discount_nominal'] = discountNominal.toString();
       request.fields['discount_percent'] = discountPercent.toString();

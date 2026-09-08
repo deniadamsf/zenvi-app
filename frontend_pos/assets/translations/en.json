@@ -1534,5 +1534,19 @@
     "receipt_points_unit": "Pts",
     "receipt_thanks": "Thank you for shopping with us!",
     "receipt_thanks_print": "Thank You For Your Visit",
-    "receipt_no_exchange": "Purchased items cannot be exchanged or returned"
+    "receipt_no_exchange": "Purchased items cannot be exchanged or returned",
+    "product_cost_price_label": "Cost of Goods per Item (Rp)",
+    "product_cost_price_hint": "Used to calculate gross profit in reports. If left at 0, this product's COGS counts as zero.",
+    "product_cost_price_recipe_hint": "This product has a recipe, so COGS is calculated automatically from ingredient costs. The number here is only used while those costs are still 0.",
+    "product_cost_price_numeric": "COGS must be a number and cannot be negative",
+    "ingredient_price_helper": "Total money spent on this initial stock. Used to work out the cost per unit.",
+    "ingredient_cost_action": "Cost",
+    "dialog_ingredient_cost_title": "Unit Cost: {}",
+    "ingredient_cost_per_unit_label": "Cost per {} (Rp)",
+    "ingredient_cost_per_unit_helper": "The cost of a single unit of this ingredient. Used to calculate COGS for products that use it in their recipe.",
+    "ingredient_cost_invalid": "Unit cost must be a number and cannot be negative",
+    "ingredient_cost_updated": "Ingredient cost updated",
+    "ingredient_cost_update_failed": "Failed to update ingredient cost",
+    "ingredient_cost_badge": "Rp {}/{}",
+    "ingredient_cost_empty_badge": "Unit cost not set yet"
 }

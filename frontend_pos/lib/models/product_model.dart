@@ -7,6 +7,7 @@ class ProductModel {
   final String name;
   final String? category;
   final double price;
+  final double costPrice;
   final bool isActive;
   final String? imageUrl;
   final double discountNominal;
@@ -26,6 +27,7 @@ class ProductModel {
     required this.name,
     this.category,
     required this.price,
+    this.costPrice = 0.0,
     required this.isActive,
     this.imageUrl,
     this.discountNominal = 0.0,
@@ -55,6 +57,7 @@ class ProductModel {
       name: json['name'],
       category: json['category'],
       price: double.parse(json['price'].toString()),
+      costPrice: double.tryParse(json['cost_price']?.toString() ?? '0') ?? 0.0,
       isActive: json['is_active'] == 1 || json['is_active'] == true,
       imageUrl: json['image_url'],
       discountNominal: double.tryParse(json['discount_nominal']?.toString() ?? '0') ?? 0.0,
@@ -71,6 +74,7 @@ class ProductModel {
       'name': name,
       'category': category,
       'price': price,
+      'cost_price': costPrice,
       'is_active': isActive ? 1 : 0,
       'image_url': imageUrl,
       'discount_nominal': discountNominal,

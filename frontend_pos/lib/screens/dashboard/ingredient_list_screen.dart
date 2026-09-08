@@ -25,6 +25,7 @@ class _IngredientListScreenState extends State<IngredientListScreen> {
     final nameController = TextEditingController();
     final unitController = TextEditingController();
     final stockController = TextEditingController();
+    final priceController = TextEditingController(text: '0');
     final toleranceController = TextEditingController(text: '0');
 
     showDialog(
@@ -32,28 +33,39 @@ class _IngredientListScreenState extends State<IngredientListScreen> {
       builder: (dialogCtx) {
         return AlertDialog(
           title: Text('tambah_bahan_baku_114'.tr(context: context)),
-          content: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              TextField(
-                controller: nameController,
-                decoration: InputDecoration(labelText: 'nama_bahan_misal_gula_24'.tr(context: context)),
-              ),
-              TextField(
-                controller: unitController,
-                decoration: InputDecoration(labelText: 'satuan_misal_gram_ml_29'.tr(context: context)),
-              ),
-              TextField(
-                controller: stockController,
-                keyboardType: TextInputType.numberWithOptions(decimal: true),
-                decoration: InputDecoration(labelText: 'stok_awal_9'.tr(context: context)),
-              ),
-              TextField(
-                controller: toleranceController,
-                keyboardType: TextInputType.numberWithOptions(decimal: true),
-                decoration: InputDecoration(labelText: 'toleransi_susut_19'.tr(context: context)),
-              ),
-            ],
+          content: SingleChildScrollView(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                TextField(
+                  controller: nameController,
+                  decoration: InputDecoration(labelText: 'nama_bahan_misal_gula_24'.tr(context: context)),
+                ),
+                TextField(
+                  controller: unitController,
+                  decoration: InputDecoration(labelText: 'satuan_misal_gram_ml_29'.tr(context: context)),
+                ),
+                TextField(
+                  controller: stockController,
+                  keyboardType: TextInputType.numberWithOptions(decimal: true),
+                  decoration: InputDecoration(labelText: 'stok_awal_9'.tr(context: context)),
+                ),
+                TextField(
+                  controller: priceController,
+                  keyboardType: const TextInputType.numberWithOptions(decimal: true),
+                  decoration: InputDecoration(
+                    labelText: 'total_harga_beli_awal_26'.tr(context: context),
+                    helperText: 'ingredient_price_helper'.tr(context: context),
+                    helperMaxLines: 2,
+                  ),
+                ),
+                TextField(
+                  controller: toleranceController,
+                  keyboardType: TextInputType.numberWithOptions(decimal: true),
+                  decoration: InputDecoration(labelText: 'toleransi_susut_19'.tr(context: context)),
+                ),
+              ],
+            ),
           ),
           actions: [
             TextButton(
@@ -65,12 +77,14 @@ class _IngredientListScreenState extends State<IngredientListScreen> {
                 final prov = Provider.of<IngredientProvider>(dialogCtx, listen: false);
                 final qty = double.tryParse(stockController.text) ?? 0.0;
                 final tolerance = double.tryParse(toleranceController.text) ?? 0.0;
-                
+                final price = double.tryParse(priceController.text) ?? 0.0;
+
                 final success = await prov.addIngredient(
                   nameController.text, 
                   unitController.text, 
                   qty,
                   tolerancePercent: tolerance,
+                  price: price,
                 );
                 
                 if (dialogCtx.mounted) {

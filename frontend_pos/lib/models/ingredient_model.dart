@@ -4,6 +4,7 @@ class IngredientModel {
   final String name;
   final String unit;
   final double stockQty;
+  final double costPerUnit;
   final double minStock;
   final double tolerancePercent;
   final int? branchId;
@@ -17,6 +18,7 @@ class IngredientModel {
     required this.name,
     required this.unit,
     required this.stockQty,
+    this.costPerUnit = 0.0,
     this.minStock = 5.0,
     required this.tolerancePercent,
     this.branchId,
@@ -36,6 +38,7 @@ class IngredientModel {
       name: json['name'],
       unit: json['unit'],
       stockQty: double.tryParse(json['stock_qty'].toString()) ?? 0,
+      costPerUnit: double.tryParse(json['cost_per_unit']?.toString() ?? '0') ?? 0.0,
       minStock: double.tryParse(json['min_stock']?.toString() ?? '5') ?? 5.0,
       tolerancePercent: double.tryParse(json['tolerance_percent'].toString()) ?? 0,
       branchId: json['branch_id'] != null ? int.tryParse(json['branch_id'].toString()) : null,
@@ -51,6 +54,7 @@ class IngredientModel {
       'name': name,
       'unit': unit,
       'stock_qty': stockQty,
+      'cost_per_unit': costPerUnit,
       'min_stock': minStock,
       'tolerance_percent': tolerancePercent,
       if (branchId != null) 'branch_id': branchId,

@@ -1534,5 +1534,19 @@
     "receipt_points_unit": "Pts",
     "receipt_thanks": "Terima kasih telah berbelanja!",
     "receipt_thanks_print": "Terima Kasih Atas Kunjungan Anda",
-    "receipt_no_exchange": "Barang yang sudah dibeli tidak dapat ditukar/dikembalikan"
+    "receipt_no_exchange": "Barang yang sudah dibeli tidak dapat ditukar/dikembalikan",
+    "product_cost_price_label": "HPP / Modal per Item (Rp)",
+    "product_cost_price_hint": "Dipakai untuk menghitung laba kotor di laporan. Kalau dibiarkan 0, HPP produk ini dianggap nol.",
+    "product_cost_price_recipe_hint": "Produk ini punya resep bahan baku, jadi HPP dihitung otomatis dari harga bahan. Angka di sini dipakai hanya kalau harga bahan masih 0.",
+    "product_cost_price_numeric": "HPP harus berupa angka dan tidak boleh minus",
+    "ingredient_price_helper": "Total uang yang dikeluarkan untuk stok awal ini. Dipakai untuk menghitung harga modal per satuan.",
+    "ingredient_cost_action": "Harga",
+    "dialog_ingredient_cost_title": "Harga Modal: {}",
+    "ingredient_cost_per_unit_label": "Harga Modal per {} (Rp)",
+    "ingredient_cost_per_unit_helper": "Harga satu satuan bahan ini. Dipakai untuk menghitung HPP produk yang memakai bahan ini di resepnya.",
+    "ingredient_cost_invalid": "Harga modal harus berupa angka dan tidak boleh minus",
+    "ingredient_cost_updated": "Harga modal bahan berhasil diperbarui",
+    "ingredient_cost_update_failed": "Gagal memperbarui harga modal bahan",
+    "ingredient_cost_badge": "Rp {}/{}",
+    "ingredient_cost_empty_badge": "Harga modal belum diisi"
 }

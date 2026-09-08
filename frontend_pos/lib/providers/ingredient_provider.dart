@@ -52,6 +52,39 @@ class IngredientProvider extends ChangeNotifier {
     notifyListeners();
   }
 
+  /// Koreksi harga modal per satuan tanpa mengubah stok.
+  /// Dipakai saat harga bahan terlanjur tersimpan 0 sehingga HPP ikut kosong.
+  Future<bool> updateCost(int ingredientId, double costPerUnit) async {
+    _isLoading = true;
+    notifyListeners();
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final token = prefs.getString('auth_token');
+
+      final response = await http.put(
+        Uri.parse('$_apiUrl/$ingredientId/cost'),
+        headers: {
+          'Authorization': 'Bearer $token',
+          'Accept': 'application/json',
+          'Content-Type': 'application/json',
+        },
+        body: jsonEncode({'cost_per_unit': costPerUnit}),
+      );
+
+      if (response.statusCode == 200) {
+        await fetchIngredients(branchId: _selectedBranchId);
+        return true;
+      }
+      debugPrint('Gagal ubah harga bahan: ${response.body}');
+    } catch (e) {
+      debugPrint('Error update ingredient cost: $e');
+    }
+
+    _isLoading = false;
+    notifyListeners();
+    return false;
+  }
+
   Future<bool> addIngredient(String name, String unit, double qty, {double tolerancePercent = 0, double price = 0, int? branchId}) async {
     _isLoading = true;
     notifyListeners();

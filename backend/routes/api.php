@@ -77,6 +77,9 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::apiResource('branches', BranchController::class)->except(['store']);
 
     // Master Data APIs
+    // Koreksi harga modal bahan tanpa harus restock - dipisah dari update biasa
+    // supaya tidak ikut menimpa stok yang dikelola per cabang.
+    Route::put('/ingredients/{id}/cost', [IngredientController::class, 'updateCost']);
     Route::apiResource('ingredients', IngredientController::class);
     Route::post('/products', [ProductController::class, 'store'])->middleware('plan.limit:products');
     Route::apiResource('products', ProductController::class)->except(['store']);

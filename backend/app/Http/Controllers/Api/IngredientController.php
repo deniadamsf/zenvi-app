@@ -160,6 +160,35 @@ class IngredientController extends Controller
     }
 
     /**
+     * Perbarui harga modal per satuan tanpa menyentuh stok.
+     *
+     * Sebelum ini, cost_per_unit hanya bisa diisi saat bahan pertama dibuat
+     * atau saat restock. Bahan yang terlanjur berharga 0 membuat HPP produk
+     * ikut 0 dan laba kotor tampil seolah 100%, tanpa cara memperbaikinya
+     * dari aplikasi.
+     */
+    public function updateCost(Request $request, $id)
+    {
+        $user = $request->user();
+        if ($user->role !== 'Owner' && !$user->hasPermission('can_access_stock')) {
+            abort(403, 'Anda tidak memiliki hak akses untuk mengubah harga bahan baku.');
+        }
+
+        $validated = $request->validate([
+            'cost_per_unit' => 'required|numeric|min:0',
+        ]);
+
+        $ingredient = Ingredient::where('company_id', $user->company_id)->findOrFail($id);
+        $ingredient->cost_per_unit = (float) $validated['cost_per_unit'];
+        $ingredient->save();
+
+        return response()->json([
+            'message' => 'Harga modal bahan baku berhasil diperbarui.',
+            'data' => $ingredient,
+        ]);
+    }
+
+    /**
      * Remove the specified resource from storage.
      */
     public function destroy(Request $request, $id)

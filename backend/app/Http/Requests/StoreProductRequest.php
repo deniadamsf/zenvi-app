@@ -17,6 +17,7 @@ class StoreProductRequest extends FormRequest
             'name' => 'required|string|max:255',
             'category' => 'nullable|string|max:100',
             'price' => 'required|numeric|min:0',
+            'cost_price' => 'nullable|numeric|min:0',
             'is_active' => 'boolean',
             'ingredients' => 'nullable|array',
             'ingredients.*.ingredient_id' => 'required|exists:ingredients,id',
