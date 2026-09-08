@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:easy_localization/easy_localization.dart';
 import '../../providers/printer_provider.dart';
-import '../../providers/auth_provider.dart';
 import '../../services/label_printer_service.dart';
 import '../../widgets/zenvi_header.dart';
 import '../../theme/app_colors.dart';
@@ -26,7 +25,6 @@ class _PrinterSettingsScreenState extends State<PrinterSettingsScreen> {
   @override
   Widget build(BuildContext context) {
     final printerProvider = Provider.of<PrinterProvider>(context);
-    final authProvider = Provider.of<AuthProvider>(context, listen: false);
     final theme = Theme.of(context);
 
     return Scaffold(
@@ -72,38 +70,18 @@ class _PrinterSettingsScreenState extends State<PrinterSettingsScreen> {
                         ],
                       ),
                     ),
-                    if (printerProvider.isConnected) ...[
-                      TextButton.icon(
-                        onPressed: () async {
-                          final storeName = authProvider.user?.company?['name']?.toString();
-                          final success = await printerProvider.printTestReceipt(storeName: storeName);
-                          if (context.mounted) {
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              SnackBar(
-                                content: Text(success
-                                    ? 'test_print_success'.tr(context: context)
-                                    : 'test_print_failed'.tr(context: context)),
-                                backgroundColor: success ? AppColors.successFill : AppColors.dangerFill,
-                              ),
-                            );
-                          }
-                        },
-                        icon: const Icon(Icons.print_rounded, size: 18),
-                        label: Text('test_print_btn'.tr(context: context)),
-                        style: TextButton.styleFrom(foregroundColor: theme.colorScheme.primary),
-                      ),
+                    if (printerProvider.isConnected)
                       TextButton(
                         onPressed: () => printerProvider.disconnect(),
                         child: Text('putuskan_304'.tr(context: context), style: const TextStyle(color: AppColors.dangerText)),
                       ),
-                    ],
                   ],
                 ),
               ],
             ),
           ),
           
-          // Pemilih ukuran kertas thermal (58 / 72 / 80 mm)
+          // Pemilih ukuran kertas thermal (58 / 72 / 80 / 110 mm)
           Padding(
             padding: const EdgeInsets.fromLTRB(16, 16, 16, 8),
             child: Column(
@@ -141,7 +119,7 @@ class _PrinterSettingsScreenState extends State<PrinterSettingsScreen> {
           ),
           const Divider(height: 1),
 
-          // Pemilih bahasa perintah printer + tes per mode
+          // Pemilih bahasa perintah printer
           Padding(
             padding: const EdgeInsets.fromLTRB(16, 16, 16, 8),
             child: Column(
@@ -165,49 +143,17 @@ class _PrinterSettingsScreenState extends State<PrinterSettingsScreen> {
                   style: TextStyle(fontSize: 12, color: theme.colorScheme.onSurfaceVariant),
                 ),
                 const SizedBox(height: 10),
-                ...PrintMode.all.map((mode) {
-                  final isActive = printerProvider.printMode == mode;
-                  return Padding(
-                    padding: const EdgeInsets.only(bottom: 6),
-                    child: Row(
-                      children: [
-                        Expanded(
-                          child: ChoiceChip(
-                            label: Text(_modeLabel(context, mode)),
-                            selected: isActive,
-                            onSelected: (_) => printerProvider.setPrintMode(mode),
-                          ),
-                        ),
-                        const SizedBox(width: 8),
-                        TextButton.icon(
-                          onPressed: printerProvider.isConnected
-                              ? () async {
-                                  final scaffoldMessenger = ScaffoldMessenger.of(context);
-                                  final successText = 'test_print_success'.tr(context: context);
-                                  final failureText = 'test_print_failed'.tr(context: context);
-                                  final storeName = authProvider.user?.company?['name']?.toString();
-
-                                  final success = await printerProvider.printTestWithMode(
-                                    mode,
-                                    storeName: storeName,
-                                  );
-
-                                  if (!mounted) return;
-                                  scaffoldMessenger.showSnackBar(
-                                    SnackBar(
-                                      content: Text(success ? successText : failureText),
-                                      backgroundColor: success ? AppColors.successFill : AppColors.dangerFill,
-                                    ),
-                                  );
-                                }
-                              : null,
-                          icon: const Icon(Icons.print_rounded, size: 16),
-                          label: Text('print_mode_test_btn'.tr(context: context)),
-                        ),
-                      ],
-                    ),
-                  );
-                }),
+                Wrap(
+                  spacing: 8,
+                  runSpacing: 8,
+                  children: PrintMode.all.map((mode) {
+                    return ChoiceChip(
+                      label: Text(_modeLabel(context, mode)),
+                      selected: printerProvider.printMode == mode,
+                      onSelected: (_) => printerProvider.setPrintMode(mode),
+                    );
+                  }).toList(),
+                ),
               ],
             ),
           ),

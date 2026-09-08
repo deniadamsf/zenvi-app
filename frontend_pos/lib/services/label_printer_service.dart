@@ -185,47 +185,4 @@ class LabelPrinterService {
     return bytes;
   }
 
-  /// Gambar sampel untuk mengetes bahasa printer.
-  ///
-  /// Isinya sengaja menyebut nama mode supaya user tahu perintah mana yang
-  /// dimengerti printernya ketika salah satu tes berhasil tercetak.
-  static img.Image buildDiagnosticImage({
-    required String modeLabel,
-    required int dotWidth,
-    required String storeName,
-    required String timestamp,
-  }) {
-    const int height = 260;
-    final image = img.Image(width: dotWidth, height: height);
-    img.fill(image, color: img.ColorRgb8(255, 255, 255));
-    final black = img.ColorRgb8(0, 0, 0);
-
-    img.drawRect(
-      image,
-      x1: 2,
-      y1: 2,
-      x2: dotWidth - 3,
-      y2: height - 3,
-      color: black,
-      thickness: 3,
-    );
-
-    img.drawString(image, storeName, font: img.arial48, x: 20, y: 22, color: black);
-    img.drawString(image, modeLabel, font: img.arial24, x: 20, y: 96, color: black);
-    img.drawString(image, timestamp, font: img.arial24, x: 20, y: 132, color: black);
-    img.drawString(image, 'Lebar cetak: $dotWidth dot', font: img.arial24, x: 20, y: 168, color: black);
-
-    // Garis penuh sebagai penanda batas kanan area cetak.
-    img.drawRect(
-      image,
-      x1: 20,
-      y1: 210,
-      x2: dotWidth - 21,
-      y2: 226,
-      color: black,
-      thickness: 16,
-    );
-
-    return image;
-  }
 }

@@ -3,8 +3,6 @@ import 'dart:typed_data';
 import 'package:flutter/material.dart';
 import 'package:blue_thermal_printer/blue_thermal_printer.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:esc_pos_utils_plus/esc_pos_utils_plus.dart';
-import 'package:intl/intl.dart';
 import '../services/printer_service.dart';
 import '../services/label_printer_service.dart';
 
@@ -181,95 +179,4 @@ class PrinterProvider extends ChangeNotifier {
     }
   }
 
-  /// Cetak sampel diagnosa memakai satu mode printer tertentu.
-  ///
-  /// Dipakai untuk mencari tahu bahasa apa yang dimengerti printer: kalau
-  /// hanya salah satu mode yang menghasilkan tulisan, mode itulah yang benar.
-  Future<bool> printTestWithMode(PrintMode mode, {String? storeName}) async {
-    final name = (storeName ?? 'ZENVI POS').toUpperCase();
-    final timestamp = DateFormat('dd/MM/yyyy HH:mm:ss').format(DateTime.now());
-    final label = _modeLabel(mode);
-
-    if (mode == PrintMode.escPosText) {
-      return printTestReceipt(storeName: storeName);
-    }
-
-    if (mode.render == PrintRender.text) {
-      final lines = [name, 'MODE: $label', timestamp, 'Lebar: ${_paperWidthMm}mm'];
-      switch (mode.language) {
-        case PrintLanguage.tspl:
-          return printBytes(LabelPrinterService.buildTsplText(lines));
-        case PrintLanguage.cpcl:
-          return printBytes(LabelPrinterService.buildCpclText(lines));
-        case PrintLanguage.escPos:
-          return printTestReceipt(storeName: storeName);
-      }
-    }
-
-    final image = LabelPrinterService.buildDiagnosticImage(
-      modeLabel: 'MODE: $label',
-      dotWidth: ReceiptPaper.dotWidth(_paperWidthMm),
-      storeName: name,
-      timestamp: timestamp,
-    );
-
-    switch (mode.language) {
-      case PrintLanguage.tspl:
-        return printBytes(LabelPrinterService.buildTsplImage(image));
-      case PrintLanguage.cpcl:
-        return printBytes(LabelPrinterService.buildCpclImage(image));
-      case PrintLanguage.escPos:
-        return printBytes(await LabelPrinterService.buildEscPosImage(
-          image,
-          ReceiptPaper.toPaperSize(_paperWidthMm),
-        ));
-    }
-  }
-
-  static String _modeLabel(PrintMode mode) {
-    final String lang = switch (mode.language) {
-      PrintLanguage.escPos => 'ESC/POS',
-      PrintLanguage.tspl => 'TSPL',
-      PrintLanguage.cpcl => 'CPCL',
-    };
-    final String render = mode.render == PrintRender.text ? 'TEKS' : 'GAMBAR';
-    return '$lang $render';
-  }
-
-  Future<bool> printTestReceipt({String? storeName}) async {
-    final profile = await CapabilityProfile.load();
-    final generator = Generator(ReceiptPaper.toPaperSize(_paperWidthMm), profile);
-    List<int> bytes = [];
-
-    bytes += generator.reset();
-    bytes += generator.text(
-      (storeName ?? 'ZENVI POS').toUpperCase(),
-      styles: const PosStyles(
-        align: PosAlign.center,
-        height: PosTextSize.size2,
-        width: PosTextSize.size2,
-        bold: true,
-      ),
-    );
-    bytes += generator.text(
-      'TEST PRINT BERHASIL',
-      styles: const PosStyles(align: PosAlign.center, bold: true),
-    );
-    bytes += generator.hr();
-    bytes += generator.text('Waktu : ${DateFormat('dd/MM/yyyy HH:mm:ss').format(DateTime.now())}');
-    bytes += generator.text('Status: Terhubung OK');
-    bytes += generator.text('Kertas: ${_paperWidthMm}mm Thermal');
-    bytes += generator.hr();
-    // Penggaris karakter: kalau baris ini terpotong, lebar kertas kebesaran.
-    final int maxChar = ReceiptPaper.maxChars(_paperWidthMm);
-    final ruler = StringBuffer();
-    for (int i = 1; i <= maxChar; i++) {
-      ruler.write((i % 10).toString());
-    }
-    bytes += generator.text(ruler.toString());
-    bytes += generator.text('1234567890 ABCD WXYZ');
-    bytes += generator.feed(3);
-
-    return printBytes(bytes);
-  }
 }
