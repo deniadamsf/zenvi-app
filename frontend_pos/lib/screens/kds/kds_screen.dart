@@ -76,7 +76,7 @@ class _KdsScreenState extends State<KdsScreen> {
         queryParams['status'] = 'preparing';
       }
 
-      final uri = Uri.parse('${ApiConfig.baseUrl}/api/orders/kds').replace(
+      final uri = Uri.parse('${ApiConfig.baseUrl}/orders/kds').replace(
         queryParameters: queryParams.isNotEmpty ? queryParams : null,
       );
 
@@ -117,7 +117,7 @@ class _KdsScreenState extends State<KdsScreen> {
   Future<void> _updateKdsStatus(int orderId, String newStatus) async {
     try {
       final auth = Provider.of<AuthProvider>(context, listen: false);
-      final url = Uri.parse('${ApiConfig.baseUrl}/api/orders/$orderId/kds-status');
+      final url = Uri.parse('${ApiConfig.baseUrl}/orders/$orderId/kds-status');
       final headers = {
         'Authorization': 'Bearer ${auth.token}',
         'Content-Type': 'application/json',
@@ -148,7 +148,7 @@ class _KdsScreenState extends State<KdsScreen> {
   Future<void> _updateItemKdsStatus(int orderId, int itemId, String newStatus) async {
     try {
       final auth = Provider.of<AuthProvider>(context, listen: false);
-      final url = Uri.parse('${ApiConfig.baseUrl}/api/orders/$orderId/items/$itemId/kds-status');
+      final url = Uri.parse('${ApiConfig.baseUrl}/orders/$orderId/items/$itemId/kds-status');
       final headers = {
         'Authorization': 'Bearer ${auth.token}',
         'Content-Type': 'application/json',

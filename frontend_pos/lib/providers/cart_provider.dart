@@ -314,7 +314,7 @@ class CartProvider extends ChangeNotifier {
       final token = prefs.getString('auth_token');
       if (token == null) return;
 
-      final url = Uri.parse('${ApiConfig.baseUrl}/api/reservations/$reservationId/status');
+      final url = Uri.parse('${ApiConfig.baseUrl}/reservations/$reservationId/status');
       await http.patch(
         url,
         headers: {
