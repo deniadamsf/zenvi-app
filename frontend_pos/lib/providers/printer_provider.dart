@@ -10,6 +10,9 @@ class PrinterProvider extends ChangeNotifier {
   static const String _paperSizeKey = 'printer_paper_width_mm';
   static const String _printModeKey = 'printer_print_mode';
 
+  /// Penanda bahwa setelan mode warisan sudah dinetralkan sekali.
+  static const String _printModeResetKey = 'printer_print_mode_reset_v1';
+
   final BlueThermalPrinter _bluetooth = BlueThermalPrinter.instance;
 
   List<BluetoothDevice> _devices = [];
@@ -104,6 +107,18 @@ class PrinterProvider extends ChangeNotifier {
     if (saved != null) {
       _paperWidthMm = ReceiptPaper.normalize(saved);
     }
+    // Sampai versi 1.2.0 pilihan mode printer tidak berpengaruh apa pun saat
+    // mencetak - semua struk keluar sebagai ESC/POS teks apa pun chip yang
+    // dipilih, dan chip itu berdampingan dengan tombol tes yang berfungsi. Jadi
+    // setelan yang tersimpan bisa saja sisa coba-coba, bukan pilihan sadar.
+    // Begitu modenya benar-benar dipakai, setelan warisan itu dinetralkan
+    // sekali supaya tidak ada kasir yang struknya mendadak kosong setelah
+    // update tanpa tahu sebabnya.
+    if (!(prefs.getBool(_printModeResetKey) ?? false)) {
+      await prefs.remove(_printModeKey);
+      await prefs.setBool(_printModeResetKey, true);
+    }
+
     _printMode = PrintMode.fromStorage(prefs.getString(_printModeKey));
   }
 
