@@ -117,6 +117,7 @@ class _PrinterDialogState extends State<PrinterDialog> {
         memberPhone: widget.memberPhone,
         memberDiscountAmount: widget.memberDiscountAmount,
         paperWidthMm: printerProvider.paperWidthMm,
+        mode: printerProvider.printMode,
       );
       
       final success = await printerProvider.printBytes(bytes);
