@@ -189,6 +189,76 @@ class _KdsScreenState extends State<KdsScreen> {
     _fetchKdsOrders();
   }
 
+  /// Tombol pindah mode TV / interaktif di kanan judul.
+  ///
+  /// Chip ini tidak memakai margin vertikal sendiri: ZenviHeader sudah memberi
+  /// jarak atas-bawah, dan margin tambahan membuat tinggi chip melebihi jatah
+  /// slot aksi sehingga tepi bawahnya terpotong.
+  ///
+  /// Di layar sempit labelnya disembunyikan dan menyisakan ikon saja. Judul
+  /// "Antrean Pesanan" dan chip ini berebut baris yang sama; kalau keduanya
+  /// dipaksa muat, judulnya yang mengalah jadi "Antrean P..." dan justru
+  /// bagian yang memberi tahu layar apa ini yang hilang. Maksud tombolnya
+  /// sendiri tetap terbaca lewat Tooltip yang sudah membungkusnya.
+  Widget _buildModeToggle(ThemeData theme) {
+    final showLabel = MediaQuery.sizeOf(context).width >= 400;
+    final accent = _isTvDisplayMode
+        ? theme.colorScheme.primary
+        : theme.colorScheme.onSurfaceVariant;
+
+    return Tooltip(
+      message: _isTvDisplayMode
+          ? 'kds_mode_tv_tooltip'.tr(context: context)
+          : 'kds_mode_interactive_tooltip'.tr(context: context),
+      child: InkWell(
+        onTap: () {
+          setState(() {
+            _isTvDisplayMode = !_isTvDisplayMode;
+          });
+        },
+        borderRadius: BorderRadius.circular(12),
+        child: Container(
+          padding: EdgeInsets.symmetric(horizontal: showLabel ? 10 : 8, vertical: 6),
+          decoration: BoxDecoration(
+            color: _isTvDisplayMode
+                ? theme.colorScheme.primary.withValues(alpha: 0.18)
+                : theme.colorScheme.surfaceContainerHighest.withValues(alpha: 0.5),
+            borderRadius: BorderRadius.circular(12),
+            border: Border.all(
+              color: _isTvDisplayMode
+                  ? theme.colorScheme.primary
+                  : theme.colorScheme.outline.withValues(alpha: 0.2),
+              width: 1.2,
+            ),
+          ),
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Icon(
+                _isTvDisplayMode ? Icons.tv_rounded : Icons.touch_app_rounded,
+                size: 16,
+                color: accent,
+              ),
+              if (showLabel) ...[
+                const SizedBox(width: 6),
+                Text(
+                  _isTvDisplayMode
+                      ? 'kds_mode_tv_display'.tr(context: context)
+                      : 'kds_mode_interactive'.tr(context: context),
+                  style: TextStyle(
+                    fontSize: 11.5,
+                    fontWeight: FontWeight.bold,
+                    color: accent,
+                  ),
+                ),
+              ],
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
@@ -199,57 +269,7 @@ class _KdsScreenState extends State<KdsScreen> {
         title: 'kds_title'.tr(context: context),
         showBackButton: true,
         actions: [
-          // Mode Toggle Button (TV Monitor Display Only vs Interactive)
-          Tooltip(
-            message: _isTvDisplayMode
-                ? 'kds_mode_tv_tooltip'.tr(context: context)
-                : 'kds_mode_interactive_tooltip'.tr(context: context),
-            child: InkWell(
-              onTap: () {
-                setState(() {
-                  _isTvDisplayMode = !_isTvDisplayMode;
-                });
-              },
-              borderRadius: BorderRadius.circular(12),
-              child: Container(
-                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-                margin: const EdgeInsets.symmetric(vertical: 8),
-                decoration: BoxDecoration(
-                  color: _isTvDisplayMode
-                      ? theme.colorScheme.primary.withValues(alpha: 0.18)
-                      : theme.colorScheme.surfaceContainerHighest.withValues(alpha: 0.5),
-                  borderRadius: BorderRadius.circular(12),
-                  border: Border.all(
-                    color: _isTvDisplayMode
-                        ? theme.colorScheme.primary
-                        : theme.colorScheme.outline.withValues(alpha: 0.2),
-                    width: 1.2,
-                  ),
-                ),
-                child: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Icon(
-                      _isTvDisplayMode ? Icons.tv_rounded : Icons.touch_app_rounded,
-                      size: 16,
-                      color: _isTvDisplayMode ? theme.colorScheme.primary : theme.colorScheme.onSurfaceVariant,
-                    ),
-                    const SizedBox(width: 6),
-                    Text(
-                      _isTvDisplayMode
-                          ? 'kds_mode_tv_display'.tr(context: context)
-                          : 'kds_mode_interactive'.tr(context: context),
-                      style: TextStyle(
-                        fontSize: 11.5,
-                        fontWeight: FontWeight.bold,
-                        color: _isTvDisplayMode ? theme.colorScheme.primary : theme.colorScheme.onSurfaceVariant,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ),
-          ),
+          _buildModeToggle(theme),
           const SizedBox(width: 4),
           IconButton(
             icon: const Icon(Icons.refresh_rounded),

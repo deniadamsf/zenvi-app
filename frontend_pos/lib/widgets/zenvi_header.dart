@@ -173,10 +173,20 @@ class ZenviHeader extends StatelessWidget implements PreferredSizeWidget {
               ),
 
               // Actions Slot
+              //
+              // Batas tinggi ini menahan aksi yang kelewat tinggi supaya tidak
+              // menarik seluruh header ikut memanjang. Angkanya harus tetap
+              // muat di dalam calculateContentHeight() - 4px padding atas +
+              // 44 + 6px padding bawah = 54, masih di bawah 66.
+              //
+              // Dulu 38, dan itu memotong aksi berbentuk chip: tombol dengan
+              // ikon 16px + padding vertikal 6px + margin vertikal 8px tingginya
+              // 44px, jadi 6px terbawahnya terpangkas tanpa peringatan apa pun.
+              // 44 juga ukuran minimum sasaran sentuh yang nyaman.
               if (actions != null && actions!.isNotEmpty) ...[
                 const SizedBox(width: 8),
                 ConstrainedBox(
-                  constraints: const BoxConstraints(maxHeight: 38),
+                  constraints: const BoxConstraints(maxHeight: 44),
                   child: Row(
                     mainAxisSize: MainAxisSize.min,
                     crossAxisAlignment: CrossAxisAlignment.center,
