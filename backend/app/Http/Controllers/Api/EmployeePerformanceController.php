@@ -8,6 +8,7 @@ use App\Models\Order;
 use App\Models\Shift;
 use App\Models\Company;
 use App\Models\EmployeePermission;
+use App\Support\ShiftSchedule;
 use Illuminate\Http\Request;
 use Carbon\Carbon;
 
@@ -194,48 +195,30 @@ class EmployeePerformanceController extends Controller
                     return $p->type === 'late' && $pDate === $shiftDateStr;
                 });
 
-                if (!empty($schedules)) {
-                    // Find closest matching schedule
-                    $bestSchedule = $schedules[0];
-                    $minDiff = PHP_INT_MAX;
+                // Pencocokan jadwal & hitungan telat dipusatkan di ShiftSchedule:
+                // perbandingannya harus dilakukan dalam jam dinding setempat,
+                // dan pemilihan shift harus tahu bedanya "telat parah untuk
+                // shift pagi" dengan "datang awal untuk shift sore".
+                $match = ShiftSchedule::match($start, $schedules, $tolerance);
 
-                    foreach ($schedules as $schedule) {
-                        if (isset($schedule['start'])) {
-                            $schedStart = Carbon::parse($start->format('Y-m-d') . ' ' . $schedule['start']);
-                            $diff = abs($start->diffInMinutes($schedStart));
-                            if ($diff < $minDiff) {
-                                $minDiff = $diff;
-                                $bestSchedule = $schedule;
-                            }
-                        }
-                    }
+                if ($match['name'] !== null) {
+                    $shiftName = $match['name'];
+                }
 
-                    if (isset($bestSchedule['start'])) {
-                        $shiftName = $bestSchedule['name'] ?? 'Shift';
-                        $schedStart = Carbon::parse($start->format('Y-m-d') . ' ' . $bestSchedule['start']);
-                        
-                        // Strict threshold: if tolerance is 0, any minute past scheduled start is late!
-                        if ($start->greaterThan($schedStart->copy()->addMinutes($tolerance))) {
-                            $shiftLateMinutes = max(1, $start->diffInMinutes($schedStart));
-                            
-                            if ($hasApprovedLatePermit) {
-                                $isLate = false;
-                                $isExcused = true;
-                                $excusedLateShiftsCount++;
-                                $onTimeShiftsCount++; // Excused late doesn't penalize on-time count
-                            } else {
-                                $isLate = true;
-                                $lateShiftsCount++;
-                                $totalLateMinutes += $shiftLateMinutes;
-                            }
-                        } else {
-                            $onTimeShiftsCount++;
-                        }
+                if ($match['is_late']) {
+                    $shiftLateMinutes = $match['late_minutes'];
+
+                    if ($hasApprovedLatePermit) {
+                        $isLate = false;
+                        $isExcused = true;
+                        $excusedLateShiftsCount++;
+                        $onTimeShiftsCount++; // Excused late doesn't penalize on-time count
                     } else {
-                        $onTimeShiftsCount++;
+                        $isLate = true;
+                        $lateShiftsCount++;
+                        $totalLateMinutes += $shiftLateMinutes;
                     }
                 } else {
-                    // If no schedules are configured by owner
                     $onTimeShiftsCount++;
                 }
 

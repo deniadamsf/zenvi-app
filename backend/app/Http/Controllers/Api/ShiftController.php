@@ -13,6 +13,7 @@ use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Cache;
 use App\Support\Entitlements;
+use App\Support\ShiftSchedule;
 
 class ShiftController extends Controller
 {
@@ -157,49 +158,22 @@ class ShiftController extends Controller
                 if (is_array($schedules) && count($schedules) > 0) {
                     $actualStart = \Carbon\Carbon::parse($shift->start_time);
                     $actualEnd = \Carbon\Carbon::parse($shift->end_time);
-                    
-                    // Find the schedule that minimizes the difference with actual start time
-                    $bestSchedule = $schedules[0];
-                    $minDiff = PHP_INT_MAX;
-                    
-                    foreach ($schedules as $schedule) {
-                        if (isset($schedule['start'])) {
-                            $schedStart = \Carbon\Carbon::parse($actualStart->format('Y-m-d') . ' ' . $schedule['start']);
-                            $diff = abs($actualStart->diffInMinutes($schedStart));
-                            if ($diff < $minDiff) {
-                                $minDiff = $diff;
-                                $bestSchedule = $schedule;
-                            }
-                        }
-                    }
-                    
-                    if (isset($bestSchedule['start']) && isset($bestSchedule['end'])) {
+
+                    // Pencocokan jadwal dipakai bersama EmployeePerformanceController
+                    // supaya satu shift tidak dinilai telat di satu layar dan
+                    // tepat waktu di layar lain.
+                    $tolerance = (int) ($company->late_tolerance_minutes ?? 0);
+                    $match = ShiftSchedule::match($actualStart, $schedules, $tolerance);
+
+                    if ($match['scheduled_start'] !== null) {
                         $shift->total_work_hours = $actualEnd->diffInMinutes($actualStart) / 60;
-                        
-                        $schedStart = \Carbon\Carbon::parse($actualStart->format('Y-m-d') . ' ' . $bestSchedule['start']);
-                        $schedEnd = \Carbon\Carbon::parse($actualStart->format('Y-m-d') . ' ' . $bestSchedule['end']);
-                        
-                        // Handle overnight shifts (e.g. 16:00 - 02:00)
-                        if ($schedEnd->lessThan($schedStart)) {
-                            $schedEnd->addDay();
-                        }
-                        
-                        // Overtime
-                        if ($actualEnd->greaterThan($schedEnd)) {
-                            $shift->overtime_hours = $actualEnd->diffInMinutes($schedEnd) / 60;
-                        } else {
-                            $shift->overtime_hours = 0;
-                        }
-                        
-                        // Late
-                        $tolerance = $company->late_tolerance_minutes ?? 0;
-                        if ($actualStart->greaterThan($schedStart->copy()->addMinutes($tolerance))) {
-                            $shift->late_minutes = $actualStart->diffInMinutes($schedStart);
-                        } else {
-                            $shift->late_minutes = 0;
-                        }
-                        
-                        $shift->shift_name = $bestSchedule['name'] ?? 'Shift';
+                        $shift->late_minutes = $match['late_minutes'];
+                        $shift->shift_name = $match['name'] ?? 'Shift';
+
+                        $schedEnd = $match['scheduled_end'];
+                        $shift->overtime_hours = ($schedEnd !== null && $actualEnd->greaterThan($schedEnd))
+                            ? $actualEnd->diffInMinutes($schedEnd) / 60
+                            : 0;
                     }
                 }
             }
