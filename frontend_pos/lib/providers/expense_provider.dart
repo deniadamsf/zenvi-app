@@ -75,6 +75,12 @@ class ExpenseProvider extends ChangeNotifier {
         'top_products': _topProducts,
         'payment_methods': _paymentMethods,
         'expense_breakdown': _expenseBreakdown,
+        // Rincian per hari (atau per jam kalau rentangnya satu hari) - sumber
+        // tabel profit harian di berkas ekspor. Sama persis dengan yang
+        // menggambar grafik di layar.
+        'chart_data': _chartData,
+        'shift_summaries': _shiftSummaries,
+        'period': _currentPeriod,
       };
 
   String get currentPeriod => _currentPeriod;

@@ -68,6 +68,13 @@ class EmployeePerformanceController extends Controller
                 break;
         }
 
+        // Daftar 5 shift terakhir cukup untuk kartu ringkas di dashboard, tapi
+        // jadi laporan absensi yang menyesatkan begitu rentangnya lebih dari
+        // beberapa hari - karyawan yang masuk 22 kali akan terbaca 5 kali.
+        // Ekspor absensi meminta `shift_detail=full` supaya seluruh shift dalam
+        // rentang ikut terkirim; dashboard tetap memakai daftar pendeknya.
+        $fullShiftDetail = $request->query('shift_detail') === 'full';
+
         // Get all approved employees in the company
         $employees = User::where('company_id', $companyId)
             ->where('is_approved', true)
@@ -232,7 +239,7 @@ class EmployeePerformanceController extends Controller
                     $onTimeShiftsCount++;
                 }
 
-                if ($idx < 5) {
+                if ($fullShiftDetail || $idx < 5) {
                     $recentShiftsList[] = [
                         'id' => $s->id,
                         'start_time' => $s->start_time ? $s->start_time->toIso8601String() : null,

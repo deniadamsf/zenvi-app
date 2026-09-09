@@ -7,6 +7,7 @@ import 'package:flutter_animate/flutter_animate.dart';
 import 'package:fl_chart/fl_chart.dart';
 
 import '../../providers/auth_provider.dart';
+import '../../providers/employee_performance_provider.dart';
 import '../../providers/expense_provider.dart';
 import '../../providers/ingredient_provider.dart';
 import '../../providers/branch_provider.dart';
@@ -2937,7 +2938,11 @@ class _DashboardOverviewState extends State<_DashboardOverview> {
               subtitle: 'export_as_pdf_desc'.tr(context: ctx),
               onTap: () {
                 Navigator.pop(ctx);
-                _runExport(() => ExportService.financialReportToPdf(report, storeName: storeName));
+                _runExport((employeeReport) => ExportService.fullReportToPdf(
+                      report,
+                      employeeReport: employeeReport,
+                      storeName: storeName,
+                    ));
               },
             ),
             const SizedBox(height: 12),
@@ -2948,7 +2953,11 @@ class _DashboardOverviewState extends State<_DashboardOverview> {
               subtitle: 'export_as_excel_desc'.tr(context: ctx),
               onTap: () {
                 Navigator.pop(ctx);
-                _runExport(() => ExportService.financialReportToCsv(report, storeName: storeName));
+                _runExport((employeeReport) => ExportService.fullReportToCsv(
+                      report,
+                      employeeReport: employeeReport,
+                      storeName: storeName,
+                    ));
               },
             ),
           ],
@@ -2957,12 +2966,60 @@ class _DashboardOverviewState extends State<_DashboardOverview> {
     );
   }
 
-  Future<void> _runExport(Future<void> Function() task) async {
+  /// Ambil data karyawan untuk rentang yang SAMA dengan laporan keuangan yang
+  /// sedang tampil, lalu bangun berkasnya.
+  ///
+  /// Rentangnya dibaca dari respons laporan keuangan (`start_date`/`end_date`),
+  /// bukan dari nama periode: server sudah memangkasnya sesuai batas riwayat
+  /// paket, jadi memakai tanggal hasil pangkasan itu membuat bagian karyawan
+  /// tidak pernah memuat tanggal yang bagian keuangannya sendiri tidak boleh
+  /// menampilkan.
+  ///
+  /// Kalau pengambilan data karyawan gagal, berkas TETAP dibuat tanpa bagian
+  /// absensi & performa - laporan keuangan yang sudah di tangan tidak ikut
+  /// hangus hanya karena satu permintaan tambahan gagal - dan owner diberi tahu
+  /// bagian mana yang hilang.
+  Future<void> _runExport(
+    Future<void> Function(Map<String, dynamic>? employeeReport) task,
+  ) async {
+    final messenger = ScaffoldMessenger.of(context);
+    final expense = Provider.of<ExpenseProvider>(context, listen: false);
+    final performance =
+        Provider.of<EmployeePerformanceProvider>(context, listen: false);
+
+    final report = expense.reportAsMap;
+    final startDate = report['start_date']?.toString() ?? '';
+    final endDate = report['end_date']?.toString() ?? '';
+
+    messenger.showSnackBar(
+      SnackBar(content: Text('export_preparing'.tr(context: context))),
+    );
+
     try {
-      await task();
+      Map<String, dynamic>? employeeReport;
+      if (startDate.isNotEmpty && endDate.isNotEmpty) {
+        try {
+          employeeReport = await performance.fetchReportForExport(
+            startDate: startDate,
+            endDate: endDate,
+          );
+        } catch (e) {
+          debugPrint('Export: gagal ambil performa karyawan: $e');
+        }
+      }
+
+      await task(employeeReport);
+
+      if (employeeReport == null && mounted) {
+        messenger.showSnackBar(
+          SnackBar(
+            content: Text('export_employee_unavailable'.tr(context: context)),
+          ),
+        );
+      }
     } catch (e) {
       if (!mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(
+      messenger.showSnackBar(
         SnackBar(content: Text('export_failed'.tr(context: context))),
       );
     }
