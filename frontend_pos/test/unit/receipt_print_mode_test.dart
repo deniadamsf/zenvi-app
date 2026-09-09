@@ -71,6 +71,20 @@ void main() {
       expect(bytes, equals(golden.readAsBytesSync()));
     });
 
+    test('setiap baris teks dicetak tebal', () async {
+      // Struk bergantung penuh pada double-strike supaya terbaca: kepala
+      // printer thermal murah mencetak font normal jadi abu-abu tipis. Satu
+      // baris yang lolos tanpa tebal akan langsung terlihat lebih pudar
+      // daripada baris di atas dan di bawahnya.
+      final doc = await sampleDocument();
+      final notBold = doc.lines
+          .where((line) => line.kind == ReceiptLineKind.text && !line.bold)
+          .map((line) => line.text)
+          .toList();
+
+      expect(notBold, isEmpty, reason: 'baris ini belum tebal: $notBold');
+    });
+
     test('mode default tetap ESC/POS teks', () async {
       final byDefault = await PrinterService.generateReceiptBytes(
         {'name': 'Kopi Senja'},

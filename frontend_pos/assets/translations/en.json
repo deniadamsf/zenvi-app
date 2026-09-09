@@ -1548,5 +1548,7 @@
     "ingredient_cost_updated": "Ingredient cost updated",
     "ingredient_cost_update_failed": "Failed to update ingredient cost",
     "ingredient_cost_badge": "Rp {}/{}",
-    "ingredient_cost_empty_badge": "Unit cost not set yet"
+    "ingredient_cost_empty_badge": "Unit cost not set yet",
+    "shift_physical_cash_formula": "(Opening Balance + Cash Sales)",
+    "shift_noncash_drawer_note": "QRIS & transfer go straight to the bank/e-wallet account, so they are not counted in the physical cash drawer."
 }

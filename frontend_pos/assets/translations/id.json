@@ -1548,5 +1548,7 @@
     "ingredient_cost_updated": "Harga modal bahan berhasil diperbarui",
     "ingredient_cost_update_failed": "Gagal memperbarui harga modal bahan",
     "ingredient_cost_badge": "Rp {}/{}",
-    "ingredient_cost_empty_badge": "Harga modal belum diisi"
+    "ingredient_cost_empty_badge": "Harga modal belum diisi",
+    "shift_physical_cash_formula": "(Saldo Awal + Penjualan Tunai)",
+    "shift_noncash_drawer_note": "QRIS & Transfer langsung masuk ke rekening bank/e-wallet, sehingga tidak dihitung di laci fisik kasir."
 }

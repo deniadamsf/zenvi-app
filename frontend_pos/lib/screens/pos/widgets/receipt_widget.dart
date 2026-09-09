@@ -153,7 +153,7 @@ class ReceiptWidget extends StatelessWidget {
             const SizedBox(height: 4),
             Text(
               resolvedStoreLocation,
-              style: const TextStyle(fontSize: 11, fontFamily: 'Courier', color: Colors.black),
+              style: const TextStyle(fontSize: 11, fontWeight: FontWeight.bold, fontFamily: 'Courier', color: Colors.black),
               textAlign: TextAlign.center,
             ),
           ],
@@ -161,14 +161,14 @@ class ReceiptWidget extends StatelessWidget {
             const SizedBox(height: 2),
             Text(
               '${'receipt_label_phone'.tr(context: context)}: $resolvedStorePhone',
-              style: const TextStyle(fontSize: 11, fontFamily: 'Courier', color: Colors.black),
+              style: const TextStyle(fontSize: 11, fontWeight: FontWeight.bold, fontFamily: 'Courier', color: Colors.black),
               textAlign: TextAlign.center,
             ),
           ],
           const SizedBox(height: 8),
           Text(
             'receipt_title'.tr(context: context),
-            style: const TextStyle(fontSize: 14, fontFamily: 'Courier', color: Colors.black),
+            style: const TextStyle(fontSize: 14, fontWeight: FontWeight.bold, fontFamily: 'Courier', color: Colors.black),
           ),
           const SizedBox(height: 16),
           
@@ -178,11 +178,11 @@ class ReceiptWidget extends StatelessWidget {
             children: [
               Text(
                 '${'receipt_label_no'.tr(context: context)}: $receiptNo',
-                style: const TextStyle(fontSize: 12, fontFamily: 'Courier', color: Colors.black),
+                style: const TextStyle(fontSize: 12, fontWeight: FontWeight.bold, fontFamily: 'Courier', color: Colors.black),
               ),
               Text(
                 DateFormat('dd/MM/yy HH:mm').format(receiptTime),
-                style: const TextStyle(fontSize: 12, fontFamily: 'Courier', color: Colors.black),
+                style: const TextStyle(fontSize: 12, fontWeight: FontWeight.bold, fontFamily: 'Courier', color: Colors.black),
               ),
             ],
           ),
@@ -191,7 +191,7 @@ class ReceiptWidget extends StatelessWidget {
             children: [
               Text(
                 '${'receipt_label_cashier'.tr(context: context)}: $resolvedCashierName',
-                style: const TextStyle(fontSize: 12, fontFamily: 'Courier', color: Colors.black),
+                style: const TextStyle(fontSize: 12, fontWeight: FontWeight.bold, fontFamily: 'Courier', color: Colors.black),
               ),
             ],
           ),
@@ -207,7 +207,7 @@ class ReceiptWidget extends StatelessWidget {
                 if (activeMemberPhone != null && activeMemberPhone.isNotEmpty)
                   Text(
                     activeMemberPhone,
-                    style: const TextStyle(fontSize: 11, fontFamily: 'Courier', color: Colors.black),
+                    style: const TextStyle(fontSize: 11, fontWeight: FontWeight.bold, fontFamily: 'Courier', color: Colors.black),
                   ),
               ],
             ),
@@ -227,12 +227,12 @@ class ReceiptWidget extends StatelessWidget {
                     flex: 2,
                     child: Text(
                       item.name,
-                      style: const TextStyle(fontSize: 14, fontFamily: 'Courier', color: Colors.black),
+                      style: const TextStyle(fontSize: 14, fontWeight: FontWeight.bold, fontFamily: 'Courier', color: Colors.black),
                     ),
                   ),
                   Text(
                     '${item.qty}x',
-                    style: const TextStyle(fontSize: 14, fontFamily: 'Courier', color: Colors.black),
+                    style: const TextStyle(fontSize: 14, fontWeight: FontWeight.bold, fontFamily: 'Courier', color: Colors.black),
                   ),
                   const SizedBox(width: 8),
                   SizedBox(
@@ -240,7 +240,7 @@ class ReceiptWidget extends StatelessWidget {
                     child: Text(
                       NumberFormat.currency(locale: 'id_ID', symbol: 'Rp', decimalDigits: 0).format(item.subtotal),
                       textAlign: TextAlign.right,
-                      style: const TextStyle(fontSize: 14, fontFamily: 'Courier', color: Colors.black),
+                      style: const TextStyle(fontSize: 14, fontWeight: FontWeight.bold, fontFamily: 'Courier', color: Colors.black),
                     ),
                   ),
                 ],
@@ -251,7 +251,7 @@ class ReceiptWidget extends StatelessWidget {
               padding: const EdgeInsets.symmetric(vertical: 8.0),
               child: Text(
                 'receipt_offline_items_hidden'.tr(context: context),
-                style: const TextStyle(fontSize: 12, fontFamily: 'Courier', fontStyle: FontStyle.italic, color: Colors.black),
+                style: const TextStyle(fontSize: 12, fontWeight: FontWeight.bold, fontFamily: 'Courier', fontStyle: FontStyle.italic, color: Colors.black),
               ),
             ),
             
@@ -266,11 +266,11 @@ class ReceiptWidget extends StatelessWidget {
               children: [
                 Text(
                   'receipt_subtotal'.tr(context: context),
-                  style: const TextStyle(fontSize: 12, fontFamily: 'Courier', color: Colors.black),
+                  style: const TextStyle(fontSize: 12, fontWeight: FontWeight.bold, fontFamily: 'Courier', color: Colors.black),
                 ),
                 Text(
                   NumberFormat.currency(locale: 'id_ID', symbol: 'Rp', decimalDigits: 0).format(grandTotal + (activeMemberDiscount ?? 0) + activePointRedeemAmount),
-                  style: const TextStyle(fontSize: 12, fontFamily: 'Courier', color: Colors.black),
+                  style: const TextStyle(fontSize: 12, fontWeight: FontWeight.bold, fontFamily: 'Courier', color: Colors.black),
                 ),
               ],
             ),
@@ -281,11 +281,11 @@ class ReceiptWidget extends StatelessWidget {
                 children: [
                   Text(
                     'receipt_member_discount'.tr(context: context),
-                    style: const TextStyle(fontSize: 12, fontFamily: 'Courier', color: Colors.black),
+                    style: const TextStyle(fontSize: 12, fontWeight: FontWeight.bold, fontFamily: 'Courier', color: Colors.black),
                   ),
                   Text(
                     '-${NumberFormat.currency(locale: 'id_ID', symbol: 'Rp', decimalDigits: 0).format(activeMemberDiscount)}',
-                    style: const TextStyle(fontSize: 12, fontFamily: 'Courier', color: Colors.black),
+                    style: const TextStyle(fontSize: 12, fontWeight: FontWeight.bold, fontFamily: 'Courier', color: Colors.black),
                   ),
                 ],
               ),
@@ -300,11 +300,11 @@ class ReceiptWidget extends StatelessWidget {
                       context: context,
                       namedArgs: {'points': '$activePointsRedeemed'},
                     ),
-                    style: const TextStyle(fontSize: 12, fontFamily: 'Courier', color: Colors.black),
+                    style: const TextStyle(fontSize: 12, fontWeight: FontWeight.bold, fontFamily: 'Courier', color: Colors.black),
                   ),
                   Text(
                     '-${NumberFormat.currency(locale: 'id_ID', symbol: 'Rp', decimalDigits: 0).format(activePointRedeemAmount)}',
-                    style: const TextStyle(fontSize: 12, fontFamily: 'Courier', color: Colors.black),
+                    style: const TextStyle(fontSize: 12, fontWeight: FontWeight.bold, fontFamily: 'Courier', color: Colors.black),
                   ),
                 ],
               ),
@@ -333,7 +333,7 @@ class ReceiptWidget extends StatelessWidget {
             children: [
               Text(
                 'receipt_payment_method'.tr(context: context),
-                style: const TextStyle(fontSize: 12, fontFamily: 'Courier', color: Colors.black),
+                style: const TextStyle(fontSize: 12, fontWeight: FontWeight.bold, fontFamily: 'Courier', color: Colors.black),
               ),
               Text(
                 activeMethod == 'qris'
@@ -352,11 +352,11 @@ class ReceiptWidget extends StatelessWidget {
               children: [
                 Text(
                   'receipt_cash_received'.tr(context: context),
-                  style: const TextStyle(fontSize: 12, fontFamily: 'Courier', color: Colors.black),
+                  style: const TextStyle(fontSize: 12, fontWeight: FontWeight.bold, fontFamily: 'Courier', color: Colors.black),
                 ),
                 Text(
                   NumberFormat.currency(locale: 'id_ID', symbol: 'Rp', decimalDigits: 0).format(activeReceived),
-                  style: const TextStyle(fontSize: 12, fontFamily: 'Courier', color: Colors.black),
+                  style: const TextStyle(fontSize: 12, fontWeight: FontWeight.bold, fontFamily: 'Courier', color: Colors.black),
                 ),
               ],
             ),
@@ -366,11 +366,11 @@ class ReceiptWidget extends StatelessWidget {
               children: [
                 Text(
                   'receipt_change'.tr(context: context),
-                  style: const TextStyle(fontSize: 12, fontFamily: 'Courier', color: Colors.black),
+                  style: const TextStyle(fontSize: 12, fontWeight: FontWeight.bold, fontFamily: 'Courier', color: Colors.black),
                 ),
                 Text(
                   NumberFormat.currency(locale: 'id_ID', symbol: 'Rp', decimalDigits: 0).format(activeChange ?? (activeReceived - grandTotal)),
-                  style: const TextStyle(fontSize: 12, fontFamily: 'Courier', color: Colors.black),
+                  style: const TextStyle(fontSize: 12, fontWeight: FontWeight.bold, fontFamily: 'Courier', color: Colors.black),
                 ),
               ],
             ),
@@ -383,7 +383,7 @@ class ReceiptWidget extends StatelessWidget {
               children: [
                 Text(
                   'receipt_points_earned'.tr(context: context),
-                  style: const TextStyle(fontSize: 11, fontFamily: 'Courier', color: Colors.black),
+                  style: const TextStyle(fontSize: 11, fontWeight: FontWeight.bold, fontFamily: 'Courier', color: Colors.black),
                 ),
                 Text(
                   '+${(grandTotal / 1000).floor()} ${'receipt_points_unit'.tr(context: context)}',
@@ -396,13 +396,13 @@ class ReceiptWidget extends StatelessWidget {
           const SizedBox(height: 24),
           Text(
             'receipt_thanks'.tr(context: context),
-            style: const TextStyle(fontSize: 12, fontFamily: 'Courier', color: Colors.black),
+            style: const TextStyle(fontSize: 12, fontWeight: FontWeight.bold, fontFamily: 'Courier', color: Colors.black),
           ),
           const SizedBox(height: 8),
           // ZENVI POS sekarang di bawah sebagai branding
           const Text(
             'Powered by Zenvi POS',
-            style: TextStyle(fontSize: 10, fontFamily: 'Courier', color: Colors.black54),
+            style: TextStyle(fontSize: 10, fontWeight: FontWeight.bold, fontFamily: 'Courier', color: Colors.black54),
           ),
         ],
       ),

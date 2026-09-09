@@ -431,6 +431,25 @@ class _POSScreenState extends State<POSScreen> {
         final userId = auth.user?.id ?? 0;
         final companyId = auth.user?.company?['id'];
 
+        // Isi struk disalin SEBELUM checkout. `cart.checkout()` memanggil
+        // `clearCart()` di dalamnya, jadi membaca `cart.finalAmount` /
+        // `cart.items` sesudahnya selalu menghasilkan keranjang kosong —
+        // itulah sebabnya struk tercetak Rp0 tanpa item, untuk semua metode
+        // bayar (tunai, QRIS, maupun transfer).
+        final receiptItems = cart.items
+            .map((e) => {
+                  'name': e.variantName != null
+                      ? '${e.product.name} - ${e.variantName}'
+                      : e.product.name,
+                  'price': e.variantPrice ?? e.product.finalPrice,
+                  'quantity': e.quantity,
+                  'subtotal': e.subtotal,
+                })
+            .toList();
+        final receiptTotal = cart.finalAmount;
+        final receiptMember = cart.selectedMember;
+        final receiptMemberDiscount = cart.memberDiscountAmount;
+
         final success = await cart.checkout(
           shiftId,
           paymentMethod: paymentMethod,
@@ -450,24 +469,21 @@ class _POSScreenState extends State<POSScreen> {
 
           await ReceiptPreviewModal.show(
             context: context,
-            items: cart.items.map((e) => {
-              'name': e.variantName != null ? '${e.product.name} - ${e.variantName}' : e.product.name,
-              'price': e.variantPrice ?? e.product.finalPrice,
-              'quantity': e.quantity,
-              'subtotal': e.subtotal,
-            }).toList(),
-            totalAmount: cart.finalAmount,
+            items: receiptItems,
+            totalAmount: receiptTotal,
             receiptNumber: receiptNum,
             transactionTime: now,
             paymentMethod: paymentMethod,
             cashReceived: cashReceived,
             cashChange: cashChange,
-            member: cart.selectedMember,
-            memberDiscountAmount: cart.memberDiscountAmount,
+            member: receiptMember,
+            memberDiscountAmount: receiptMemberDiscount,
             pointsRedeemed: pointsRedeemed,
             pointRedeemAmount: pointRedeemAmount,
           );
 
+          // `cart.checkout()` sudah membersihkan keranjang; panggilan ini
+          // hanya untuk berjaga kalau ada jalur checkout lain nanti.
           cart.clearCart();
         }
       },

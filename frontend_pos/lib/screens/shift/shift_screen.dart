@@ -1285,7 +1285,7 @@ class _ShiftScreenState extends State<ShiftScreen> {
                               ),
                               const SizedBox(height: 2),
                               Text(
-                                '(Saldo Awal + Penjualan Tunai)',
+                                'shift_physical_cash_formula'.tr(context: context),
                                 style: TextStyle(fontSize: 11, color: theme.colorScheme.onSurfaceVariant),
                               ),
                             ],
@@ -1303,7 +1303,7 @@ class _ShiftScreenState extends State<ShiftScreen> {
                     ),
                     const SizedBox(height: 8),
                     Text(
-                      '💡 QRIS & Transfer langsung masuk ke rekening bank/e-wallet, sehingga tidak dihitung di laci fisik kasir.',
+                      '💡 ${'shift_noncash_drawer_note'.tr(context: context)}',
                       style: TextStyle(fontSize: 11, color: theme.colorScheme.onSurfaceVariant.withValues(alpha: 0.8), fontStyle: FontStyle.italic),
                     ),
                   ],

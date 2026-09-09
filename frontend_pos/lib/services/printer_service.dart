@@ -417,9 +417,31 @@ class PrinterService {
     return ReceiptDocument(
       paperWidthMm: paperWidth,
       maxChars: maxChar,
-      lines: lines,
+      lines: _allBold(lines),
       logo: logo,
     );
+  }
+
+  /// Tebalkan seluruh baris teks struk.
+  ///
+  /// Kepala printer thermal murah — apalagi yang kertasnya sudah lama atau
+  /// baterainya menipis — mencetak font normal jadi abu-abu tipis yang harus
+  /// dimiringkan ke cahaya dulu supaya terbaca. Double-strike menggelapkan
+  /// semua teks dengan biaya satu lintasan tambahan per baris.
+  ///
+  /// Dipasang di sini, bukan di tiap `ReceiptLine.text` di atas, supaya baris
+  /// baru yang ditambahkan nanti ikut tebal tanpa perlu diingat satu per satu.
+  static List<ReceiptLine> _allBold(List<ReceiptLine> lines) {
+    return lines.map((line) {
+      if (line.kind != ReceiptLineKind.text || line.bold) return line;
+      return ReceiptLine.text(
+        line.text,
+        align: line.align,
+        bold: true,
+        doubleHeight: line.doubleHeight,
+        doubleWidth: line.doubleWidth,
+      );
+    }).toList();
   }
 
   /// Terjemahkan dokumen struk ke perintah printer sesuai [mode].
