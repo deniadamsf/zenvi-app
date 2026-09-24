@@ -30,7 +30,7 @@ void main() {
   // 1. Logo penuh (dipakai iOS dan ikon legacy Android)
   final solidImage = img.Image(width: size, height: size, numChannels: 4);
   img.fill(solidImage, color: brandTeal);
-  _drawZenviTriangle(solidImage, size, whiteColor, 0.345, 0.068);
+  drawZenviTriangle(solidImage, size, whiteColor, 0.345, 0.068);
   File('assets/images/logo.png').writeAsBytesSync(img.encodePng(solidImage));
   print('Generated assets/images/logo.png');
 
@@ -48,7 +48,7 @@ void main() {
   // yang perlu benar.
   final foregroundImage = img.Image(width: size, height: size, numChannels: 4);
   img.fill(foregroundImage, color: transparentColor);
-  _drawZenviTriangle(foregroundImage, size, whiteColor, 0.345, 0.068);
+  drawZenviTriangle(foregroundImage, size, whiteColor, 0.345, 0.068);
   File('assets/images/logo_foreground.png').writeAsBytesSync(img.encodePng(foregroundImage));
   print('Generated assets/images/logo_foreground.png');
 
@@ -56,7 +56,7 @@ void main() {
   const splashSize = 512;
   final splashImage = img.Image(width: splashSize, height: splashSize, numChannels: 4);
   img.fill(splashImage, color: transparentColor);
-  _drawZenviTriangle(splashImage, splashSize, whiteColor, 0.335, 0.072);
+  drawZenviTriangle(splashImage, splashSize, whiteColor, 0.335, 0.072);
 
   final splashDir = Directory('android/app/src/main/res/drawable');
   if (!splashDir.existsSync()) splashDir.createSync(recursive: true);
@@ -76,7 +76,7 @@ void main() {
   const storeSize = 512;
   final storeImage = img.Image(width: storeSize, height: storeSize, numChannels: 4);
   img.fill(storeImage, color: brandTeal);
-  _drawZenviTriangle(storeImage, storeSize, whiteColor, 0.345, 0.068);
+  drawZenviTriangle(storeImage, storeSize, whiteColor, 0.345, 0.068);
 
   // Aset toko tinggal di akar repo, sejajar dengan folder aplikasi.
   final storeDir = Directory('../playstore_assets');
@@ -118,13 +118,15 @@ void _patchAdaptiveIconXml() {
 /// begitu garisnya dipertebal - terlihat jelas pada ikon peluncur. Menguji
 /// tiap piksel terhadap dua segitiga sebangun menghasilkan sudut yang benar
 /// tanpa perlu menambal apa pun.
-void _drawZenviTriangle(
+void drawZenviTriangle(
   img.Image image,
   int size,
   img.Color color,
   double paddingFraction,
-  double thicknessFraction,
-) {
+  double thicknessFraction, {
+  double heightRatio = 0.90,
+  double nudgeFraction = -0.015,
+}) {
   final padding = size * paddingFraction;
   final thickness = size * thicknessFraction;
 
@@ -132,7 +134,6 @@ void _drawZenviTriangle(
   //
   // Sempat disetel 1,3 (jangkung) dan hasilnya justru terlihat kurus. Patokan
   // sekarang lambang Play Console: sedikit lebih lebar daripada tinggi.
-  const heightRatio = 0.90;
   final halfWidth = (size - padding * 2) / 2;
   final height = halfWidth * 2 * heightRatio;
   final top = (size - height) / 2;
@@ -150,7 +151,7 @@ void _drawZenviTriangle(
   // titik sudutnya daripada sisi atas yang tumpul, sehingga bentuk yang dipusatkan
   // secara hitungan tetap terlihat melorot. Diukur dari hasil jadinya: ruang atas
   // ~21%, ruang bawah ~17%.
-  final nudge = size * -0.015;
+  final nudge = size * nudgeFraction;
 
   final ax = padding, ay = top + nudge;                    // sudut kiri atas
   final bx = size - padding, by = top + nudge;             // sudut kanan atas

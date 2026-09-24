@@ -20,6 +20,18 @@ Thumbs.db
 *.iws
 .history/
 
+# AI Agent & Assistant files
+.agents/
+.claude/
+.cursor/
+.gemini/
+.copilot/
+.aider*
+.cursorrules
+CLAUDE.md
+AGENTS.md
+GEMINI.md
+
 # ==========================================
 # Laravel Backend Exclusions
 # ==========================================
