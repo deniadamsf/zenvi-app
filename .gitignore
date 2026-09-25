@@ -12,6 +12,11 @@ domains_ls.txt
 .DS_Store
 Thumbs.db
 
+# Deployment Scripts & Credentials
+deploy*.ps1
+deploy*.bat
+deploy*.sh
+
 # IDE & Editor files
 .idea/
 .vscode/
