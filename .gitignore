@@ -12,10 +12,37 @@ domains_ls.txt
 .DS_Store
 Thumbs.db
 
-# Deployment Scripts & Credentials
-deploy*.ps1
-deploy*.bat
-deploy*.sh
+# Deployment Scripts & SSH Credentials
+deploy*
+*.ps1
+*.bat
+*.sh
+*.key
+*.pem
+*.der
+*.cer
+*.crt
+
+# Passwords, Access Notes & Credentials
+*password*.txt
+*password*.md
+*kredensial*
+*credential*
+*akses*.txt
+*akses*.md
+*secret*.txt
+*secret*.md
+*login*.txt
+*login*.md
+database password*
+email & password*
+
+# Database Dumps
+*.sql
+*.sql.gz
+*.sql.zip
+*.dump
+*.bak
 
 # IDE & Editor files
 .idea/
