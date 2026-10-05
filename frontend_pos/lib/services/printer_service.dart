@@ -47,6 +47,29 @@ class ReceiptPaper {
     }
   }
 
+  /// Jumlah karakter per baris yang benar-benar muat untuk [mode].
+  ///
+  /// [maxChars] hanya melihat lebar kertas, padahal yang menentukan muat
+  /// tidaknya satu baris adalah font si printer:
+  /// - ESC/POS tidak mengenal kertas di atas 80mm (Generator memakai `mm80`
+  ///   = 48 kolom), jadi baris 64 kolom untuk kertas 110mm terlipat di
+  ///   printer dan kolom harga jadi berantakan.
+  /// - Font TSPL teks lebih lebar dari Font A ESC/POS, sehingga kolom harga di
+  ///   sisi kanan jatuh di luar kertas kalau barisnya disusun 32/48/64 kolom.
+  static int maxCharsFor(int widthMm, PrintMode mode) {
+    final int normalized = normalize(widthMm);
+    if (mode.language == PrintLanguage.escPos) {
+      return maxChars(normalized > 80 ? 80 : normalized);
+    }
+    if (mode == PrintMode.tsplText) {
+      final int fit = (dotWidth(normalized) - 2 * LabelPrinterService.tsplTextMarginX) ~/
+          LabelPrinterService.tsplTextCharWidth;
+      final int base = maxChars(normalized);
+      return fit < base ? fit : base;
+    }
+    return maxChars(normalized);
+  }
+
   /// Lebar area cetak dalam dot pada kepala printer 203 dpi (8 dot/mm).
   /// Dipakai saat struk dirender sebagai gambar (TSPL/CPCL/raster).
   static int dotWidth(int widthMm) {
@@ -241,6 +264,7 @@ class PrinterService {
       memberPhone: memberPhone,
       memberDiscountAmount: memberDiscountAmount,
       paperWidthMm: paperWidthMm,
+      maxCharsOverride: ReceiptPaper.maxCharsFor(paperWidthMm, mode),
       // Logo hanya diambil kalau modenya memang mengenal bitmap. Mengunduhnya
       // untuk mode teks cuma menambah tunggu 4 detik sebelum struk keluar.
       includeLogo: mode.render == PrintRender.image || mode.language == PrintLanguage.escPos,
@@ -266,9 +290,10 @@ class PrinterService {
     double? memberDiscountAmount,
     int paperWidthMm = ReceiptPaper.defaultWidthMm,
     bool includeLogo = true,
+    int? maxCharsOverride,
   }) async {
     final int paperWidth = ReceiptPaper.normalize(paperWidthMm);
-    final int maxChar = ReceiptPaper.maxChars(paperWidth);
+    final int maxChar = maxCharsOverride ?? ReceiptPaper.maxChars(paperWidth);
     final lines = <ReceiptLine>[];
 
     final safeCompany = company ?? {'name': 'toko_saya_9'.tr()};
@@ -614,8 +639,16 @@ class PrinterService {
                 : margin;
             _drawText(canvas, line.text, bigFont, x, y, black, bold: line.bold);
           } else {
-            final font = line.doubleHeight ? bigFont : baseFont;
-            _drawMonospace(canvas, line.text, font, margin, y, cellWidth, black, bold: line.bold);
+            // Perataan dihitung dalam satuan sel supaya baris tengah/kanan
+            // tetap berada di kisi yang sama dengan kolom harga. Sebelumnya
+            // perataan diabaikan: alamat, ucapan terima kasih, dan "Powered
+            // by" semuanya menempel ke kiri.
+            final int x = margin + _alignOffsetCells(line, doc.maxChars) * cellWidth;
+            if (line.doubleHeight) {
+              _drawTallMonospace(canvas, line.text, baseFont, x, y, cellWidth, black, bold: line.bold);
+            } else {
+              _drawMonospace(canvas, line.text, baseFont, x, y, cellWidth, black, bold: line.bold);
+            }
           }
           break;
       }
@@ -674,8 +707,52 @@ class PrinterService {
       case ReceiptLineKind.rule:
         return base.lineHeight;
       case ReceiptLineKind.text:
-        return (line.doubleHeight || line.doubleWidth) ? big.lineHeight : base.lineHeight;
+        if (line.doubleWidth) return big.lineHeight;
+        if (line.doubleHeight) return base.lineHeight * 2;
+        return base.lineHeight;
     }
+  }
+
+  /// Geseran awal baris (dalam sel) sesuai perataannya.
+  static int _alignOffsetCells(ReceiptLine line, int maxChars) {
+    final int free = maxChars - line.text.length;
+    if (free <= 0) return 0;
+    switch (line.align) {
+      case ReceiptAlign.left:
+        return 0;
+      case ReceiptAlign.center:
+        return free ~/ 2;
+      case ReceiptAlign.right:
+        return free;
+    }
+  }
+
+  /// Tulis teks monospace dengan tinggi dua kali lipat, meniru mode
+  /// double-height ESC/POS: lebar per karakter tetap satu sel.
+  ///
+  /// Dulu baris seperti TOTAL digambar dengan font yang lebih besar tapi
+  /// tetap di kisi sel font kecil, sehingga hurufnya saling tumpuk.
+  static void _drawTallMonospace(
+    img.Image canvas,
+    String text,
+    img.BitmapFont font,
+    int x,
+    int y,
+    int cellWidth,
+    img.Color color, {
+    bool bold = false,
+  }) {
+    if (text.isEmpty) return;
+    final strip = img.Image(width: text.length * cellWidth + 2, height: font.lineHeight);
+    img.fill(strip, color: img.ColorRgb8(255, 255, 255));
+    _drawMonospace(strip, text, font, 0, 0, cellWidth, color, bold: bold);
+    final tall = img.copyResize(
+      strip,
+      width: strip.width,
+      height: strip.height * 2,
+      interpolation: img.Interpolation.nearest,
+    );
+    img.compositeImage(canvas, tall, dstX: x, dstY: y);
   }
 
   /// Font terbesar yang satu karakternya masih muat dalam satu sel.

@@ -118,6 +118,14 @@ class LabelPrinterService {
     return bytes;
   }
 
+  /// Font bawaan TSPL yang dipakai mode teks: "2" = 12x20 dot, selebar Font A
+  /// ESC/POS. Font "3" (16x24) yang dulu dipakai hanya memuat ~21 kolom di
+  /// kertas 58mm, jadi kolom harga di kanan terpotong keluar kertas.
+  static const String tsplTextFont = '2';
+  static const int tsplTextCharWidth = 12;
+  static const int tsplTextMarginX = 24;
+  static const int tsplTextLineStep = 28;
+
   /// Perintah TSPL memakai font bawaan printer (tanpa bitmap).
   ///
   /// Payload-nya hanya puluhan byte, jadi tes ini bebas dari masalah
@@ -130,8 +138,8 @@ class LabelPrinterService {
     int y = 24;
     for (final line in lines) {
       final safe = line.replaceAll('"', "'");
-      bytes.addAll(latin1.encode('TEXT 24,$y,"3",0,1,1,"$safe"\r\n'));
-      y += 40;
+      bytes.addAll(latin1.encode('TEXT $tsplTextMarginX,$y,"$tsplTextFont",0,1,1,"$safe"\r\n'));
+      y += tsplTextLineStep;
     }
 
     bytes.addAll(latin1.encode('PRINT 1,1\r\n'));
