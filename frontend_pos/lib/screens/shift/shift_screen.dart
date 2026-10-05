@@ -31,6 +31,7 @@ class _ShiftScreenState extends State<ShiftScreen> {
   bool _isProcessingSelfie = false;
   bool _isLocationValid = false;
   bool _isCheckingLocation = false;
+  bool _isSubmittingShift = false;
 
   @override
   void initState() {
@@ -488,6 +489,8 @@ class _ShiftScreenState extends State<ShiftScreen> {
   }
 
   Future<void> _openShift() async {
+    if (_isSubmittingShift || context.read<ShiftProvider>().isLoading) return;
+
     final auth = context.read<AuthProvider>();
     final user = auth.user;
     final isOwner = user?.role == 'owner_5'.tr(context: context);
@@ -519,17 +522,21 @@ class _ShiftScreenState extends State<ShiftScreen> {
     final token = auth.token;
     if (token == null) return;
 
-    Position? position;
-    if (requireAttendance && !isOwner) {
-      if (!_isLocationValid) {
-        await _checkLocation();
-        if (!_isLocationValid) return;
-      }
-      position = await _getSafePosition();
-    }
+    setState(() {
+      _isSubmittingShift = true;
+    });
 
-    if (!mounted) return;
     try {
+      Position? position;
+      if (requireAttendance && !isOwner) {
+        if (!_isLocationValid) {
+          await _checkLocation();
+          if (!_isLocationValid) return;
+        }
+        position = await _getSafePosition();
+      }
+
+      if (!mounted) return;
       final success = await context.read<ShiftProvider>().startShift(
         token,
         openingBalance,
@@ -557,6 +564,12 @@ class _ShiftScreenState extends State<ShiftScreen> {
             SnackBar(content: Text(errorMsg), backgroundColor: AppColors.dangerFill),
           );
         }
+      }
+    } finally {
+      if (mounted) {
+        setState(() {
+          _isSubmittingShift = false;
+        });
       }
     }
   }
@@ -701,10 +714,15 @@ class _ShiftScreenState extends State<ShiftScreen> {
   }
 
   Future<void> _processCloseShift(List<Map<String, dynamic>> opnameData) async {
+    if (_isSubmittingShift || context.read<ShiftProvider>().isLoading) return;
     final provider = context.read<ShiftProvider>();
     final auth = context.read<AuthProvider>();
     final token = auth.token;
     if (token == null || provider.activeShift == null) return;
+
+    setState(() {
+      _isSubmittingShift = true;
+    });
 
     final isOwner = auth.user?.role == 'owner_5'.tr(context: context);
     final isCashierOrOwner = isOwner || (auth.user?.canAccessPos ?? false);
@@ -740,8 +758,14 @@ class _ShiftScreenState extends State<ShiftScreen> {
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(e.toString()), backgroundColor: AppColors.dangerFill),
+          SnackBar(content: Text(e.toString().replaceAll('Exception: ', '')), backgroundColor: AppColors.dangerFill),
         );
+      }
+    } finally {
+      if (mounted) {
+        setState(() {
+          _isSubmittingShift = false;
+        });
       }
     }
   }
@@ -753,7 +777,7 @@ class _ShiftScreenState extends State<ShiftScreen> {
     final provider = context.watch<ShiftProvider>();
     final isShiftOpen = provider.activeShift != null;
 
-    if (provider.isLoading && !isShiftOpen && _openingBalanceController.text.isEmpty) {
+    if (provider.isLoading && !isShiftOpen && !_isSubmittingShift && _openingBalanceController.text.isEmpty) {
       return Scaffold(backgroundColor: theme.scaffoldBackgroundColor, body: const Center(child: CircularProgressIndicator()));
     }
 
@@ -1069,14 +1093,16 @@ class _ShiftScreenState extends State<ShiftScreen> {
               width: double.infinity,
               height: 52,
               child: ElevatedButton(
-                onPressed: provider.isLoading ? null : _openShift,
+                onPressed: (_isSubmittingShift || provider.isLoading) ? null : _openShift,
                 style: ElevatedButton.styleFrom(
                   backgroundColor: theme.colorScheme.primary,
                   foregroundColor: theme.colorScheme.onPrimary,
+                  disabledBackgroundColor: theme.colorScheme.primary.withValues(alpha: 0.6),
+                  disabledForegroundColor: Colors.white,
                   shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
                   elevation: 0,
                 ),
-                child: provider.isLoading 
+                child: (_isSubmittingShift || provider.isLoading)
                   ? const SizedBox(width: 22, height: 22, child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2.5))
                   : Text('open_shift'.tr(), style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
               ),
@@ -1415,17 +1441,19 @@ class _ShiftScreenState extends State<ShiftScreen> {
             width: double.infinity,
             height: 50,
             child: ElevatedButton.icon(
-              onPressed: provider.isLoading ? null : _showCloseShiftDialog,
+              onPressed: (_isSubmittingShift || provider.isLoading) ? null : _showCloseShiftDialog,
               style: ElevatedButton.styleFrom(
                 backgroundColor: theme.colorScheme.error,
                 foregroundColor: theme.colorScheme.onError,
+                disabledBackgroundColor: theme.colorScheme.error.withValues(alpha: 0.6),
+                disabledForegroundColor: Colors.white,
                 shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
                 elevation: 0,
               ),
-              icon: provider.isLoading 
+              icon: (_isSubmittingShift || provider.isLoading)
                 ? const SizedBox.shrink()
                 : const Icon(Icons.lock_rounded, size: 18),
-              label: provider.isLoading
+              label: (_isSubmittingShift || provider.isLoading)
                 ? const SizedBox(width: 22, height: 22, child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2.5))
                 : Text('close_shift'.tr(), style: const TextStyle(fontSize: 15, fontWeight: FontWeight.bold)),
             ),
