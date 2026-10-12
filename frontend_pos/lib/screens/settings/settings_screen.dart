@@ -11,6 +11,7 @@ import 'employee_settings_screen.dart';
 import 'store_settings_screen.dart';
 import 'payment_settings_screen.dart';
 import '../../widgets/zenvi_header.dart';
+import '../../services/review_service.dart';
 
 class SettingsScreen extends StatefulWidget {
   const SettingsScreen({super.key});
@@ -208,6 +209,17 @@ class _SettingsScreenState extends State<SettingsScreen> {
                           },
                         ).animate().fade(delay: 180.ms).slideY(begin: 0.1, end: 0),
                         
+                        const SizedBox(height: 16),
+
+                        // Beri Nilai / Ulasan di Google Play
+                        _buildSettingsCard(
+                          theme: theme,
+                          title: 'rate_app_title'.tr(context: context),
+                          subtitle: 'rate_app_subtitle'.tr(context: context),
+                          icon: Icons.star_rounded,
+                          onTap: () => ReviewService.openStoreListing(),
+                        ).animate().fade(delay: 200.ms).slideY(begin: 0.1, end: 0),
+
                         const SizedBox(height: 32),
                         
                         // Logout

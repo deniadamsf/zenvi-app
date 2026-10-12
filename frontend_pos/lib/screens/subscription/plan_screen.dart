@@ -9,6 +9,7 @@ import 'package:provider/provider.dart';
 import '../../providers/auth_provider.dart';
 import '../../services/api_client.dart';
 import '../../services/billing_service.dart';
+import '../../services/review_service.dart';
 import '../../theme/app_colors.dart';
 import '../../widgets/zenvi_header.dart';
 import 'plan_card.dart';
@@ -82,6 +83,9 @@ class _PlanScreenState extends State<PlanScreen> {
           if (!mounted) return;
           _snack('purchase_success'.tr(context: context));
           _load();
+          Future.delayed(const Duration(seconds: 2), () {
+            ReviewService.requestReviewAfterTrial();
+          });
         } else {
           _snack('purchase_unverified'.tr(context: context));
         }

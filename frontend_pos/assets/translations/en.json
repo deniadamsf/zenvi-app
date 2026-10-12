@@ -1467,6 +1467,8 @@
     "plan_trial_cancel_hint": "Free for the first 7 days. Cancel anytime in Google Play.",
     "plan_trial_active_title": "Free Trial Active",
     "plan_trial_expires_on": "Free trial ends on {date}",
+    "rate_app_title": "Rate on Google Play",
+    "rate_app_subtitle": "Help Zenvi grow by leaving a 5-star rating and review",
     "plan_includes_title": "What's included",
     "plan_all_free_included": "Everything in the Free plan",
     "plan_billing_monthly": "Monthly",
