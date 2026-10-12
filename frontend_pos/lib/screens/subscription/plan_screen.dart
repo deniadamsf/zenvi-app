@@ -258,7 +258,10 @@ class _PlanScreenState extends State<PlanScreen> {
               mainAxisSize: MainAxisSize.min,
               children: [
                 Text(
-                  'plan_status_label'.tr(context: context).toUpperCase(),
+                  (auth.planStatus == 'trialing'
+                          ? 'plan_trial_active_title'.tr(context: context)
+                          : 'plan_status_label'.tr(context: context))
+                      .toUpperCase(),
                   style: TextStyle(
                     fontSize: 9.5,
                     fontWeight: FontWeight.w800,
@@ -268,7 +271,7 @@ class _PlanScreenState extends State<PlanScreen> {
                 ),
                 const SizedBox(height: 2),
                 Text(
-                  planName,
+                  auth.planStatus == 'trialing' ? '$planName (Trial)' : planName,
                   style: TextStyle(
                     fontSize: 15,
                     fontWeight: FontWeight.w800,
@@ -279,7 +282,10 @@ class _PlanScreenState extends State<PlanScreen> {
                 if (!onFree && expiry != null) ...[
                   const SizedBox(height: 1),
                   Text(
-                    'plan_expires_on'.tr(context: context, namedArgs: {
+                    (auth.planStatus == 'trialing'
+                            ? 'plan_trial_expires_on'
+                            : 'plan_expires_on')
+                        .tr(context: context, namedArgs: {
                       'date': DateFormat('d MMM yyyy', context.locale.languageCode).format(expiry),
                     }),
                     style: TextStyle(fontSize: 11, color: theme.colorScheme.onSurfaceVariant),

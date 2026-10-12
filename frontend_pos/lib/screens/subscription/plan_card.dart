@@ -158,6 +158,36 @@ class PlanCard extends StatelessWidget {
           ),
           const SizedBox(height: 10),
           _buildPriceLine(theme, isPaid),
+          if (isPaid) ...[
+            const SizedBox(height: 8),
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+              decoration: BoxDecoration(
+                color: Colors.white.withValues(alpha: 0.18),
+                borderRadius: BorderRadius.circular(8),
+                border: Border.all(
+                  color: AppColors.premiumBright.withValues(alpha: 0.4),
+                  width: 1,
+                ),
+              ),
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  const Icon(Icons.stars_rounded, size: 14, color: AppColors.premiumGlow),
+                  const SizedBox(width: 5),
+                  Text(
+                    'plan_free_trial_badge'.tr(),
+                    style: const TextStyle(
+                      color: Colors.white,
+                      fontSize: 11.5,
+                      fontWeight: FontWeight.w700,
+                      letterSpacing: 0.2,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
         ],
       ),
     );
@@ -497,24 +527,39 @@ class PlanCard extends StatelessWidget {
       );
     }
 
-    return SizedBox(
-      width: double.infinity,
-      child: FilledButton.icon(
-        onPressed: purchasing ? null : onBuy,
-        style: FilledButton.styleFrom(
-          padding: const EdgeInsets.symmetric(vertical: 15),
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
-          textStyle: const TextStyle(fontSize: 15, fontWeight: FontWeight.w700),
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        SizedBox(
+          width: double.infinity,
+          child: FilledButton.icon(
+            onPressed: purchasing ? null : onBuy,
+            style: FilledButton.styleFrom(
+              padding: const EdgeInsets.symmetric(vertical: 15),
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
+              textStyle: const TextStyle(fontSize: 15, fontWeight: FontWeight.w700),
+            ),
+            icon: purchasing
+                ? const SizedBox(
+                    width: 17,
+                    height: 17,
+                    child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white),
+                  )
+                : const Icon(Icons.workspace_premium_rounded, size: 19),
+            label: Text('plan_start_free_trial'.tr(namedArgs: {'plan': name})),
+          ),
         ),
-        icon: purchasing
-            ? const SizedBox(
-                width: 17,
-                height: 17,
-                child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white),
-              )
-            : const Icon(Icons.workspace_premium_rounded, size: 19),
-        label: Text('plan_upgrade_to'.tr(namedArgs: {'plan': name})),
-      ),
+        const SizedBox(height: 8),
+        Text(
+          'plan_trial_cancel_hint'.tr(),
+          textAlign: TextAlign.center,
+          style: TextStyle(
+            fontSize: 11,
+            color: theme.colorScheme.onSurfaceVariant,
+            height: 1.3,
+          ),
+        ),
+      ],
     );
   }
 }
